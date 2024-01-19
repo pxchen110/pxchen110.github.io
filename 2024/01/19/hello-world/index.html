@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.\nQuick StartCreate a new post1$ hexo new &quot;My New Post&quot;\n\nMore info: Writing\nRun server1$ hexo server\n\nMore info: Server\nGenerate static files1$ hexo generate\n\nMore info: Generating\nDeploy to remote sites1$ hexo deploy\n\nMore info: Deployment\n","dateCreated":"2024-01-19T15:11:43+08:00","dateModified":"2024-01-19T15:11:43+08:00","datePublished":"2024-01-19T15:11:43+08:00","description":"","headline":"Hello World","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/2024/01/19/hello-world/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"https://pxchen110.github.io/2024/01/19/hello-world/"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"],"image":"author_img.jpg"},"articleBody":"Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.\nQuick StartCreate a new post1$ hexo new &quot;My New Post&quot;\n\nMore info: Writing\nRun server1$ hexo server\n\nMore info: Server\nGenerate static files1$ hexo generate\n\nMore info: Generating\nDeploy to remote sites1$ hexo deploy\n\nMore info: Deployment\n","dateCreated":"2024-01-19T15:11:43+08:00","dateModified":"2024-01-19T15:11:43+08:00","datePublished":"2024-01-19T15:11:43+08:00","description":"","headline":"Hello World","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/2024/01/19/hello-world/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/2024/01/19/hello-world/"}</script>
     <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Hello World">
@@ -35,6 +35,8 @@
     
         
     
+    
+        <meta property="og:image" content="https://pxchen110.github.io/assets/images/author_img.jpg"/>
     
     
     
@@ -59,6 +61,10 @@
 
 
     
+        
+            
+        
+    
 
 <header id="header" data-behavior="4">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
@@ -76,9 +82,11 @@
             <a
                 class="header-right-picture "
                 href="#about"
-                aria-label="Öffne den Link: /#about"
+                aria-label="Abre el enlace: /#about"
             >
         
+        
+            <img class="header-picture" src="/assets/images/author_img.jpg" alt="Foto de autor"/>
         
         </a>
     
@@ -87,8 +95,26 @@
             <!-- Define author's picture -->
 
 
+
+        
+    
+
 <nav id="sidebar" data-behavior="4">
     <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Leer más sobre el autor."
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/author_img.jpg" alt="Foto de autor"/>
+                </a>
+                <h4 class="sidebar-profile-name">Xuan Chen</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
         
         
             <ul class="sidebar-buttons">
@@ -100,10 +126,10 @@
                             href="/"
                             
                             rel="noopener"
-                            title="Home"
+                            title="Inicio"
                         >
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Home</span>
+                        <span class="sidebar-button-desc">Inicio</span>
                     </a>
             </li>
             
@@ -114,10 +140,10 @@
                             href="/all-categories"
                             
                             rel="noopener"
-                            title="Kategorien"
+                            title="Categorías"
                         >
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Kategorien</span>
+                        <span class="sidebar-button-desc">Categorías</span>
                     </a>
             </li>
             
@@ -128,10 +154,10 @@
                             href="/all-tags"
                             
                             rel="noopener"
-                            title="Tags"
+                            title="Etiquetas"
                         >
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Tags</span>
+                        <span class="sidebar-button-desc">Etiquetas</span>
                     </a>
             </li>
             
@@ -142,10 +168,10 @@
                             href="/all-archives"
                             
                             rel="noopener"
-                            title="Archiv"
+                            title="Archivos"
                         >
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Archiv</span>
+                        <span class="sidebar-button-desc">Archivos</span>
                     </a>
             </li>
             
@@ -156,10 +182,10 @@
                             href="#search"
                             
                             rel="noopener"
-                            title="Suche"
+                            title="Buscar"
                         >
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Suche</span>
+                        <span class="sidebar-button-desc">Buscar</span>
                     </a>
             </li>
             
@@ -170,10 +196,10 @@
                             href="#about"
                             
                             rel="noopener"
-                            title="Über"
+                            title="Acerca de"
                         >
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Über</span>
+                        <span class="sidebar-button-desc">Acerca de</span>
                     </a>
             </li>
             
@@ -284,10 +310,10 @@
                             href="/mailto"
                             
                             rel="noopener"
-                            title="E-Mail"
+                            title="Correo"
                         >
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">E-Mail</span>
+                        <span class="sidebar-button-desc">Correo</span>
                     </a>
             </li>
             
@@ -378,7 +404,7 @@
                     >
                         
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
-                        <span class="hide-xs hide-sm text-small icon-ml">FRÜHER</span>
+                        <span class="hide-xs hide-sm text-small icon-ml">ANTERIOR</span>
                     </a>
             </li>
             <li class="post-action">
@@ -388,7 +414,7 @@
                         aria-hidden="true"
                     >
                         
-                        <span class="hide-xs hide-sm text-small icon-mr">NÄCHSTER</span>
+                        <span class="hide-xs hide-sm text-small icon-mr">SIGUIENTE</span>
                         <i class="fa fa-angle-right" aria-hidden="true"></i>
                     </a>
             </li>
@@ -411,8 +437,8 @@
                 <a
                     class="post-action-btn btn btn--default"
                     target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/01/19/hello-world/"
-                    title="Teilen auf Facebook"
-                    aria-label="Teilen auf Facebook"
+                    title="Compartir en Facebook"
+                    aria-label="Compartir en Facebook"
                 >
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
@@ -424,8 +450,8 @@
                 <a
                     class="post-action-btn btn btn--default"
                     target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/01/19/hello-world/"
-                    title="Teilen auf Twitter"
-                    aria-label="Teilen auf Twitter"
+                    title="Compartir en Twitter"
+                    aria-label="Compartir en Twitter"
                 >
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
@@ -437,8 +463,8 @@
                 <a
                     class="post-action-btn btn btn--default"
                     target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/01/19/hello-world/"
-                    title="Teilen auf Google Plus"
-                    aria-label="Teilen auf Google Plus"
+                    title="Compartir en Google+"
+                    aria-label="Compartir en Google+"
                 >
                     <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
@@ -487,7 +513,7 @@
                     >
                         
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
-                        <span class="hide-xs hide-sm text-small icon-ml">FRÜHER</span>
+                        <span class="hide-xs hide-sm text-small icon-ml">ANTERIOR</span>
                     </a>
             </li>
             <li class="post-action">
@@ -497,7 +523,7 @@
                         aria-hidden="true"
                     >
                         
-                        <span class="hide-xs hide-sm text-small icon-mr">NÄCHSTER</span>
+                        <span class="hide-xs hide-sm text-small icon-mr">SIGUIENTE</span>
                         <i class="fa fa-angle-right" aria-hidden="true"></i>
                     </a>
             </li>
@@ -520,8 +546,8 @@
                 <a
                     class="post-action-btn btn btn--default"
                     target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/01/19/hello-world/"
-                    title="Teilen auf Facebook"
-                    aria-label="Teilen auf Facebook"
+                    title="Compartir en Facebook"
+                    aria-label="Compartir en Facebook"
                 >
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
@@ -533,8 +559,8 @@
                 <a
                     class="post-action-btn btn btn--default"
                     target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/01/19/hello-world/"
-                    title="Teilen auf Twitter"
-                    aria-label="Teilen auf Twitter"
+                    title="Compartir en Twitter"
+                    aria-label="Compartir en Twitter"
                 >
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
@@ -546,8 +572,8 @@
                 <a
                     class="post-action-btn btn btn--default"
                     target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/01/19/hello-world/"
-                    title="Teilen auf Google Plus"
-                    aria-label="Teilen auf Google Plus"
+                    title="Compartir en Google+"
+                    aria-label="Compartir en Google+"
                 >
                     <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
@@ -580,9 +606,9 @@
                         class="share-option-btn"
                         target="new"
                         href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/01/19/hello-world/"
-                        aria-label="Teilen auf Facebook"
+                        aria-label="Compartir en Facebook"
                     >
-                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Teilen auf Facebook</span>
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Compartir en Facebook</span>
                     </a>
                 </li>
             
@@ -593,9 +619,9 @@
                         class="share-option-btn"
                         target="new"
                         href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/01/19/hello-world/"
-                        aria-label="Teilen auf Twitter"
+                        aria-label="Compartir en Twitter"
                     >
-                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Teilen auf Twitter</span>
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Compartir en Twitter</span>
                     </a>
                 </li>
             
@@ -606,9 +632,9 @@
                         class="share-option-btn"
                         target="new"
                         href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/01/19/hello-world/"
-                        aria-label="Teilen auf Google Plus"
+                        aria-label="Compartir en Google+"
                     >
-                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Teilen auf Google Plus</span>
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Compartir en Google+</span>
                     </a>
                 </li>
             
@@ -621,11 +647,17 @@
         
 
 
+    
+        
+    
+
 <div id="about">
     <div id="about-card">
         <div id="about-btn-close">
             <i class="fa fa-times"></i>
         </div>
+        
+            <img id="about-card-picture" src="/assets/images/author_img.jpg" alt="Foto de autor"/>
         
             <h4 id="about-card-name">Xuan Chen</h4>
         
@@ -661,7 +693,7 @@
             </form>
         </div>
         <div class="modal-body">
-            <div class="no-result text-color-light text-center">keinen Beitrag gefunden</div>
+            <div class="no-result text-color-light text-center">no se encontraron artículos</div>
             <div class="results">
                 
                 <div class="media">
@@ -691,10 +723,10 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium"
-                data-message-zero="keinen Beitrag gefunden"
-                data-message-one="1 Beitrag gefunden"
-                data-message-other="{n} Einträge gefunden">
-                1 Beitrag gefunden
+                data-message-zero="no se encontraron artículos"
+                data-message-one="1 artículo encontrado"
+                data-message-other="{n} artículos encontrados">
+                1 artículo encontrado
             </p>
         </div>
     </div>

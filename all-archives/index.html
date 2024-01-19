@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"Website","@id":"https://pxchen110.github.io","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"name":"Xuan's Blog","description":"","url":"https://pxchen110.github.io","keywords":"hexo, javascript"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"Website","@id":"https://pxchen110.github.io","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"],"image":"author_img.jpg"},"name":"Xuan's Blog","description":"","url":"https://pxchen110.github.io","keywords":"hexo, javascript"}</script>
     <meta property="og:type" content="blog">
 <meta property="og:title" content="all-archives">
 <meta property="og:url" content="https://pxchen110.github.io/all-archives/index.html">
@@ -33,6 +33,8 @@
     
         
     
+    
+        <meta property="og:image" content="https://pxchen110.github.io/assets/images/author_img.jpg"/>
     
     
     
@@ -55,6 +57,10 @@
 
 
     
+        
+            
+        
+    
 
 <header id="header" data-behavior="1">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
@@ -72,9 +78,11 @@
             <a
                 class="header-right-picture "
                 href="#about"
-                aria-label="Öffne den Link: /#about"
+                aria-label="Abre el enlace: /#about"
             >
         
+        
+            <img class="header-picture" src="/assets/images/author_img.jpg" alt="Foto de autor"/>
         
         </a>
     
@@ -83,8 +91,26 @@
             <!-- Define author's picture -->
 
 
+
+        
+    
+
 <nav id="sidebar" data-behavior="1">
     <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Leer más sobre el autor."
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/author_img.jpg" alt="Foto de autor"/>
+                </a>
+                <h4 class="sidebar-profile-name">Xuan Chen</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
         
         
             <ul class="sidebar-buttons">
@@ -96,10 +122,10 @@
                             href="/"
                             
                             rel="noopener"
-                            title="Home"
+                            title="Inicio"
                         >
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Home</span>
+                        <span class="sidebar-button-desc">Inicio</span>
                     </a>
             </li>
             
@@ -110,10 +136,10 @@
                             href="/all-categories"
                             
                             rel="noopener"
-                            title="Kategorien"
+                            title="Categorías"
                         >
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Kategorien</span>
+                        <span class="sidebar-button-desc">Categorías</span>
                     </a>
             </li>
             
@@ -124,10 +150,10 @@
                             href="/all-tags"
                             
                             rel="noopener"
-                            title="Tags"
+                            title="Etiquetas"
                         >
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Tags</span>
+                        <span class="sidebar-button-desc">Etiquetas</span>
                     </a>
             </li>
             
@@ -138,10 +164,10 @@
                             href="/all-archives"
                             
                             rel="noopener"
-                            title="Archiv"
+                            title="Archivos"
                         >
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Archiv</span>
+                        <span class="sidebar-button-desc">Archivos</span>
                     </a>
             </li>
             
@@ -152,10 +178,10 @@
                             href="#search"
                             
                             rel="noopener"
-                            title="Suche"
+                            title="Buscar"
                         >
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Suche</span>
+                        <span class="sidebar-button-desc">Buscar</span>
                     </a>
             </li>
             
@@ -166,10 +192,10 @@
                             href="#about"
                             
                             rel="noopener"
-                            title="Über"
+                            title="Acerca de"
                         >
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Über</span>
+                        <span class="sidebar-button-desc">Acerca de</span>
                     </a>
             </li>
             
@@ -280,10 +306,10 @@
                             href="/mailto"
                             
                             rel="noopener"
-                            title="E-Mail"
+                            title="Correo"
                         >
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">E-Mail</span>
+                        <span class="sidebar-button-desc">Correo</span>
                     </a>
             </li>
             
@@ -318,12 +344,12 @@
                 
 <div id="archives" class="main-content-wrap">
     <form id="filter-form" action="#">
-        <input name="date" type="text" class="form-control input--xlarge" placeholder="Such Datum (YYYY/MM/DD)" autofocus="autofocus">
+        <input name="date" type="text" class="form-control input--xlarge" placeholder="Buscar fecha (YYYY/MM/DD)" autofocus="autofocus">
     </form>
     <h5 class="archive-result text-color-base text-xlarge"
-        data-message-zero="keinen Beitrag gefunden"
-        data-message-one="1 Beitrag gefunden"
-        data-message-other="{n} Einträge gefunden"></h5>
+        data-message-zero="no se encontraron artículos"
+        data-message-one="1 artículo encontrado"
+        data-message-other="{n} artículos encontrados"></h5>
     <section class="boxes">
         
             
@@ -364,11 +390,17 @@
         
 
 
+    
+        
+    
+
 <div id="about">
     <div id="about-card">
         <div id="about-btn-close">
             <i class="fa fa-times"></i>
         </div>
+        
+            <img id="about-card-picture" src="/assets/images/author_img.jpg" alt="Foto de autor"/>
         
             <h4 id="about-card-name">Xuan Chen</h4>
         
@@ -404,7 +436,7 @@
             </form>
         </div>
         <div class="modal-body">
-            <div class="no-result text-color-light text-center">keinen Beitrag gefunden</div>
+            <div class="no-result text-color-light text-center">no se encontraron artículos</div>
             <div class="results">
                 
                 <div class="media">
@@ -434,10 +466,10 @@
         </div>
         <div class="modal-footer">
             <p class="results-count text-medium"
-                data-message-zero="keinen Beitrag gefunden"
-                data-message-one="1 Beitrag gefunden"
-                data-message-other="{n} Einträge gefunden">
-                1 Beitrag gefunden
+                data-message-zero="no se encontraron artículos"
+                data-message-one="1 artículo encontrado"
+                data-message-other="{n} artículos encontrados">
+                1 artículo encontrado
             </p>
         </div>
     </div>
