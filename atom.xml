@@ -6,7 +6,7 @@
   <link href="https://pxchen110.github.io/atom.xml" rel="self"/>
   
   <link href="https://pxchen110.github.io/"/>
-  <updated>2024-01-19T07:11:43.889Z</updated>
+  <updated>2024-01-20T05:32:38.582Z</updated>
   <id>https://pxchen110.github.io/</id>
   
   <author>
@@ -17,18 +17,18 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>Hello World</title>
-    <link href="https://pxchen110.github.io/2024/01/19/hello-world/"/>
-    <id>https://pxchen110.github.io/2024/01/19/hello-world/</id>
-    <published>2024-01-19T07:11:43.889Z</published>
-    <updated>2024-01-19T07:11:43.889Z</updated>
+    <title>Introduction</title>
+    <link href="https://pxchen110.github.io/2024/01/20/introduction/"/>
+    <id>https://pxchen110.github.io/2024/01/20/introduction/</id>
+    <published>2024-01-19T16:00:00.000Z</published>
+    <updated>2024-01-20T05:32:38.582Z</updated>
     
-    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
+    <content type="html"><![CDATA[<h2 id="自我介紹"><a href="#自我介紹" class="headerlink" title="自我介紹"></a>自我介紹</h2><p>Hello World!<br>這是我的第一篇(類似酒精路跑的開頭XD)<br>簡單的自我介紹，生物資訊背景，隨著接觸的程式語言增加對前端產生興趣並開始自學程式精進。<br>主要使用語言: Linux, Python, R, HTML, CSS, JavaScript<br>平時喜好閱讀、音樂廣播、電影，有機會也會分享心得體會。</p><p>為何想寫部落格? 在學習過程中，從很多大神的blog獲得知識，因此希望將這個部落格當成是我的學習筆記，在撰寫同時能疏理邏輯脈絡，內化更有效率，此外也記錄一些coding過程遇到的問題，和debug的方法，以後有人遇到類似問題可以快速避坑（避坑避雷你我有責XD）</p><p>最後點播一首張敬軒的My Way，我的副標題亦是取自歌詞 “Baby長大以後就是小軒~”<br>用心去追，感覺就對，I will find my way</p>]]></content>
     
     
       
       
-    <summary type="html">&lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.io/docs/&quot;&gt;documentation&lt;/a&gt; for</summary>
+    <summary type="html">&lt;h2 id=&quot;自我介紹&quot;&gt;&lt;a href=&quot;#自我介紹&quot; class=&quot;headerlink&quot; title=&quot;自我介紹&quot;&gt;&lt;/a&gt;自我介紹&lt;/h2&gt;&lt;p&gt;Hello World!&lt;br&gt;這是我的第一篇(類似酒精路跑的開頭XD)&lt;br&gt;簡單的自我介紹，生物資訊背景，隨著接觸的程式</summary>
       
     
     
