@@ -6,7 +6,7 @@
   <link href="https://pxchen110.github.io/atom.xml" rel="self"/>
   
   <link href="https://pxchen110.github.io/"/>
-  <updated>2024-01-30T14:33:29.469Z</updated>
+  <updated>2024-02-08T13:21:24.094Z</updated>
   <id>https://pxchen110.github.io/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>HTML+CSS成果展(1)：可愛貓咪網站</title>
+    <link href="https://pxchen110.github.io/2024/02/08/20240208/"/>
+    <id>https://pxchen110.github.io/2024/02/08/20240208/</id>
+    <published>2024-02-08T13:14:35.000Z</published>
+    <updated>2024-02-08T13:21:24.094Z</updated>
+    
+    <content type="html"><![CDATA[<p>在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為<strong>要來我家看貓嗎</strong>的小網頁</p><h2 id="切版架構"><a href="#切版架構" class="headerlink" title="切版架構"></a>切版架構</h2><p><img src="/2024/02/08/20240208/20240208_img1.png"></p><p>可以分成兩大區塊:</p><ul><li>header section</li><li>body section</li></ul><h2 id="header-section"><a href="#header-section" class="headerlink" title="header section"></a>header section</h2><p>html元素: 單純地用h1做大標題</p><p>css樣式設計:</p><ul><li>整體div固定在最上方，並加上z-index讓body上滑不會蓋住它<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">position: fixed; </span><br><span class="line">z-index: 2;</span><br><span class="line">top: 0;</span><br><span class="line">border: 1px solid lightblue;</span><br><span class="line">background-color: lightblue;</span><br><span class="line">width: 100%; /*fill all broswer*/</span><br><span class="line">height: 50px;</span><br></pre></td></tr></table></figure></li></ul><h2 id="body-section"><a href="#body-section" class="headerlink" title="body section"></a>body section</h2><p>body部分以 <code>display:flex</code> 排列，並添加 wrapper 讓每行可以依照視窗大小改變容器數量<br>每個容器包含img,固定寬度200px<br>加上一些文字描述，和尚未引入javascript的button，其中有添加cursor樣式以及hover的pseudo element<br>為了讓文字與圖片置中排列於容器內，以position: relative 定位，使用 <code>left: 50%; margin-left:-(img_width/2);</code> 來置中</p><p>html元素:</p><ul><li>區塊模板相同，每個div由上到下依序為標題div、圖檔img、文字div、以及按鈕button</li></ul><p>css樣式設計:</p><ul><li>整體body沒有加定位樣式，因此設margin-top來預防被header遮蓋</li><li>對於內部區塊模板，以flex呈現水平排列，並設定flex-wrap來允許視窗大小改變時，div能變成多行排列<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">display: flex;</span><br><span class="line">flex-direction: row;</span><br><span class="line">flex-wrap: wrap; </span><br><span class="line">align-content: flex-start;</span><br><span class="line">margin: 50px;</span><br><span class="line">margin-top: 200px; /*solving position:fixed covering problem*/</span><br><span class="line">width:auto;</span><br></pre></td></tr></table></figure></li><li>針對區塊模板，給予寬度後設定 <code>margin:auto</code> 來均分左右空間，border調整圓弧形<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">margin: auto; /*share left space equally*/</span><br><span class="line">border: 1px solid lightblue;</span><br><span class="line">border-radius: 10%;</span><br><span class="line">width: 300px;</span><br><span class="line">height: 400px; </span><br></pre></td></tr></table></figure></li><li>區塊內部的按鈕，加上鼠標移上去的偽元素樣式<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.but-class-name:hover &#123;</span><br><span class="line">    background-color: lightcoral;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure></li></ul><h2 id="成果展示"><a href="#成果展示" class="headerlink" title="成果展示"></a>成果展示</h2><p><a href="https://github.com/pxchen110/html_case/tree/main/cute_cat_html">Github 原始碼</a></p><p>從下兩張圖比對，可以看到當螢幕尺寸改變，每行可容納的div數量也會彈性調整</p><p><img src="/2024/02/08/20240208/20240208_img2.png"></p><p><img src="/2024/02/08/20240208/20240208_img3.png"></p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為&lt;strong&gt;要來我家看貓嗎&lt;/strong&gt;的小網頁&lt;/p&gt;
+&lt;h2 id=&quot;切版架構&quot;&gt;&lt;a href=&quot;#切版架構&quot; class=&quot;headerlink&quot; title=</summary>
+      
+    
+    
+    
+    <category term="HTML, CSS" scheme="https://pxchen110.github.io/categories/HTML-CSS/"/>
+    
+    
+    <category term="HTML, CSS" scheme="https://pxchen110.github.io/tags/HTML-CSS/"/>
+    
+  </entry>
   
   <entry>
     <title>用Github+Hexo建立個人部落格：方法與問題紀錄</title>
