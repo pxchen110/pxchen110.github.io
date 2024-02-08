@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為要來我家看貓嗎的小網頁\n切版架構\n可以分成兩大區塊:\n\nheader section\nbody section\n\nheader sectionhtml元素: 單純地用h1做大標題\ncss樣式設計:\n\n整體div固定在最上方，並加上z-index讓body上滑不會蓋住它1234567position: fixed; z-index: 2;top: 0;border: 1px solid lightblue;background-color: lightblue;width: 100%; /*fill all broswer*/height: 50px;\n\nbody sectionbody部分以 display:flex 排列，並添加 wrapper 讓每行可以依照視窗大小改變容器數量每個容器包含img,固定寬度200px加上一些文字描述，和尚未引入javascript的button，其中有添加cursor樣式以及hover的pseudo element為了讓文字與圖片置中排列於容器內，以position: relative 定位，使用 left: 50%; margin-left:-(img_width/2); 來置中\nhtml元素:\n\n區塊模板相同，每個div由上到下依序為標題div、圖檔img、文字div、以及按鈕button\n\ncss樣式設計:\n\n整體body沒有加定位樣式，因此設margin-top來預防被header遮蓋\n對於內部區塊模板，以flex呈現水平排列，並設定flex-wrap來允許視窗大小改變時，div能變成多行排列1234567display: flex;flex-direction: row;flex-wrap: wrap; align-content: flex-start;margin: 50px;margin-top: 200px; /*solving position:fixed covering problem*/width:auto;\n針對區塊模板，給予寬度後設定 margin:auto 來均分左右空間，border調整圓弧形12345margin: auto; /*share left space equally*/border: 1px solid lightblue;border-radius: 10%;width: 300px;height: 400px; \n區塊內部的按鈕，加上鼠標移上去的偽元素樣式123.but-class-name:hover &#123;    background-color: lightcoral;&#125; \n\n成果展示Github 原始碼\n從下兩張圖比對，可以看到當螢幕尺寸改變，每行可容納的div數量也會彈性調整\n\n\n","dateCreated":"2024-02-08T21:14:35+08:00","dateModified":"2024-02-08T21:21:24+08:00","datePublished":"2024-02-08T21:14:35+08:00","description":"","headline":"HTML+CSS成果展(1)：可愛貓咪網站","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/2024/02/08/20240208/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/2024/02/08/20240208/","keywords":"HTML, CSS"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為要來我家看貓嗎的小網頁\n切版架構\n可以分成兩大區塊:\n\nheader section\nbody section\n\nheader sectionhtml元素: 單純地用h1做大標題\ncss樣式設計:\n\n整體div固定在最上方，並加上z-index讓body上滑不會蓋住它1234567position: fixed; z-index: 2;top: 0;border: 1px solid lightblue;background-color: lightblue;width: 100%; /*fill all broswer*/height: 50px;\n\nbody sectionbody部分以 display:flex 排列，並添加 wrapper 讓每行可以依照視窗大小改變容器數量每個容器包含img,固定寬度200px加上一些文字描述，和尚未引入javascript的button，其中有添加cursor樣式以及hover的pseudo element為了讓文字與圖片置中排列於容器內，以position: relative 定位，使用 left: 50%; margin-left:-(img_width/2); 來置中\nhtml元素:\n\n區塊模板相同，每個div由上到下依序為標題div、圖檔img、文字div、以及按鈕button\n\ncss樣式設計:\n\n整體body沒有加定位樣式，因此設margin-top來預防被header遮蓋\n對於內部區塊模板，以flex呈現水平排列，並設定flex-wrap來允許視窗大小改變時，div能變成多行排列1234567display: flex;flex-direction: row;flex-wrap: wrap; align-content: flex-start;margin: 50px;margin-top: 200px; /*solving position:fixed covering problem*/width:auto;\n針對區塊模板，給予寬度後設定 margin:auto 來均分左右空間，border調整圓弧形12345margin: auto; /*share left space equally*/border: 1px solid lightblue;border-radius: 10%;width: 300px;height: 400px; \n區塊內部的按鈕，加上鼠標移上去的偽元素樣式123.but-class-name:hover &#123;    background-color: lightcoral;&#125; \n\n成果展示Github 原始碼\n從下兩張圖比對，可以看到當螢幕尺寸改變，每行可容納的div數量也會彈性調整\n\n\n","dateCreated":"2024-02-08T21:14:35+08:00","dateModified":"2024-02-08T21:26:18+08:00","datePublished":"2024-02-08T21:14:35+08:00","description":"","headline":"HTML+CSS成果展(1)：可愛貓咪網站","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/2024/02/08/20240208/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/2024/02/08/20240208/","keywords":"HTML, CSS"}</script>
     <meta name="description" content="在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為要來我家看貓嗎的小網頁 切版架構 可以分成兩大區塊:  header section body section  header sectionhtml元素: 單純地用h1做大標題 css樣式設計:  整體div固定在最上方，並加上z-index讓body上滑不會蓋住它1234567position:">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="HTML+CSS成果展(1)：可愛貓咪網站">
@@ -29,9 +29,10 @@
 <meta property="og:image" content="https://pxchen110.github.io/2024/02/08/20240208/20240208_img2.png">
 <meta property="og:image" content="https://pxchen110.github.io/2024/02/08/20240208/20240208_img3.png">
 <meta property="article:published_time" content="2024-02-08T13:14:35.000Z">
-<meta property="article:modified_time" content="2024-02-08T13:21:24.094Z">
+<meta property="article:modified_time" content="2024-02-08T13:26:18.825Z">
 <meta property="article:author" content="Xuan Chen">
-<meta property="article:tag" content="HTML, CSS">
+<meta property="article:tag" content="HTML">
+<meta property="article:tag" content="CSS">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://pxchen110.github.io/2024/02/08/20240208/20240208_img1.png">
     
@@ -316,7 +317,7 @@
     
         <span>分類 </span>
         
-    <a class="category-link" href="/categories/HTML-CSS/">HTML, CSS</a>
+    <a class="category-link" href="/categories/Front-end/">Front-end</a>
 
 
     
@@ -367,7 +368,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">標籤</span><br/>
                 
-    <a class="tag tag--primary tag--small t-none-link" href="/tags/HTML-CSS/" rel="tag">HTML, CSS</a>
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/CSS/" rel="tag">CSS</a> <a class="tag tag--primary tag--small t-none-link" href="/tags/HTML/" rel="tag">HTML</a>
 
             </div>
         
