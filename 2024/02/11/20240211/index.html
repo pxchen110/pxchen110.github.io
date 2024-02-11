@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Xuan&#39;s Blog">
-    <title>標籤: HTML - Xuan&#39;s Blog</title>
+    <title>HTML+CSS成果展(2)：仿寫拼多多網站 - Xuan&#39;s Blog</title>
     <meta name="author" content="Xuan Chen">
     
         <meta name="keywords" content="hexo,javascript,">
@@ -17,16 +17,26 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{}</script>
-    <meta property="og:type" content="blog">
-<meta property="og:title" content="Xuan&#39;s Blog">
-<meta property="og:url" content="https://pxchen110.github.io/tags/HTML/index.html">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"\n參考資料來源：udemy 課程\n從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。\n學習流程：將影片要仿寫的部份截圖-&gt;自己寫看看-&gt;觀看課程影片比對老師和我的作法差異-&gt;改善程式-&gt;完成！\n大致的切版規劃:\n切版成三區塊，以及一個固定於網頁左下方的qrcode，在html會分成四個&lt;div&gt;&lt;/div&gt;撰寫\n\nheader+nav(嚴格來說只有navigation bar)\nbody(以相同模板套用內容並垂直排列)\nfooter(下方聯絡資訊等樣式)\nqrcode banner\n\nHeader+nav section切版設計:\nhtml元素:\n\n圖片和nav文字都是 &lt;a&gt;&lt;/a&gt; 元素\n\ncss樣式重點:\n\n網頁滑動仍固定於上方:1234position: fixed; /*固定在最上面*/top: 0; /*定位*/left: 0; /*定位*/z-index: 999; /*滑動時不會被上來的div蓋住*/\nnav的div以flex呈現水平排列，以border作為間隔，並清除尾端div的border12display: flex; /*將div以flex規劃排列方式，呈現清單*/flex-direction: row; \nnav 下面的小div以border作為間隔\n在倒數個div加上class name(.g-header-list-re)，練習以+方式清除最後一個div元素的border12345border-right: 1px solid gray; .g-header-list-re + div  &#123; /*清除最後一個元素的border*/border-right: none;  &#125;\n\nbody section切版設計:\nhtml元素:\n\n由於區塊模板相似，做好一個候可以重複套用添加內容\n一個區塊以div包覆，下面分三個小div操作\n最上div面用 &lt;p&gt;&lt;/p&gt; 和 &lt;a&gt;&lt;/a&gt; 放置文字與連結點選\n中間div放大圖片\n下方div包含三個小div，放置圖片，文字等商品資訊\n\ncss樣式重點:\n\nbody整體以header做父元素定位，並做水平置中\nbody寬度以view point為單位設定，使其可依照視窗縮放比例\n區塊模板以flex呈垂直排列1234567891011position: absolute; top: 40%;left: 50%; /*搭配margin-left: -(width/2)做水平置中*/overflow: hidden;display: flex;flex-direction: column;gap: 50px;margin-left: -40vw; /*寬度的一半做水平置中*/width: 80vw;\n區塊模版最上方的&lt;p&gt;和&lt;a&gt; 分別以 float: left; float: right; 浮動\n區塊模板下方再套用flex呈水平排列123display: flex;flex-direction: row;gap: 10px;\n\nfooter section切版設計:\nhtml元素:\n\n上方div內有兩個小div，分別放置qrcode跟聯絡資訊\n下方div跟header的nav清單相似，但以list寫法呈現\n\ncss樣式重點:\n\nfooter整體以body做父元素定位\n使用預先知道得body total height作為top距離，讓footer銜接在body下方123456position:absolute;top: 3000px; /*不太好得做法，以body為父元素，body height為top距離*/padding-top: 60px;width:100vw; /*可依視窗大小縮放的寬度單位*/height:300px;background-color: lightgray;\n上方div內的兩個小div以float:left;做浮動\n左側div以flex讓內部三個div呈水平排列，同時設定跟右側div相同的高度\n右側div主要調整的是p元素的間隔，高寬，以及與左側div的距離，並以border做區隔12345/*左側div css*/display: flex; /*flex方式排列qrcodes*/flex-direction: row;gap: 10px; height: 240px; /*讓img+text總高和右側聯絡資訊一樣*/\n12345678/*右側div css*/text-align: left;border-left: 1px solid black;margin-left: 15px;margin-bottom: 20px;padding-left: 45px;line-height: 30px;font-size: 20px;\n\n\n下方div(.g-footer-list)的list以更改display:inline-block;的方式呈水平排列，並保留設定元素寬度的能力\n練習以last-child或first-child方式移除頭尾元素的border123456.g-footer-list ul li &#123; /*以inline-block displayed list製作清單*/display: inline-block; /*可設長寬的元素*/border-left: 1px solid black;margin: 0 auto; /*給予寬度的情況下，margin auto可置中*/width: 100px;&#125;\n123    .g-footer-list li:first-child &#123; /*remove border for the first element in the list*/    border: none;&#125;\n\nqrcode bannerhtml元素:\n\ndiv包含img和兩個小div\n\ncss樣式設計:\n\n整體定位，以網頁為父元素，固定浮動於左下方\n設定z-index浮動在body和footer上方1234567position: fixed; /*固定浮動在網頁左下方*/bottom: 50px;left: 100px;z-index: 998; /*不被body蓋住*/padding: 10px 30px;border: 1px solid gray;background-color: white;\n先設定圖片寬度，配合left和margin-left讓圖片水平置中於div內123456img &#123;    position: relative;    left: 50%;    margin-left: -75px;     width: 150px;&#125;\n\n成果展示Github 原始碼 \n一併附上拚多多網站連結\n檢討回顧以上就是我得第一版網站仿寫，過程歷經許多trial and error，像是沒規劃好區塊，等寫到60%時又重新修改架構，打掉重練的狀況；也蠻常遇到加了css樣式但卻出不來的困惑。最後列出幾點我在udemy上學到的技巧，以及這一版仿寫有待改進的部分:\n\nnavigation bar 應該也改成list製作會比較簡單，開太多div來包感覺沒意義\nfooter出現在尾端的定位方式非robust，和body依賴性太高，萬一body新增內容豈不是要調整top數值?\n佔滿視窗大小並依比例調整，改用100%會比100vw好，原因可以參考此網站的解釋\n透過將float: left;`` float: right; 設成一個class name，當有元素需要就加上這個class是有效率的方法\n同理可以新增清除浮動的class，有需要就加上12345 .clearfix::after &#123; /*清除浮動    content: &quot;&quot;;    display: block;    clear: both;&#125; \n一開始就設定所有的a元素都移除下底線，或所有list都移除符號\n\n","dateCreated":"2024-02-11T18:28:37+08:00","dateModified":"2024-02-11T18:40:10+08:00","datePublished":"2024-02-11T18:28:37+08:00","description":"","headline":"HTML+CSS成果展(2)：仿寫拼多多網站","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/2024/02/11/20240211/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/2024/02/11/20240211/","keywords":"HTML, CSS"}</script>
+    <meta name="description" content="introduce html and css coding results">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="HTML+CSS成果展(2)：仿寫拼多多網站">
+<meta property="og:url" content="https://pxchen110.github.io/2024/02/11/20240211/index.html">
 <meta property="og:site_name" content="Xuan&#39;s Blog">
+<meta property="og:description" content="introduce html and css coding results">
 <meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://pxchen110.github.io/2024/02/11/20240211/20240211_img0.png">
+<meta property="og:image" content="https://pxchen110.github.io/2024/02/11/20240211/20240211_img1.png">
+<meta property="og:image" content="https://pxchen110.github.io/2024/02/11/20240211/20240211_img2.png">
+<meta property="og:image" content="https://pxchen110.github.io/2024/02/11/20240211/20240211_img3.png">
+<meta property="og:image" content="https://pxchen110.github.io/2024/02/11/20240211/20240211_img4.png">
+<meta property="article:published_time" content="2024-02-11T10:28:37.000Z">
+<meta property="article:modified_time" content="2024-02-11T10:40:10.529Z">
 <meta property="article:author" content="Xuan Chen">
-<meta property="article:tag" content="hexo">
-<meta property="article:tag" content="javascript">
+<meta property="article:tag" content="HTML">
+<meta property="article:tag" content="CSS">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pxchen110.github.io/2024/02/11/20240211/20240211_img0.png">
     
     
         
@@ -47,6 +57,8 @@
     
 
     
+        
+    
 </head>
 
     <body>
@@ -54,7 +66,7 @@
             <!-- Define author's picture -->
 
 
-<header id="header" data-behavior="1">
+<header id="header" data-behavior="4">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
         <a
@@ -87,7 +99,7 @@
         
     
 
-<nav id="sidebar" data-behavior="1">
+<nav id="sidebar" data-behavior="4">
     <div class="sidebar-container">
         
             <div class="sidebar-profile">
@@ -283,30 +295,22 @@
 </nav>
 
             
-            <div id="main" data-behavior="1"
+            <div id="main" data-behavior="4"
                  class="
                         hasCoverMetaIn
                         ">
                 
-    <section class="postShorten-group main-content-wrap">
+<article class="post">
     
     
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
-                            href="/2024/02/11/20240211/"
-                            aria-label=": HTML+CSS成果展(2)：仿寫拼多多網站"
-                        >
-                            HTML+CSS成果展(2)：仿寫拼多多網站
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            HTML+CSS成果展(2)：仿寫拼多多網站
+        </h1>
+    
+    
+        <div class="post-meta">
     <time datetime="2024-02-11T18:28:37+08:00">
 	
 		    2024 年 2 月 11 日
@@ -321,10 +325,13 @@
     
 </div>
 
-            </div>
-            
-                <div class="postShorten-content">
-                    <p><img src="/2024/02/11/20240211/20240211_img0.png"></p>
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p><img src="/2024/02/11/20240211/20240211_img0.png"></p>
 <p>參考資料來源：udemy 課程</p>
 <p>從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。</p>
 <p>學習流程：將影片要仿寫的部份截圖-&gt;自己寫看看-&gt;觀看課程影片比對老師和我的作法差異-&gt;改善程式-&gt;完成！</p>
@@ -407,122 +414,143 @@
 <li>一開始就設定所有的a元素都移除下底線，或所有list都移除符號</li>
 </ul>
 
-                    
-                        
-
-
-                    
-                    
-                        <p>
-                            <a
-                                href="/2024/02/11/20240211/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                留言與分享
-                            </a>
-                        </p>
-                    
-                </div>
             
+
+
         </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
         
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
-                            href="/2024/02/08/20240208/"
-                            aria-label=": HTML+CSS成果展(1)：可愛貓咪網站"
-                        >
-                            HTML+CSS成果展(1)：可愛貓咪網站
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2024-02-08T21:14:35+08:00">
-	
-		    2024 年 2 月 8 日
-    	
-    </time>
-    
-        <span>分類 </span>
-        
-    <a class="category-link" href="/categories/Front-end/">Front-end</a>
-
-
-    
-</div>
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">標籤</span><br/>
+                
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/CSS/" rel="tag">CSS</a> <a class="tag tag--primary tag--small t-none-link" href="/tags/HTML/" rel="tag">HTML</a>
 
             </div>
-            
-                <div class="postShorten-content">
-                    <p>在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為<strong>要來我家看貓嗎</strong>的小網頁</p>
-<h2 id="切版架構"><a href="#切版架構" class="headerlink" title="切版架構"></a>切版架構</h2><p><img src="/2024/02/08/20240208/20240208_img1.png"></p>
-<p>可以分成兩大區塊:</p>
-<ul>
-<li>header section</li>
-<li>body section</li>
-</ul>
-<h2 id="header-section"><a href="#header-section" class="headerlink" title="header section"></a>header section</h2><p>html元素: 單純地用h1做大標題</p>
-<p>css樣式設計:</p>
-<ul>
-<li>整體div固定在最上方，並加上z-index讓body上滑不會蓋住它<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">position: fixed; </span><br><span class="line">z-index: 2;</span><br><span class="line">top: 0;</span><br><span class="line">border: 1px solid lightblue;</span><br><span class="line">background-color: lightblue;</span><br><span class="line">width: 100%; /*fill all broswer*/</span><br><span class="line">height: 50px;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="body-section"><a href="#body-section" class="headerlink" title="body section"></a>body section</h2><p>body部分以 <code>display:flex</code> 排列，並添加 wrapper 讓每行可以依照視窗大小改變容器數量<br>每個容器包含img,固定寬度200px<br>加上一些文字描述，和尚未引入javascript的button，其中有添加cursor樣式以及hover的pseudo element<br>為了讓文字與圖片置中排列於容器內，以position: relative 定位，使用 <code>left: 50%; margin-left:-(img_width/2);</code> 來置中</p>
-<p>html元素:</p>
-<ul>
-<li>區塊模板相同，每個div由上到下依序為標題div、圖檔img、文字div、以及按鈕button</li>
-</ul>
-<p>css樣式設計:</p>
-<ul>
-<li>整體body沒有加定位樣式，因此設margin-top來預防被header遮蓋</li>
-<li>對於內部區塊模板，以flex呈現水平排列，並設定flex-wrap來允許視窗大小改變時，div能變成多行排列<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">display: flex;</span><br><span class="line">flex-direction: row;</span><br><span class="line">flex-wrap: wrap; </span><br><span class="line">align-content: flex-start;</span><br><span class="line">margin: 50px;</span><br><span class="line">margin-top: 200px; /*solving position:fixed covering problem*/</span><br><span class="line">width:auto;</span><br></pre></td></tr></table></figure></li>
-<li>針對區塊模板，給予寬度後設定 <code>margin:auto</code> 來均分左右空間，border調整圓弧形<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">margin: auto; /*share left space equally*/</span><br><span class="line">border: 1px solid lightblue;</span><br><span class="line">border-radius: 10%;</span><br><span class="line">width: 300px;</span><br><span class="line">height: 400px; </span><br></pre></td></tr></table></figure></li>
-<li>區塊內部的按鈕，加上鼠標移上去的偽元素樣式<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.but-class-name:hover &#123;</span><br><span class="line">    background-color: lightcoral;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="成果展示"><a href="#成果展示" class="headerlink" title="成果展示"></a>成果展示</h2><p><a target="_blank" rel="noopener" href="https://github.com/pxchen110/html_case/tree/main/cute_cat_html">Github 原始碼</a></p>
-<p>從下兩張圖比對，可以看到當螢幕尺寸改變，每行可容納的div數量也會彈性調整</p>
-<p><img src="/2024/02/08/20240208/20240208_img2.png"></p>
-<p><img src="/2024/02/08/20240208/20240208_img3.png"></p>
-
-                    
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
                         
-
-
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
                     
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2024/02/08/20240208/"
+                    data-tooltip="HTML+CSS成果展(1)：可愛貓咪網站"
+                    aria-label="下一篇: HTML+CSS成果展(1)：可愛貓咪網站"
+                >
                     
-                        <p>
-                            <a
-                                href="/2024/02/08/20240208/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                留言與分享
-                            </a>
-                        </p>
-                    
-                </div>
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="post.share"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
             
-        </div>
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/02/11/20240211/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
         
-    </article>
-    
-    <div class="pagination-bar">
-    <ul class="pagination">
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/02/11/20240211/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/02/11/20240211/"
+                    title="分享到 Google+"
+                    aria-label="分享到 Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
         
         
-        <li class="pagination-number">第 1 頁 共 1 頁</li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="post.back_to_top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
     </ul>
 </div>
 
-</section>
+
+        
+        
+            
+        
+    </div>
+</article>
+
+
+
+    <div id="disqus_thread"></div>
+    <script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+        var disqus_config = function () {
+          this.page.url = 'https://pxchen110.github.io/2024/02/11/20240211/';  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = '1707647317000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://pxchen110-blog.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  
+
 
 
                 <footer id="footer" class="main-content-wrap">
@@ -532,6 +560,151 @@
 </footer>
 
             </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2024/02/08/20240208/"
+                    data-tooltip="HTML+CSS成果展(1)：可愛貓咪網站"
+                    aria-label="下一篇: HTML+CSS成果展(1)：可愛貓咪網站"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="post.share"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/02/11/20240211/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/02/11/20240211/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/02/11/20240211/"
+                    title="分享到 Google+"
+                    aria-label="分享到 Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="post.back_to_top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/02/11/20240211/"
+                        aria-label="分享到 Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/02/11/20240211/"
+                        aria-label="分享到 Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/02/11/20240211/"
+                        aria-label="分享到 Google+"
+                    >
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
             
         </div>
         
@@ -706,6 +879,8 @@
 
 <!--SCRIPTS END-->
 
+
+    
 
 
 
