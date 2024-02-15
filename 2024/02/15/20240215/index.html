@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Xuan&#39;s Blog">
-    <title>HTML+CSS成果展(2)：仿寫拼多多網站 - Xuan&#39;s Blog</title>
+    <title>Python實用系列： smtplib 模組實現自動寄信 - Xuan&#39;s Blog</title>
     <meta name="author" content="Xuan Chen">
     
         <meta name="keywords" content="hexo,javascript,">
@@ -17,26 +17,23 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"\n參考資料來源：udemy 課程\n從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。\n\n\n學習流程：將影片要仿寫的部份截圖-&gt;自己寫看看-&gt;觀看課程影片比對老師和我的作法差異-&gt;改善程式-&gt;完成！\n\n\n大致的切版規劃:\n切版成三區塊，以及一個固定於網頁左下方的qrcode，在html會分成四個&lt;div&gt;&lt;/div&gt;撰寫\n\nheader+nav(嚴格來說只有navigation bar)\nbody(以相同模板套用內容並垂直排列)\nfooter(下方聯絡資訊等樣式)\nqrcode banner\n\nHeader+nav section切版設計:\nhtml元素:\n\n圖片和nav文字都是 &lt;a&gt;&lt;/a&gt; 元素\n\ncss樣式重點:\n\n網頁滑動仍固定於上方:1234position: fixed; /*固定在最上面*/top: 0; /*定位*/left: 0; /*定位*/z-index: 999; /*滑動時不會被上來的div蓋住*/\nnav的div以flex呈現水平排列，以border作為間隔，並清除尾端div的border12display: flex; /*將div以flex規劃排列方式，呈現清單*/flex-direction: row; \nnav 下面的小div以border作為間隔\n在倒數個div加上class name(.g-header-list-re)，練習以+方式清除最後一個div元素的border12345border-right: 1px solid gray; .g-header-list-re + div  &#123; /*清除最後一個元素的border*/border-right: none;  &#125;\n\nbody section切版設計:\nhtml元素:\n\n由於區塊模板相似，做好一個候可以重複套用添加內容\n一個區塊以div包覆，下面分三個小div操作\n最上div面用 &lt;p&gt;&lt;/p&gt; 和 &lt;a&gt;&lt;/a&gt; 放置文字與連結點選\n中間div放大圖片\n下方div包含三個小div，放置圖片，文字等商品資訊\n\ncss樣式重點:\n\nbody整體以header做父元素定位，並做水平置中\nbody寬度以view point為單位設定，使其可依照視窗縮放比例\n區塊模板以flex呈垂直排列1234567891011position: absolute; top: 40%;left: 50%; /*搭配margin-left: -(width/2)做水平置中*/overflow: hidden;display: flex;flex-direction: column;gap: 50px;margin-left: -40vw; /*寬度的一半做水平置中*/width: 80vw;\n區塊模版最上方的&lt;p&gt;和&lt;a&gt; 分別以 float: left; float: right; 浮動\n區塊模板下方再套用flex呈水平排列123display: flex;flex-direction: row;gap: 10px;\n\nfooter section切版設計:\nhtml元素:\n\n上方div內有兩個小div，分別放置qrcode跟聯絡資訊\n下方div跟header的nav清單相似，但以list寫法呈現\n\ncss樣式重點:\n\nfooter整體以body做父元素定位\n使用預先知道得body total height作為top距離，讓footer銜接在body下方123456position:absolute;top: 3000px; /*不太好得做法，以body為父元素，body height為top距離*/padding-top: 60px;width:100vw; /*可依視窗大小縮放的寬度單位*/height:300px;background-color: lightgray;\n上方div內的兩個小div以float:left;做浮動\n左側div以flex讓內部三個div呈水平排列，同時設定跟右側div相同的高度\n右側div主要調整的是p元素的間隔，高寬，以及與左側div的距離，並以border做區隔12345/*左側div css*/display: flex; /*flex方式排列qrcodes*/flex-direction: row;gap: 10px; height: 240px; /*讓img+text總高和右側聯絡資訊一樣*/\n12345678/*右側div css*/text-align: left;border-left: 1px solid black;margin-left: 15px;margin-bottom: 20px;padding-left: 45px;line-height: 30px;font-size: 20px;\n\n\n下方div(.g-footer-list)的list以更改display:inline-block;的方式呈水平排列，並保留設定元素寬度的能力\n練習以last-child或first-child方式移除頭尾元素的border123456.g-footer-list ul li &#123; /*以inline-block displayed list製作清單*/display: inline-block; /*可設長寬的元素*/border-left: 1px solid black;margin: 0 auto; /*給予寬度的情況下，margin auto可置中*/width: 100px;&#125;\n123    .g-footer-list li:first-child &#123; /*remove border for the first element in the list*/    border: none;&#125;\n\nqrcode bannerhtml元素:\n\ndiv包含img和兩個小div\n\ncss樣式設計:\n\n整體定位，以網頁為父元素，固定浮動於左下方\n設定z-index浮動在body和footer上方1234567position: fixed; /*固定浮動在網頁左下方*/bottom: 50px;left: 100px;z-index: 998; /*不被body蓋住*/padding: 10px 30px;border: 1px solid gray;background-color: white;\n先設定圖片寬度，配合left和margin-left讓圖片水平置中於div內123456img &#123;    position: relative;    left: 50%;    margin-left: -75px;     width: 150px;&#125;\n\n成果展示Github 原始碼 \n一併附上拚多多網站連結\n檢討回顧以上就是我得第一版網站仿寫，過程歷經許多trial and error，像是沒規劃好區塊，等寫到60%時又重新修改架構，打掉重練的狀況；也蠻常遇到加了css樣式但卻出不來的困惑。最後列出幾點我在udemy上學到的技巧，以及這一版仿寫有待改進的部分:\n\nnavigation bar 應該也改成list製作會比較簡單，開太多div來包感覺沒意義\nfooter出現在尾端的定位方式非robust，和body依賴性太高，萬一body新增內容豈不是要調整top數值?\n佔滿視窗大小並依比例調整，改用100%會比100vw好，原因可以參考此網站的解釋\n透過將float: left;`` float: right; 設成一個class name，當有元素需要就加上這個class是有效率的方法\n同理可以新增清除浮動的class，有需要就加上12345 .clearfix::after &#123; /*清除浮動    content: &quot;&quot;;    display: block;    clear: both;&#125; \n一開始就設定所有的a元素都移除下底線，或所有list都移除符號\n\n","dateCreated":"2024-02-11T18:28:37+08:00","dateModified":"2024-02-15T19:35:02+08:00","datePublished":"2024-02-11T18:28:37+08:00","description":"\n參考資料來源：udemy 課程\n從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。","headline":"HTML+CSS成果展(2)：仿寫拼多多網站","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/2024/02/11/20240211/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/2024/02/11/20240211/","keywords":"HTML, CSS"}</script>
-    <meta name="description" content="introduce html and css coding results">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"Photo by Brett Jordan on Unsplash\n在信箱收件夾，不乏看到許多自動寄出的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信\n\n\n\n\nPart1: SMTP協定介紹通訊協定，是協助資訊在不同軟硬體之間傳輸的方式，例如使用相同IP的兩台電腦，可以突破主機限制互相通訊。網際網路中，常用的通訊協定包含TCP&#x2F;IP, HTTPS(TLS&#x2F;SSL加密)，以及本文要使用的SMTP協定。SMTP全名為簡易郵件傳輸通訊協定 (Simple Mail Transfer Protocol)，是透過網路在電腦與伺服器之間接收與傳送電子郵件的通訊方式。只要知道服務廠商的smtp, port, 並提供一個寄件帳號，就可以自動\\廣發信件給多名收件人。\n常見的廠商與smtp伺服器：\n\ngmail:  smtp.gmail.com\noutlook: smtp-mail.outlook.com\n\n常見的連接埠比較(內容節錄自cloudflare網站) :\n\n連接埠 25 最常用於 SMTP 伺服器之間的連線。如今，用於終端使用者網路的防火牆通常會封鎖該連接埠，因為垃圾郵件發送者嘗試濫用它來傳送大量垃圾郵件。\n連接埠 465 曾經專供具有安全通訊端層 (SSL) 加密的 SMTP 使用。但是 SSL 已被 Transport Layer Security (TLS) 取代，因此現代電子郵件系統不再使用該連接埠。它只存在於舊版（過時的）系統中。\n連接埠 587 現在是電子郵件提交的預設連接埠。透過此連接埠進行的 SMTP 通訊使用 TLS 加密。\n\nPart2: 撰寫python程式python 提供 smtplib 模組來協助 smtp 封裝信息並傳輸給目標端。由於\nstep0: 引入套件和開啟google mail 權限1import smtplib\n除了基本模組，常搭配擴充電子郵件標準套件，來處理內文部分\n12from email.mime.multipart import MIMEMultipart #email內容載體from email.mime.text import MIMEText           #製作郵件內文\n\n若要在gmail使用smtplib，需要到 google 帳戶的安全性頁面 完成帳戶密碼設定(下圖紅框標示處)\n\nstep1: 設定帳戶資訊1234567MAIL_USER = &quot;from_who_user_@gmail...&quot;  #寄件者email帳號MAIL_PASSWD = &quot;......&quot;                 #寄件者email密碼FROM_ADDRESS = MAIL_USER               #和寄件者相同# 郵件平台的主機 port (這裡使用 gmail smtp 伺服器)MAIL_SMTP = &quot;smtp.gmail.com&quot;MAIL_PORT = 587                        #安全加密port &quot;587&quot;\n\nstep2: 撰寫郵件內容與寄件人12to_address = &quot;to_who_@gmail...&quot;        #收件者email帳號body_content = &quot;&quot;                      #輸入郵件內文\n\n\nstep3: 以擴充電子郵件標準來組合 email 結構123456mail = MIMEMultipart()mail[&#x27;From&#x27;] = FROM_ADDRESS            #寄件者mail[&#x27;Subject&#x27;] = &quot;the subject&quot;        #主旨mail[&#x27;To&#x27;] = to_address                #收件者mail.attach(MIMEText(body_content))    #以attach方式貼上內文\n\n\nstep4: 設定smtp伺服器並寄信12345678910111213141516smtpserver = smtplib.SMTP(MAIL_SMTP, MAIL_PORT)# 發出「Hello」訊息，以在用戶端和伺服器之間建立SMTP連線smtpserver.ehlo()   # TLS加密：延伸保護 SMTP 階段作業smtpserver.starttls() # 登入寄件人郵件系統smtpserver.login(MAIL_USER. MAIL_PASSWD) # 將step3產生的信件內容轉成string並寫入smtpserver.sendmail(FROM_ADDRESS, to_address, mail.as_string()) # 結束系統連線server.quit() \n\nPart3: 完整script &amp; 成果展示附上完整的 python script注意: 由於使用個人主機測試，才敢將信箱帳密直接輸入在command line、由 sys 存取，若在公用主機請注意資安考量。\n123456789101112131415161718192021222324252627282930313233#!/usr/bin/env python3import osimport sysimport smtplibfrom email.mime.multipart import MIMEMultipartfrom email.mime.text import MIMETextmail_user = sys.argv[1]mail_passwd = sys.argv[2]from_address = mail_usermail_smtp = &quot;smtp.gmail.com&quot;mail_port = 587to_address = sys.argv[3]body_content = &quot;&quot;&quot;\tThis is the auto-send email test &quot;&quot;&quot;mail = MIMEMultipart()mail[&#x27;From&#x27;] = mail_usermail[&#x27;To&#x27;] = to_addressmail[&#x27;Subject&#x27;] = &quot;Test for smtp email-sender&quot;mail.attach(MIMEText(body_content))server = smtplib.SMTP(mail_smtp, mail_port)server.ehlo()server.starttls()server.login(mail_user, mail_passwd)server.sendmail(mail_user, to_address, mail.as_string())server.quit()\n\n到收件者的信箱查看，成功收到如下圖的信件\n\n參考資料https://aws.amazon.com/tw/what-is/smtp/https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/\n","dateCreated":"2024-02-15T19:21:40+08:00","dateModified":"2024-02-15T19:34:33+08:00","datePublished":"2024-02-15T19:21:40+08:00","description":"Photo by Brett Jordan on Unsplash\n在信箱收件夾，不乏看到許多自動寄出的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信","headline":"Python實用系列： smtplib 模組實現自動寄信","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/2024/02/15/20240215/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/2024/02/15/20240215/","keywords":"Python"}</script>
+    <meta name="description" content="introducing python smtplib module to automatically send email">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="HTML+CSS成果展(2)：仿寫拼多多網站">
-<meta property="og:url" content="https://pxchen110.github.io/2024/02/11/20240211/index.html">
+<meta property="og:title" content="Python實用系列： smtplib 模組實現自動寄信">
+<meta property="og:url" content="https://pxchen110.github.io/2024/02/15/20240215/index.html">
 <meta property="og:site_name" content="Xuan&#39;s Blog">
-<meta property="og:description" content="introduce html and css coding results">
+<meta property="og:description" content="introducing python smtplib module to automatically send email">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://pxchen110.github.io/2024/02/11/20240211/20240211_img0.png">
-<meta property="og:image" content="https://pxchen110.github.io/2024/02/11/20240211/20240211_img1.png">
-<meta property="og:image" content="https://pxchen110.github.io/2024/02/11/20240211/20240211_img2.png">
-<meta property="og:image" content="https://pxchen110.github.io/2024/02/11/20240211/20240211_img3.png">
-<meta property="og:image" content="https://pxchen110.github.io/2024/02/11/20240211/20240211_img4.png">
-<meta property="article:published_time" content="2024-02-11T10:28:37.000Z">
-<meta property="article:modified_time" content="2024-02-15T11:35:02.660Z">
+<meta property="og:image" content="https://pxchen110.github.io/2024/02/15/20240215/20240215_img1.jpg">
+<meta property="og:image" content="https://pxchen110.github.io/2024/02/15/20240215/20240215_img2.png">
+<meta property="og:image" content="https://pxchen110.github.io/2024/02/15/20240215/20240215_img3.png">
+<meta property="article:published_time" content="2024-02-15T11:21:40.000Z">
+<meta property="article:modified_time" content="2024-02-15T11:34:33.391Z">
 <meta property="article:author" content="Xuan Chen">
-<meta property="article:tag" content="HTML">
-<meta property="article:tag" content="CSS">
+<meta property="article:tag" content="Python">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pxchen110.github.io/2024/02/11/20240211/20240211_img0.png">
+<meta name="twitter:image" content="https://pxchen110.github.io/2024/02/15/20240215/20240215_img1.jpg">
     
     
         
@@ -306,20 +303,20 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            HTML+CSS成果展(2)：仿寫拼多多網站
+            Python實用系列： smtplib 模組實現自動寄信
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2024-02-11T18:28:37+08:00">
+    <time datetime="2024-02-15T19:21:40+08:00">
 	
-		    2024 年 2 月 11 日
+		    2024 年 2 月 15 日
     	
     </time>
     
         <span>分類 </span>
         
-    <a class="category-link" href="/categories/Front-end/">Front-end</a>
+    <a class="category-link" href="/categories/Python/">Python</a>
 
 
     
@@ -331,92 +328,47 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p><img src="/2024/02/11/20240211/20240211_img0.png"></p>
-<p>參考資料來源：udemy 課程</p>
-<p>從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。</p>
+            <p><img src="/2024/02/15/20240215/20240215_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@brett_jordan">Brett Jordan</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+<p>在信箱收件夾，不乏看到許多<strong>自動寄出</strong>的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信</p>
 <span id="more"></span>
 
-<p>學習流程：將影片要仿寫的部份截圖-&gt;自己寫看看-&gt;觀看課程影片比對老師和我的作法差異-&gt;改善程式-&gt;完成！</p>
-<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%A7%E8%87%B4%E7%9A%84%E5%88%87%E7%89%88%E8%A6%8F%E5%8A%83"><span class="toc-text">大致的切版規劃:</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Header-nav-section"><span class="toc-text">Header+nav section</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#body-section"><span class="toc-text">body section</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#footer-section"><span class="toc-text">footer section</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#qrcode-banner"><span class="toc-text">qrcode banner</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA"><span class="toc-text">成果展示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AA%A2%E8%A8%8E%E5%9B%9E%E9%A1%A7"><span class="toc-text">檢討回顧</span></a></li></ol>
+<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Part1-SMTP%E5%8D%94%E5%AE%9A%E4%BB%8B%E7%B4%B9"><span class="toc-text">Part1: SMTP協定介紹</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Part2-%E6%92%B0%E5%AF%ABpython%E7%A8%8B%E5%BC%8F"><span class="toc-text">Part2: 撰寫python程式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#step0-%E5%BC%95%E5%85%A5%E5%A5%97%E4%BB%B6%E5%92%8C%E9%96%8B%E5%95%9Fgoogle-mail-%E6%AC%8A%E9%99%90"><span class="toc-text">step0: 引入套件和開啟google mail 權限</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step1-%E8%A8%AD%E5%AE%9A%E5%B8%B3%E6%88%B6%E8%B3%87%E8%A8%8A"><span class="toc-text">step1: 設定帳戶資訊</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step2-%E6%92%B0%E5%AF%AB%E9%83%B5%E4%BB%B6%E5%85%A7%E5%AE%B9%E8%88%87%E5%AF%84%E4%BB%B6%E4%BA%BA"><span class="toc-text">step2: 撰寫郵件內容與寄件人</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step3-%E4%BB%A5%E6%93%B4%E5%85%85%E9%9B%BB%E5%AD%90%E9%83%B5%E4%BB%B6%E6%A8%99%E6%BA%96%E4%BE%86%E7%B5%84%E5%90%88-email-%E7%B5%90%E6%A7%8B"><span class="toc-text">step3: 以擴充電子郵件標準來組合 email 結構</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step4-%E8%A8%AD%E5%AE%9Asmtp%E4%BC%BA%E6%9C%8D%E5%99%A8%E4%B8%A6%E5%AF%84%E4%BF%A1"><span class="toc-text">step4: 設定smtp伺服器並寄信</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Part3-%E5%AE%8C%E6%95%B4script-%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA"><span class="toc-text">Part3: 完整script &amp; 成果展示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-text">參考資料</span></a></li></ol>
 
-<h2 id="大致的切版規劃"><a href="#大致的切版規劃" class="headerlink" title="大致的切版規劃:"></a>大致的切版規劃:</h2><p><img src="/2024/02/11/20240211/20240211_img1.png"></p>
-<p>切版成三區塊，以及一個固定於網頁左下方的qrcode，在html會分成四個<code>&lt;div&gt;&lt;/div&gt;</code>撰寫</p>
+<h2 id="Part1-SMTP協定介紹"><a href="#Part1-SMTP協定介紹" class="headerlink" title="Part1: SMTP協定介紹"></a>Part1: SMTP協定介紹</h2><p>通訊協定，是協助資訊在不同軟硬體之間傳輸的方式，例如使用相同IP的兩台電腦，可以突破主機限制互相通訊。網際網路中，常用的通訊協定包含TCP&#x2F;IP, HTTPS(TLS&#x2F;SSL加密)，以及本文要使用的SMTP協定。<br>SMTP全名為簡易郵件傳輸通訊協定 (Simple Mail Transfer Protocol)，是透過網路在電腦與伺服器之間<strong>接收與傳送電子郵件</strong>的通訊方式。只要知道服務廠商的smtp, port, 並提供一個寄件帳號，就可以自動\廣發信件給多名收件人。</p>
+<p>常見的廠商與smtp伺服器：</p>
 <ul>
-<li>header+nav(嚴格來說只有navigation bar)</li>
-<li>body(以相同模板套用內容並垂直排列)</li>
-<li>footer(下方聯絡資訊等樣式)</li>
-<li>qrcode banner</li>
+<li>gmail:  <code>smtp.gmail.com</code></li>
+<li>outlook: <code>smtp-mail.outlook.com</code></li>
 </ul>
-<h2 id="Header-nav-section"><a href="#Header-nav-section" class="headerlink" title="Header+nav section"></a>Header+nav section</h2><p>切版設計:<br><img src="/2024/02/11/20240211/20240211_img2.png"></p>
-<p>html元素:</p>
-<ul>
-<li>圖片和nav文字都是 <code>&lt;a&gt;&lt;/a&gt;</code> 元素</li>
-</ul>
-<p>css樣式重點:</p>
-<ul>
-<li>網頁滑動仍固定於上方:<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">position: fixed; /*固定在最上面*/</span><br><span class="line">top: 0; /*定位*/</span><br><span class="line">left: 0; /*定位*/</span><br><span class="line">z-index: 999; /*滑動時不會被上來的div蓋住*/</span><br></pre></td></tr></table></figure></li>
-<li>nav的div以flex呈現水平排列，以border作為間隔，並清除尾端div的border<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">display: flex; /*將div以flex規劃排列方式，呈現清單*/</span><br><span class="line">flex-direction: row; </span><br></pre></td></tr></table></figure></li>
-<li>nav 下面的小div以border作為間隔</li>
-<li>在倒數個div加上class name(.g-header-list-re)，練習以<code>+</code>方式清除最後一個div元素的border<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">border-right: 1px solid gray; </span><br><span class="line"></span><br><span class="line">.g-header-list-re + div  &#123; /*清除最後一個元素的border*/</span><br><span class="line">border-right: none;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="body-section"><a href="#body-section" class="headerlink" title="body section"></a>body section</h2><p>切版設計:<br><img src="/2024/02/11/20240211/20240211_img3.png"></p>
-<p>html元素:</p>
-<ul>
-<li>由於區塊模板相似，做好一個候可以重複套用添加內容</li>
-<li>一個區塊以div包覆，下面分三個小div操作</li>
-<li>最上div面用 <code>&lt;p&gt;&lt;/p&gt;</code> 和 <code>&lt;a&gt;&lt;/a&gt;</code> 放置文字與連結點選</li>
-<li>中間div放大圖片</li>
-<li>下方div包含三個小div，放置圖片，文字等商品資訊</li>
-</ul>
-<p>css樣式重點:</p>
-<ul>
-<li>body整體以header做父元素定位，並做水平置中</li>
-<li>body寬度以view point為單位設定，使其可依照視窗縮放比例</li>
-<li>區塊模板以flex呈垂直排列<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">position: absolute; </span><br><span class="line">top: 40%;</span><br><span class="line">left: 50%; /*搭配margin-left: -(width/2)做水平置中*/</span><br><span class="line">overflow: hidden;</span><br><span class="line"></span><br><span class="line">display: flex;</span><br><span class="line">flex-direction: column;</span><br><span class="line">gap: 50px;</span><br><span class="line"></span><br><span class="line">margin-left: -40vw; /*寬度的一半做水平置中*/</span><br><span class="line">width: 80vw;</span><br></pre></td></tr></table></figure></li>
-<li>區塊模版最上方的<code>&lt;p&gt;</code>和<code>&lt;a&gt;</code> 分別以 <code>float: left; float: right;</code> 浮動</li>
-<li>區塊模板下方再套用flex呈水平排列<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">display: flex;</span><br><span class="line">flex-direction: row;</span><br><span class="line">gap: 10px;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="footer-section"><a href="#footer-section" class="headerlink" title="footer section"></a>footer section</h2><p>切版設計:<br><img src="/2024/02/11/20240211/20240211_img4.png"></p>
-<p>html元素:</p>
-<ul>
-<li>上方div內有兩個小div，分別放置qrcode跟聯絡資訊</li>
-<li>下方div跟header的nav清單相似，但以list寫法呈現</li>
-</ul>
-<p>css樣式重點:</p>
-<ul>
-<li>footer整體以body做父元素定位</li>
-<li>使用預先知道得body total height作為top距離，讓footer銜接在body下方<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">position:absolute;</span><br><span class="line">top: 3000px; /*不太好得做法，以body為父元素，body height為top距離*/</span><br><span class="line">padding-top: 60px;</span><br><span class="line">width:100vw; /*可依視窗大小縮放的寬度單位*/</span><br><span class="line">height:300px;</span><br><span class="line">background-color: lightgray;</span><br></pre></td></tr></table></figure></li>
-<li>上方div內的兩個小div以<code>float:left;</code>做浮動<ul>
-<li>左側div以flex讓內部三個div呈水平排列，同時設定跟右側div相同的高度</li>
-<li>右側div主要調整的是p元素的間隔，高寬，以及與左側div的距離，並以border做區隔<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/*左側div css*/</span><br><span class="line">display: flex; /*flex方式排列qrcodes*/</span><br><span class="line">flex-direction: row;</span><br><span class="line">gap: 10px; </span><br><span class="line">height: 240px; /*讓img+text總高和右側聯絡資訊一樣*/</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/*右側div css*/</span><br><span class="line">text-align: left;</span><br><span class="line">border-left: 1px solid black;</span><br><span class="line">margin-left: 15px;</span><br><span class="line">margin-bottom: 20px;</span><br><span class="line">padding-left: 45px;</span><br><span class="line">line-height: 30px;</span><br><span class="line">font-size: 20px;</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li>下方div(.g-footer-list)的list以更改<code>display:inline-block;</code>的方式呈水平排列，並保留設定元素寬度的能力</li>
-<li>練習以last-child或first-child方式移除頭尾元素的border<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">.g-footer-list ul li &#123; /*以inline-block displayed list製作清單*/</span><br><span class="line">display: inline-block; /*可設長寬的元素*/</span><br><span class="line">border-left: 1px solid black;</span><br><span class="line">margin: 0 auto; /*給予寬度的情況下，margin auto可置中*/</span><br><span class="line">width: 100px;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">    .g-footer-list li:first-child &#123; /*remove border for the first element in the list*/</span><br><span class="line">    border: none;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="qrcode-banner"><a href="#qrcode-banner" class="headerlink" title="qrcode banner"></a>qrcode banner</h2><p>html元素:</p>
-<ul>
-<li>div包含img和兩個小div</li>
-</ul>
-<p>css樣式設計:</p>
-<ul>
-<li>整體定位，以網頁為父元素，固定浮動於左下方</li>
-<li>設定z-index浮動在body和footer上方<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">position: fixed; /*固定浮動在網頁左下方*/</span><br><span class="line">bottom: 50px;</span><br><span class="line">left: 100px;</span><br><span class="line">z-index: 998; /*不被body蓋住*/</span><br><span class="line">padding: 10px 30px;</span><br><span class="line">border: 1px solid gray;</span><br><span class="line">background-color: white;</span><br></pre></td></tr></table></figure></li>
-<li>先設定圖片寬度，配合left和margin-left讓圖片水平置中於div內<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">img &#123;</span><br><span class="line">    position: relative;</span><br><span class="line">    left: 50%;</span><br><span class="line">    margin-left: -75px; </span><br><span class="line">    width: 150px;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="成果展示"><a href="#成果展示" class="headerlink" title="成果展示"></a>成果展示</h2><p><a target="_blank" rel="noopener" href="https://github.com/pxchen110/html_case/tree/main/true_web_practice1">Github 原始碼 </a></p>
-<p>一併附上拚<a target="_blank" rel="noopener" href="https://m.pinduoduo.com/">多多網站連結</a></p>
-<h2 id="檢討回顧"><a href="#檢討回顧" class="headerlink" title="檢討回顧"></a>檢討回顧</h2><p>以上就是我得第一版網站仿寫，過程歷經許多trial and error，像是沒規劃好區塊，等寫到60%時又重新修改架構，打掉重練的狀況；也蠻常遇到加了css樣式但卻出不來的困惑。最後列出幾點我在udemy上學到的技巧，以及這一版仿寫有待改進的部分:</p>
-<ul>
-<li>navigation bar 應該也改成list製作會比較簡單，開太多div來包感覺沒意義</li>
-<li>footer出現在尾端的定位方式非robust，和body依賴性太高，萬一body新增內容豈不是要調整top數值?</li>
-<li>佔滿視窗大小並依比例調整，改用<strong>100%<strong>會比</strong>100vw</strong>好，原因可以參考<a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10251849">此網站的解釋</a></li>
-<li>透過將<code>float: left;`` float: right;</code> 設成一個class name，當有元素需要就加上這個class是有效率的方法</li>
-<li>同理可以新增清除浮動的class，有需要就加上<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"> .clearfix::after &#123; /*清除浮動</span><br><span class="line">    content: &quot;&quot;;</span><br><span class="line">    display: block;</span><br><span class="line">    clear: both;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure></li>
-<li>一開始就設定所有的a元素都移除下底線，或所有list都移除符號</li>
-</ul>
+<p>常見的連接埠比較(內容節錄自<a target="_blank" rel="noopener" href="https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/">cloudflare網站</a>) :</p>
+<blockquote>
+<p>連接埠 25 最常用於 SMTP 伺服器之間的連線。如今，用於終端使用者網路的防火牆通常會封鎖該連接埠，因為垃圾郵件發送者嘗試濫用它來傳送大量垃圾郵件。</p>
+<p>連接埠 465 曾經專供具有安全通訊端層 (SSL) 加密的 SMTP 使用。但是 SSL 已被 Transport Layer Security (TLS) 取代，因此現代電子郵件系統不再使用該連接埠。它只存在於舊版（過時的）系統中。</p>
+<p>連接埠 587 現在是電子郵件提交的預設連接埠。透過此連接埠進行的 SMTP 通訊使用 TLS 加密。</p>
+</blockquote>
+<h2 id="Part2-撰寫python程式"><a href="#Part2-撰寫python程式" class="headerlink" title="Part2: 撰寫python程式"></a>Part2: 撰寫python程式</h2><p>python 提供 smtplib 模組來協助 smtp 封裝信息並傳輸給目標端。由於</p>
+<h3 id="step0-引入套件和開啟google-mail-權限"><a href="#step0-引入套件和開啟google-mail-權限" class="headerlink" title="step0: 引入套件和開啟google mail 權限"></a>step0: 引入套件和開啟google mail 權限</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">import smtplib</span><br></pre></td></tr></table></figure>
+<p>除了基本模組，常搭配擴充電子郵件標準套件，來處理內文部分</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">from email.mime.multipart import MIMEMultipart #email內容載體</span><br><span class="line">from email.mime.text import MIMEText           #製作郵件內文</span><br></pre></td></tr></table></figure>
+
+<p>若要在gmail使用smtplib，需要到 <a target="_blank" rel="noopener" href="https://myaccount.google.com/security">google 帳戶的安全性頁面</a> 完成帳戶密碼設定(下圖紅框標示處)</p>
+<p><img src="/2024/02/15/20240215/20240215_img2.png"></p>
+<h3 id="step1-設定帳戶資訊"><a href="#step1-設定帳戶資訊" class="headerlink" title="step1: 設定帳戶資訊"></a>step1: 設定帳戶資訊</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">MAIL_USER = &quot;from_who_user_@gmail...&quot;  #寄件者email帳號</span><br><span class="line">MAIL_PASSWD = &quot;......&quot;                 #寄件者email密碼</span><br><span class="line">FROM_ADDRESS = MAIL_USER               #和寄件者相同</span><br><span class="line"></span><br><span class="line"># 郵件平台的主機 port (這裡使用 gmail smtp 伺服器)</span><br><span class="line">MAIL_SMTP = &quot;smtp.gmail.com&quot;</span><br><span class="line">MAIL_PORT = 587                        #安全加密port &quot;587&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="step2-撰寫郵件內容與寄件人"><a href="#step2-撰寫郵件內容與寄件人" class="headerlink" title="step2: 撰寫郵件內容與寄件人"></a>step2: 撰寫郵件內容與寄件人</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">to_address = &quot;to_who_@gmail...&quot;        #收件者email帳號</span><br><span class="line">body_content = &quot;&quot;                      #輸入郵件內文</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="step3-以擴充電子郵件標準來組合-email-結構"><a href="#step3-以擴充電子郵件標準來組合-email-結構" class="headerlink" title="step3: 以擴充電子郵件標準來組合 email 結構"></a>step3: 以擴充電子郵件標準來組合 email 結構</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mail = MIMEMultipart()</span><br><span class="line">mail[&#x27;From&#x27;] = FROM_ADDRESS            #寄件者</span><br><span class="line">mail[&#x27;Subject&#x27;] = &quot;the subject&quot;        #主旨</span><br><span class="line">mail[&#x27;To&#x27;] = to_address                #收件者</span><br><span class="line"></span><br><span class="line">mail.attach(MIMEText(body_content))    #以attach方式貼上內文</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="step4-設定smtp伺服器並寄信"><a href="#step4-設定smtp伺服器並寄信" class="headerlink" title="step4: 設定smtp伺服器並寄信"></a>step4: 設定smtp伺服器並寄信</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">smtpserver = smtplib.SMTP(MAIL_SMTP, MAIL_PORT)</span><br><span class="line"></span><br><span class="line"># 發出「Hello」訊息，以在用戶端和伺服器之間建立SMTP連線</span><br><span class="line">smtpserver.ehlo()   </span><br><span class="line"></span><br><span class="line"># TLS加密：延伸保護 SMTP 階段作業</span><br><span class="line">smtpserver.starttls() </span><br><span class="line"></span><br><span class="line"># 登入寄件人郵件系統</span><br><span class="line">smtpserver.login(MAIL_USER. MAIL_PASSWD) </span><br><span class="line"></span><br><span class="line"># 將step3產生的信件內容轉成string並寫入</span><br><span class="line">smtpserver.sendmail(FROM_ADDRESS, to_address, mail.as_string()) </span><br><span class="line"></span><br><span class="line"># 結束系統連線</span><br><span class="line">server.quit() </span><br></pre></td></tr></table></figure>
+
+<h2 id="Part3-完整script-成果展示"><a href="#Part3-完整script-成果展示" class="headerlink" title="Part3: 完整script &amp; 成果展示"></a>Part3: 完整script &amp; 成果展示</h2><p>附上完整的 python script<br><strong>注意: 由於使用個人主機測試，才敢將信箱帳密直接輸入在command line、由 sys 存取，若在公用主機請注意資安考量。</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python3</span><br><span class="line"></span><br><span class="line">import os</span><br><span class="line">import sys</span><br><span class="line">import smtplib</span><br><span class="line">from email.mime.multipart import MIMEMultipart</span><br><span class="line">from email.mime.text import MIMEText</span><br><span class="line"></span><br><span class="line">mail_user = sys.argv[1]</span><br><span class="line">mail_passwd = sys.argv[2]</span><br><span class="line">from_address = mail_user</span><br><span class="line"></span><br><span class="line">mail_smtp = &quot;smtp.gmail.com&quot;</span><br><span class="line">mail_port = 587</span><br><span class="line"></span><br><span class="line">to_address = sys.argv[3]</span><br><span class="line">body_content = &quot;&quot;&quot;</span><br><span class="line">	This is the auto-send email test </span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">mail = MIMEMultipart()</span><br><span class="line">mail[&#x27;From&#x27;] = mail_user</span><br><span class="line">mail[&#x27;To&#x27;] = to_address</span><br><span class="line">mail[&#x27;Subject&#x27;] = &quot;Test for smtp email-sender&quot;</span><br><span class="line"></span><br><span class="line">mail.attach(MIMEText(body_content))</span><br><span class="line"></span><br><span class="line">server = smtplib.SMTP(mail_smtp, mail_port)</span><br><span class="line">server.ehlo()</span><br><span class="line">server.starttls()</span><br><span class="line">server.login(mail_user, mail_passwd)</span><br><span class="line">server.sendmail(mail_user, to_address, mail.as_string())</span><br><span class="line">server.quit()</span><br></pre></td></tr></table></figure>
+
+<p>到收件者的信箱查看，成功收到如下圖的信件</p>
+<p><img src="/2024/02/15/20240215/20240215_img3.png"></p>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><p><a target="_blank" rel="noopener" href="https://aws.amazon.com/tw/what-is/smtp/">https://aws.amazon.com/tw/what-is/smtp/</a><br><a target="_blank" rel="noopener" href="https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/">https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/</a></p>
 
             
 
@@ -428,7 +380,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">標籤</span><br/>
                 
-    <a class="tag tag--primary tag--small t-none-link" href="/tags/CSS/" rel="tag">CSS</a> <a class="tag tag--primary tag--small t-none-link" href="/tags/HTML/" rel="tag">HTML</a>
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/Python/" rel="tag">Python</a>
 
             </div>
         
@@ -438,14 +390,11 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2024/02/15/20240215/"
-                    data-tooltip="Python實用系列： smtplib 模組實現自動寄信"
-                    aria-label="上一篇: Python實用系列： smtplib 模組實現自動寄信"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -455,9 +404,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2024/02/08/20240208/"
-                    data-tooltip="HTML+CSS成果展(1)：可愛貓咪網站"
-                    aria-label="下一篇: HTML+CSS成果展(1)：可愛貓咪網站"
+                    href="/2024/02/11/20240211/"
+                    data-tooltip="HTML+CSS成果展(2)：仿寫拼多多網站"
+                    aria-label="下一篇: HTML+CSS成果展(2)：仿寫拼多多網站"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -482,7 +431,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/02/11/20240211/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/02/15/20240215/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -495,7 +444,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/02/11/20240211/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/02/15/20240215/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -508,7 +457,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/02/11/20240211/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/02/15/20240215/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -545,8 +494,8 @@
         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
         var disqus_config = function () {
-          this.page.url = 'https://pxchen110.github.io/2024/02/11/20240211/';  // Replace PAGE_URL with your page's canonical URL variable
-          this.page.identifier = '1707647317000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          this.page.url = 'https://pxchen110.github.io/2024/02/15/20240215/';  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = '1707996100000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
         };
         (function() { // DON'T EDIT BELOW THIS LINE
         var d = document, s = d.createElement('script');
@@ -574,14 +523,11 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2024/02/15/20240215/"
-                    data-tooltip="Python實用系列： smtplib 模組實現自動寄信"
-                    aria-label="上一篇: Python實用系列： smtplib 模組實現自動寄信"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -591,9 +537,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2024/02/08/20240208/"
-                    data-tooltip="HTML+CSS成果展(1)：可愛貓咪網站"
-                    aria-label="下一篇: HTML+CSS成果展(1)：可愛貓咪網站"
+                    href="/2024/02/11/20240211/"
+                    data-tooltip="HTML+CSS成果展(2)：仿寫拼多多網站"
+                    aria-label="下一篇: HTML+CSS成果展(2)：仿寫拼多多網站"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -618,7 +564,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/02/11/20240211/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/02/15/20240215/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -631,7 +577,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/02/11/20240211/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/02/15/20240215/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -644,7 +590,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/02/11/20240211/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/02/15/20240215/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -678,7 +624,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/02/11/20240211/"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/02/15/20240215/"
                         aria-label="分享到 Facebook"
                     >
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
@@ -691,7 +637,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/02/11/20240211/"
+                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/02/15/20240215/"
                         aria-label="分享到 Twitter"
                     >
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
@@ -704,7 +650,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/02/11/20240211/"
+                        href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/02/15/20240215/"
                         aria-label="分享到 Google+"
                     >
                         <i class="fab fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
