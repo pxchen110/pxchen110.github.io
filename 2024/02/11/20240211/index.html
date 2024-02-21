@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"\n參考資料來源：udemy 課程\n從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。\n\n\n學習流程：將影片要仿寫的部份截圖-&gt;自己寫看看-&gt;觀看課程影片比對老師和我的作法差異-&gt;改善程式-&gt;完成！\n\n\n大致的切版規劃:\n切版成三區塊，以及一個固定於網頁左下方的qrcode，在html會分成四個&lt;div&gt;&lt;/div&gt;撰寫\n\nheader+nav(嚴格來說只有navigation bar)\nbody(以相同模板套用內容並垂直排列)\nfooter(下方聯絡資訊等樣式)\nqrcode banner\n\nHeader+nav section切版設計:\nhtml元素:\n\n圖片和nav文字都是 &lt;a&gt;&lt;/a&gt; 元素\n\ncss樣式重點:\n\n網頁滑動仍固定於上方:1234position: fixed; /*固定在最上面*/top: 0; /*定位*/left: 0; /*定位*/z-index: 999; /*滑動時不會被上來的div蓋住*/\nnav的div以flex呈現水平排列，以border作為間隔，並清除尾端div的border12display: flex; /*將div以flex規劃排列方式，呈現清單*/flex-direction: row; \nnav 下面的小div以border作為間隔\n在倒數個div加上class name(.g-header-list-re)，練習以+方式清除最後一個div元素的border12345border-right: 1px solid gray; .g-header-list-re + div  &#123; /*清除最後一個元素的border*/border-right: none;  &#125;\n\nbody section切版設計:\nhtml元素:\n\n由於區塊模板相似，做好一個候可以重複套用添加內容\n一個區塊以div包覆，下面分三個小div操作\n最上div面用 &lt;p&gt;&lt;/p&gt; 和 &lt;a&gt;&lt;/a&gt; 放置文字與連結點選\n中間div放大圖片\n下方div包含三個小div，放置圖片，文字等商品資訊\n\ncss樣式重點:\n\nbody整體以header做父元素定位，並做水平置中\nbody寬度以view point為單位設定，使其可依照視窗縮放比例\n區塊模板以flex呈垂直排列1234567891011position: absolute; top: 40%;left: 50%; /*搭配margin-left: -(width/2)做水平置中*/overflow: hidden;display: flex;flex-direction: column;gap: 50px;margin-left: -40vw; /*寬度的一半做水平置中*/width: 80vw;\n區塊模版最上方的&lt;p&gt;和&lt;a&gt; 分別以 float: left; float: right; 浮動\n區塊模板下方再套用flex呈水平排列123display: flex;flex-direction: row;gap: 10px;\n\nfooter section切版設計:\nhtml元素:\n\n上方div內有兩個小div，分別放置qrcode跟聯絡資訊\n下方div跟header的nav清單相似，但以list寫法呈現\n\ncss樣式重點:\n\nfooter整體以body做父元素定位\n使用預先知道得body total height作為top距離，讓footer銜接在body下方123456position:absolute;top: 3000px; /*不太好得做法，以body為父元素，body height為top距離*/padding-top: 60px;width:100vw; /*可依視窗大小縮放的寬度單位*/height:300px;background-color: lightgray;\n上方div內的兩個小div以float:left;做浮動\n左側div以flex讓內部三個div呈水平排列，同時設定跟右側div相同的高度\n右側div主要調整的是p元素的間隔，高寬，以及與左側div的距離，並以border做區隔12345/*左側div css*/display: flex; /*flex方式排列qrcodes*/flex-direction: row;gap: 10px; height: 240px; /*讓img+text總高和右側聯絡資訊一樣*/\n12345678/*右側div css*/text-align: left;border-left: 1px solid black;margin-left: 15px;margin-bottom: 20px;padding-left: 45px;line-height: 30px;font-size: 20px;\n\n\n下方div(.g-footer-list)的list以更改display:inline-block;的方式呈水平排列，並保留設定元素寬度的能力\n練習以last-child或first-child方式移除頭尾元素的border123456.g-footer-list ul li &#123; /*以inline-block displayed list製作清單*/display: inline-block; /*可設長寬的元素*/border-left: 1px solid black;margin: 0 auto; /*給予寬度的情況下，margin auto可置中*/width: 100px;&#125;\n123    .g-footer-list li:first-child &#123; /*remove border for the first element in the list*/    border: none;&#125;\n\nqrcode bannerhtml元素:\n\ndiv包含img和兩個小div\n\ncss樣式設計:\n\n整體定位，以網頁為父元素，固定浮動於左下方\n設定z-index浮動在body和footer上方1234567position: fixed; /*固定浮動在網頁左下方*/bottom: 50px;left: 100px;z-index: 998; /*不被body蓋住*/padding: 10px 30px;border: 1px solid gray;background-color: white;\n先設定圖片寬度，配合left和margin-left讓圖片水平置中於div內123456img &#123;    position: relative;    left: 50%;    margin-left: -75px;     width: 150px;&#125;\n\n成果展示Github 原始碼 \n一併附上拚多多網站連結\n檢討回顧以上就是我得第一版網站仿寫，過程歷經許多trial and error，像是沒規劃好區塊，等寫到60%時又重新修改架構，打掉重練的狀況；也蠻常遇到加了css樣式但卻出不來的困惑。最後列出幾點我在udemy上學到的技巧，以及這一版仿寫有待改進的部分:\n\nnavigation bar 應該也改成list製作會比較簡單，開太多div來包感覺沒意義\nfooter出現在尾端的定位方式非robust，和body依賴性太高，萬一body新增內容豈不是要調整top數值?\n佔滿視窗大小並依比例調整，改用100%會比100vw好，原因可以參考此網站的解釋\n透過將float: left;`` float: right; 設成一個class name，當有元素需要就加上這個class是有效率的方法\n同理可以新增清除浮動的class，有需要就加上12345 .clearfix::after &#123; /*清除浮動    content: &quot;&quot;;    display: block;    clear: both;&#125; \n一開始就設定所有的a元素都移除下底線，或所有list都移除符號\n\n","dateCreated":"2024-02-11T18:28:37+08:00","dateModified":"2024-02-15T19:35:02+08:00","datePublished":"2024-02-11T18:28:37+08:00","description":"\n參考資料來源：udemy 課程\n從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。","headline":"HTML+CSS成果展(2)：仿寫拼多多網站","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/2024/02/11/20240211/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/2024/02/11/20240211/","keywords":"HTML, CSS"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"\n參考資料來源：udemy 課程\n從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。\n\n\n學習流程：將影片要仿寫的部份截圖-&gt;自己寫看看-&gt;觀看課程影片比對老師和我的作法差異-&gt;改善程式-&gt;完成！\n\n\n大致的切版規劃:\n切版成三區塊，以及一個固定於網頁左下方的qrcode，在html會分成四個&lt;div&gt;&lt;/div&gt;撰寫\n\nheader+nav(嚴格來說只有navigation bar)\nbody(以相同模板套用內容並垂直排列)\nfooter(下方聯絡資訊等樣式)\nqrcode banner\n\nHeader+nav section切版設計:\nhtml元素:\n\n圖片和nav文字都是 &lt;a&gt;&lt;/a&gt; 元素\n\ncss樣式重點:\n\n網頁滑動仍固定於上方:1234position: fixed; /*固定在最上面*/top: 0; /*定位*/left: 0; /*定位*/z-index: 999; /*滑動時不會被上來的div蓋住*/\nnav的div以flex呈現水平排列，以border作為間隔，並清除尾端div的border12display: flex; /*將div以flex規劃排列方式，呈現清單*/flex-direction: row; \nnav 下面的小div以border作為間隔\n在倒數個div加上class name(.g-header-list-re)，練習以+方式清除最後一個div元素的border12345border-right: 1px solid gray; .g-header-list-re + div  &#123; /*清除最後一個元素的border*/border-right: none;  &#125;\n\nbody section切版設計:\nhtml元素:\n\n由於區塊模板相似，做好一個候可以重複套用添加內容\n一個區塊以div包覆，下面分三個小div操作\n最上div面用 &lt;p&gt;&lt;/p&gt; 和 &lt;a&gt;&lt;/a&gt; 放置文字與連結點選\n中間div放大圖片\n下方div包含三個小div，放置圖片，文字等商品資訊\n\ncss樣式重點:\n\nbody整體以header做父元素定位，並做水平置中\nbody寬度以view point為單位設定，使其可依照視窗縮放比例\n區塊模板以flex呈垂直排列1234567891011position: absolute; top: 40%;left: 50%; /*搭配margin-left: -(width/2)做水平置中*/overflow: hidden;display: flex;flex-direction: column;gap: 50px;margin-left: -40vw; /*寬度的一半做水平置中*/width: 80vw;\n區塊模版最上方的&lt;p&gt;和&lt;a&gt; 分別以 float: left; float: right; 浮動\n區塊模板下方再套用flex呈水平排列123display: flex;flex-direction: row;gap: 10px;\n\nfooter section切版設計:\nhtml元素:\n\n上方div內有兩個小div，分別放置qrcode跟聯絡資訊\n下方div跟header的nav清單相似，但以list寫法呈現\n\ncss樣式重點:\n\nfooter整體以body做父元素定位\n使用預先知道得body total height作為top距離，讓footer銜接在body下方123456position:absolute;top: 3000px; /*不太好得做法，以body為父元素，body height為top距離*/padding-top: 60px;width:100vw; /*可依視窗大小縮放的寬度單位*/height:300px;background-color: lightgray;\n上方div內的兩個小div以float:left;做浮動\n左側div以flex讓內部三個div呈水平排列，同時設定跟右側div相同的高度\n右側div主要調整的是p元素的間隔，高寬，以及與左側div的距離，並以border做區隔12345/*左側div css*/display: flex; /*flex方式排列qrcodes*/flex-direction: row;gap: 10px; height: 240px; /*讓img+text總高和右側聯絡資訊一樣*/\n12345678/*右側div css*/text-align: left;border-left: 1px solid black;margin-left: 15px;margin-bottom: 20px;padding-left: 45px;line-height: 30px;font-size: 20px;\n\n\n下方div(.g-footer-list)的list以更改display:inline-block;的方式呈水平排列，並保留設定元素寬度的能力\n練習以last-child或first-child方式移除頭尾元素的border123456.g-footer-list ul li &#123; /*以inline-block displayed list製作清單*/display: inline-block; /*可設長寬的元素*/border-left: 1px solid black;margin: 0 auto; /*給予寬度的情況下，margin auto可置中*/width: 100px;&#125;\n123    .g-footer-list li:first-child &#123; /*remove border for the first element in the list*/    border: none;&#125;\n\nqrcode bannerhtml元素:\n\ndiv包含img和兩個小div\n\ncss樣式設計:\n\n整體定位，以網頁為父元素，固定浮動於左下方\n設定z-index浮動在body和footer上方1234567position: fixed; /*固定浮動在網頁左下方*/bottom: 50px;left: 100px;z-index: 998; /*不被body蓋住*/padding: 10px 30px;border: 1px solid gray;background-color: white;\n先設定圖片寬度，配合left和margin-left讓圖片水平置中於div內123456img &#123;    position: relative;    left: 50%;    margin-left: -75px;     width: 150px;&#125;\n\n成果展示Github 原始碼 \n一併附上拚多多網站連結\n檢討回顧以上就是我得第一版網站仿寫，過程歷經許多trial and error，像是沒規劃好區塊，等寫到60%時又重新修改架構，打掉重練的狀況；也蠻常遇到加了css樣式但卻出不來的困惑。最後列出幾點我在udemy上學到的技巧，以及這一版仿寫有待改進的部分:\n\nnavigation bar 應該也改成list製作會比較簡單，開太多div來包感覺沒意義\nfooter出現在尾端的定位方式非robust，和body依賴性太高，萬一body新增內容豈不是要調整top數值?\n佔滿視窗大小並依比例調整，改用100%會比100vw好，原因可以參考此網站的解釋\n透過將float: left;`` float: right; 設成一個class name，當有元素需要就加上這個class是有效率的方法\n同理可以新增清除浮動的class，有需要就加上12345 .clearfix::after &#123; /*清除浮動    content: &quot;&quot;;    display: block;    clear: both;&#125; \n一開始就設定所有的a元素都移除下底線，或所有list都移除符號\n\n","dateCreated":"2024-02-11T18:28:37+08:00","dateModified":"2024-02-21T20:06:51+08:00","datePublished":"2024-02-11T18:28:37+08:00","description":"\n參考資料來源：udemy 課程\n從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。","headline":"HTML+CSS成果展(2)：仿寫拼多多網站","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/2024/02/11/20240211/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/2024/02/11/20240211/","keywords":"HTML, CSS"}</script>
     <meta name="description" content="introduce html and css coding results">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="HTML+CSS成果展(2)：仿寫拼多多網站">
@@ -31,7 +31,7 @@
 <meta property="og:image" content="https://pxchen110.github.io/2024/02/11/20240211/20240211_img3.png">
 <meta property="og:image" content="https://pxchen110.github.io/2024/02/11/20240211/20240211_img4.png">
 <meta property="article:published_time" content="2024-02-11T10:28:37.000Z">
-<meta property="article:modified_time" content="2024-02-15T11:35:02.660Z">
+<meta property="article:modified_time" content="2024-02-21T12:06:51.986Z">
 <meta property="article:author" content="Xuan Chen">
 <meta property="article:tag" content="HTML">
 <meta property="article:tag" content="CSS">
@@ -815,7 +815,8 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/2024/02/01/20240201/20240201_img0.jpg"></p>
+<p>決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -838,7 +839,8 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為<strong>要來我家看貓嗎</strong>的小網頁</p></div>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/2024/02/08/20240208/20240208_img2.png"></p>
+<p>在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為<strong>要來我家看貓嗎</strong>的小網頁</p></div>
                     </div>
                     <div style="clear:both;"></div>
                     <hr>
@@ -893,6 +895,30 @@
                     <hr>
                 </div>
                 
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://pxchen110.github.io/2024/02/21/20240221/"
+                            aria-label=": Python實用系列： 三種引入外部參數的方法"
+                        >
+                            <h3 class="media-heading">Python實用系列： 三種引入外部參數的方法</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2024年2月21日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/2024/02/21/20240221/20240221_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+<p>撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: <code>sys</code>, <code>argparse</code>, 以及 <code>click</code>，文章將介紹模組&#x2F;套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
             </div>
         </div>
         <div class="modal-footer">
@@ -900,7 +926,7 @@
                 data-message-zero="沒有找到文章"
                 data-message-one="找到 1 篇文章"
                 data-message-other="找到 {n} 篇文章">
-                找到 5 篇文章
+                找到 6 篇文章
             </p>
         </div>
     </div>
