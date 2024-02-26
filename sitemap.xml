@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://pxchen110.github.io/2024/02/27/20240227/</loc>
+    
+    <lastmod>2024-02-26</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://pxchen110.github.io/2024/02/26/20240226/</loc>
     
     <lastmod>2024-02-26</lastmod>
@@ -139,6 +148,13 @@
   
   <url>
     <loc>https://pxchen110.github.io/tags/Movie/</loc>
+    <lastmod>2024-02-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://pxchen110.github.io/tags/Travel/</loc>
     <lastmod>2024-02-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
