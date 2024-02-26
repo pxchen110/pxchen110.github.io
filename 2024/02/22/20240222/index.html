@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"Photo by Artturi Jalli on Unsplash\n撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\\輸入檔案的方式，產生目標內容。\n同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。\n\n\n\n\n\nPart1: subprocess 套件引入subprocess 為 Python 內建模組，引入即可使用\n12import subprocessfrom subprocess import PIPE, Popen\n\nPart2: 基本函數: run() and Popen()subprocess 啟動子進程的方式有兩種 subprocess.run() 和 subprocess.Popen其中run()在大部分情況下都可使用，Popen() 則使用於更進階的底層操作兩函數的基本參數都一樣，下面以 run() 來做參數介紹:\nsubprocess.run()\n外部指令的參數有兩種輸入方式，但建議以list形式輸入:可以使用 shlex 套件協助將指令 string 切分成 list注意: shell = True 代表允許系統調用shell執行，如同讓主機門戶大開、容易發生 shell injection 的資安風險，請盡量少用1234567891011121314# in linux shellln -s# in python subprocess run## method1: input as list (recommend!)## 徒手拆分成listsubprocess.run([&#x27;ln&#x27;, &#x27;-s&#x27;])## 用shlex協助拆分成listcmd_split = shlex.split(&#x27;ln -s&#x27;)subprocess.run(cmd_split)## method2: input as string, with shell = Truesubprocess.run(&#x27;ln -s&#x27;, shell = True)\ndefault 情況下，run() 執行無誤 (returncode &#x3D; 0) 後會返回 subprocess.CompletedProcess 的實例並印出結果；如果想查看返回狀況，可加上check = True ， 當 returncode !&#x3D; 0 會抛出 CalledProcessError\ndefault 情況下，run() 將結果直接印出，若想抓取輸出並存成變數，可使用 capture_output = True\ndefault 輸出形式為 bytes，可用 text = True 來更改輸出形式，透過下面例子來比較:1234567a = subprocess.run([&#x27;pwd&#x27;], capture_output = True)print(a.stdout)&gt; b&#x27;/current/working/directory\\n&#x27;a = subprocess.run([&#x27;pwd&#x27;], capture_output = True, text = True)print(a.stdout)&gt; /current/working/directory\n\nsubprocess.Popen()大部分的參數跟 run() 相同，特別的是只有 Popen() 可使用 PIPE 在串聯子進程間的 stdout, stdin, stderr，並搭配 communicate()防止死瑣，詳細內容在Part3注意: run()不能使用 PIPE 和 communicate()\nPart3: 以 PIPE 串聯進程間的輸入\\ 輸出PIPE 觀念相當於 linux 裡的 piping |，可減少中間檔案儲存的冗餘。下面的例子利用 PIPE 將第一個子進程的輸出，當作第二個子進程的輸入\n12cmd1 = subprocess.Popen([&#x27;pwd&#x27;], stdout = PIPE)subprocess.Popen([&#x27;ls&#x27;, &#x27;-alh&#x27;], stdin = cmd1.stdout)\nPIPE 的實用程度高，但當管道內暫存的資料量過大，會造成子進程卡住，永遠無法結束(稱作死瑣)，使用 communicate() 可即時讀取 PIPE 內容:\n123e = subprocess.Popen([&#x27;pwd&#x27;], stdout = PIPE, stdin = PIPE, text = True)out, err = e.communicate() print(out)\n另外也可將 PIPE 的輸出存進檔案，解決死瑣問題\n12f = open(&#x27;save_stdout.txt&#x27;, &#x27;w&#x27;)subprocess.Popen([&#x27;pwd&#x27;], stdout = f, text = True)\n\nPart4: 實例應用Example1:我想檢查幾份log檔是否有回報錯誤訊息，利用 PIPE 加communicate() 將子進程 grep 到的內容存進 out 變數、並判斷是否有錯誤訊息\n12345678910111213import shleximport subprocessfrom subprocess import PIPE, Popenlogs = [&#x27;log.1&#x27;, &#x27;log.2&#x27;]for i in logs:    cmd = shlex.split(&#x27;grep &quot;terminated with an error exit status&quot; &#123;&#125;&#x27;.format(i))    p = subprocess.Popen(cmd, stdout = PIPE, text = True)    out,err = p.communicate()        if out: ## NOT NULL    sys.exit(&#x27;Error occured, please refer to &#123;&#125; for more detail&#x27;.format(i))\n\nExample2:現在有一份vcf原始檔，需要先以bio-tool(using Singularity)做格式轉換，再用python做資料篩選，但我不想產生轉換格式的中間檔，於是寫了以下 python script，以原始vcf做input，先開一個子進程處理vcf，以PIPE儲存輸出，存進 pyton 變數並作後續篩選\n123456789101112import sysimport shleximport subprocessfrom subprocess import PIPE, Popenorigin_vcf = sys.argv[1]cmds = shlex.split(&#x27;singularity exec vcflib_1.0.0-rc2.sif vcf2tsv &#123;&#125;&#x27;.format(origin_vcf))input_vcf = subprocess.run(cmds, stdout = PIPE).stdout.decode(&#x27;utf-8&#x27;).splitlines()for lines in input_vcf: #post-filtering in python\n\n參考資料https://docs.python.org/zh-tw/3/library/subprocess.html#https://www.aikaiyuan.com/4705.html\n","dateCreated":"2024-02-22T19:57:58+08:00","dateModified":"2024-02-22T20:00:39+08:00","datePublished":"2024-02-22T19:57:58+08:00","description":"Photo by Artturi Jalli on Unsplash\n撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\\輸入檔案的方式，產生目標內容。\n同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。","headline":"Python實用系列： subprocess模組管理子進程","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/2024/02/22/20240222/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/2024/02/22/20240222/","keywords":"Python"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"Photo by Artturi Jalli on Unsplash\n撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\\輸入檔案的方式，產生目標內容。\n同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。\n\n\n\n\n\nPart1: subprocess 套件引入subprocess 為 Python 內建模組，引入即可使用\n12import subprocessfrom subprocess import PIPE, Popen\n\nPart2: 基本函數: run() and Popen()subprocess 啟動子進程的方式有兩種 subprocess.run() 和 subprocess.Popen其中run()在大部分情況下都可使用，Popen() 則使用於更進階的底層操作兩函數的基本參數都一樣，下面以 run() 來做參數介紹:\nsubprocess.run()\n外部指令的參數有兩種輸入方式，但建議以list形式輸入:可以使用 shlex 套件協助將指令 string 切分成 list注意: shell = True 代表允許系統調用shell執行，如同讓主機門戶大開、容易發生 shell injection 的資安風險，請盡量少用1234567891011121314# in linux shellln -s# in python subprocess run## method1: input as list (recommend!)## 徒手拆分成listsubprocess.run([&#x27;ln&#x27;, &#x27;-s&#x27;])## 用shlex協助拆分成listcmd_split = shlex.split(&#x27;ln -s&#x27;)subprocess.run(cmd_split)## method2: input as string, with shell = Truesubprocess.run(&#x27;ln -s&#x27;, shell = True)\ndefault 情況下，run() 執行無誤 (returncode &#x3D; 0) 後會返回 subprocess.CompletedProcess 的實例並印出結果；如果想查看返回狀況，可加上check = True ， 當 returncode !&#x3D; 0 會抛出 CalledProcessError\ndefault 情況下，run() 將結果直接印出，若想抓取輸出並存成變數，可使用 capture_output = True\ndefault 輸出形式為 bytes，可用 text = True 來更改輸出形式，透過下面例子來比較:1234567a = subprocess.run([&#x27;pwd&#x27;], capture_output = True)print(a.stdout)&gt; b&#x27;/current/working/directory\\n&#x27;a = subprocess.run([&#x27;pwd&#x27;], capture_output = True, text = True)print(a.stdout)&gt; /current/working/directory\n\nsubprocess.Popen()大部分的參數跟 run() 相同，特別的是只有 Popen() 可使用 PIPE 在串聯子進程間的 stdout, stdin, stderr，並搭配 communicate()防止死瑣，詳細內容在Part3注意: run()不能使用 PIPE 和 communicate()\nPart3: 以 PIPE 串聯進程間的輸入\\ 輸出PIPE 觀念相當於 linux 裡的 piping |，可減少中間檔案儲存的冗餘。下面的例子利用 PIPE 將第一個子進程的輸出，當作第二個子進程的輸入\n12cmd1 = subprocess.Popen([&#x27;pwd&#x27;], stdout = PIPE)subprocess.Popen([&#x27;ls&#x27;, &#x27;-alh&#x27;], stdin = cmd1.stdout)\nPIPE 的實用程度高，但當管道內暫存的資料量過大，會造成子進程卡住，永遠無法結束(稱作死瑣)，使用 communicate() 可即時讀取 PIPE 內容:\n123e = subprocess.Popen([&#x27;pwd&#x27;], stdout = PIPE, stdin = PIPE, text = True)out, err = e.communicate() print(out)\n另外也可將 PIPE 的輸出存進檔案，解決死瑣問題\n12f = open(&#x27;save_stdout.txt&#x27;, &#x27;w&#x27;)subprocess.Popen([&#x27;pwd&#x27;], stdout = f, text = True)\n\nPart4: 實例應用Example1:我想檢查幾份log檔是否有回報錯誤訊息，利用 PIPE 加communicate() 將子進程 grep 到的內容存進 out 變數、並判斷是否有錯誤訊息\n12345678910111213import shleximport subprocessfrom subprocess import PIPE, Popenlogs = [&#x27;log.1&#x27;, &#x27;log.2&#x27;]for i in logs:    cmd = shlex.split(&#x27;grep &quot;terminated with an error exit status&quot; &#123;&#125;&#x27;.format(i))    p = subprocess.Popen(cmd, stdout = PIPE, text = True)    out,err = p.communicate()        if out: ## NOT NULL    sys.exit(&#x27;Error occured, please refer to &#123;&#125; for more detail&#x27;.format(i))\n\nExample2:現在有一份vcf原始檔，需要先以bio-tool(using Singularity)做格式轉換，再用python做資料篩選，但我不想產生轉換格式的中間檔，於是寫了以下 python script，以原始vcf做input，先開一個子進程處理vcf，以PIPE儲存輸出，存進 pyton 變數並作後續篩選\n123456789101112import sysimport shleximport subprocessfrom subprocess import PIPE, Popenorigin_vcf = sys.argv[1]cmds = shlex.split(&#x27;singularity exec vcflib_1.0.0-rc2.sif vcf2tsv &#123;&#125;&#x27;.format(origin_vcf))input_vcf = subprocess.run(cmds, stdout = PIPE).stdout.decode(&#x27;utf-8&#x27;).splitlines()for lines in input_vcf: #post-filtering in python\n\n參考資料https://docs.python.org/zh-tw/3/library/subprocess.html#https://www.aikaiyuan.com/4705.html\n","dateCreated":"2024-02-22T19:57:58+08:00","dateModified":"2024-02-23T17:09:21+08:00","datePublished":"2024-02-22T19:57:58+08:00","description":"Photo by Artturi Jalli on Unsplash\n撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\\輸入檔案的方式，產生目標內容。\n同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。","headline":"Python實用系列： subprocess模組管理子進程","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/2024/02/22/20240222/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/2024/02/22/20240222/","keywords":"Python"}</script>
     <meta name="description" content="Photo by Artturi Jalli on Unsplash 撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\輸入檔案的方式，產生目標內容。 同理我們也能在以 python 做為父進程的情況下，以 subprocess">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Python實用系列： subprocess模組管理子進程">
@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://pxchen110.github.io/2024/02/22/20240222/20240222_img1.jpg">
 <meta property="article:published_time" content="2024-02-22T11:57:58.000Z">
-<meta property="article:modified_time" content="2024-02-22T12:00:39.163Z">
+<meta property="article:modified_time" content="2024-02-23T09:09:21.617Z">
 <meta property="article:author" content="Xuan Chen">
 <meta property="article:tag" content="Python">
 <meta name="twitter:card" content="summary">
@@ -380,11 +380,14 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a
-                        class="post-action-btn btn btn--disabled"
-                        aria-hidden="true"
-                    >
-                        
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2024/02/26/20240226/"
+                    data-tooltip="楊德昌《 一一 》觀後感"
+                    aria-label="上一篇: 楊德昌《 一一 》觀後感"
+                >
+                    
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -513,11 +516,14 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a
-                        class="post-action-btn btn btn--disabled"
-                        aria-hidden="true"
-                    >
-                        
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2024/02/26/20240226/"
+                    data-tooltip="楊德昌《 一一 》觀後感"
+                    aria-label="上一篇: 楊德昌《 一一 》觀後感"
+                >
+                    
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -880,6 +886,30 @@
                     <hr>
                 </div>
                 
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://pxchen110.github.io/2024/02/26/20240226/"
+                            aria-label=": 楊德昌《 一一 》觀後感"
+                        >
+                            <h3 class="media-heading">楊德昌《 一一 》觀後感</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2024年2月26日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>A one and A two…<br><img src="/2024/02/26/20240226/20240226_img1.jpeg"></p>
+<p>這是一個喜宴開頭喪禮結尾，由一家人的生活片段交疊而成的電影，時空背景設定在沒有智慧型手機的台北，也是我尚未出生的時代，所以電影裡的台北景色對我來說都很新奇: 麥當勞內用區、誠品咖啡廳、或是圓山大飯店的宴會廳，帶有微顆粒感的畫質讓電影更吸引人。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
             </div>
         </div>
         <div class="modal-footer">
@@ -887,7 +917,7 @@
                 data-message-zero="沒有找到文章"
                 data-message-one="找到 1 篇文章"
                 data-message-other="找到 {n} 篇文章">
-                找到 7 篇文章
+                找到 8 篇文章
             </p>
         </div>
     </div>
