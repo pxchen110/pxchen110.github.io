@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Xuan&#39;s Blog">
-    <title>Python實用系列： subprocess模組管理子進程 - Xuan&#39;s Blog</title>
+    <title>Introduction - Xuan&#39;s Blog</title>
     <meta name="author" content="Xuan Chen">
     
         <meta name="keywords" content="hexo,javascript,">
@@ -17,21 +17,20 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"Photo by Artturi Jalli on Unsplash\n撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\\輸入檔案的方式，產生目標內容。\n同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。\n\n\n\n\n\nPart1: subprocess 套件引入subprocess 為 Python 內建模組，引入即可使用\n12import subprocessfrom subprocess import PIPE, Popen\n\nPart2: 基本函數: run() and Popen()subprocess 啟動子進程的方式有兩種 subprocess.run() 和 subprocess.Popen其中run()在大部分情況下都可使用，Popen() 則使用於更進階的底層操作兩函數的基本參數都一樣，下面以 run() 來做參數介紹:\nsubprocess.run()\n外部指令的參數有兩種輸入方式，但建議以list形式輸入:可以使用 shlex 套件協助將指令 string 切分成 list注意: shell = True 代表允許系統調用shell執行，如同讓主機門戶大開、容易發生 shell injection 的資安風險，請盡量少用1234567891011121314# in linux shellln -s# in python subprocess run## method1: input as list (recommend!)## 徒手拆分成listsubprocess.run([&#x27;ln&#x27;, &#x27;-s&#x27;])## 用shlex協助拆分成listcmd_split = shlex.split(&#x27;ln -s&#x27;)subprocess.run(cmd_split)## method2: input as string, with shell = Truesubprocess.run(&#x27;ln -s&#x27;, shell = True)\ndefault 情況下，run() 執行無誤 (returncode &#x3D; 0) 後會返回 subprocess.CompletedProcess 的實例並印出結果；如果想查看返回狀況，可加上check = True ， 當 returncode !&#x3D; 0 會抛出 CalledProcessError\ndefault 情況下，run() 將結果直接印出，若想抓取輸出並存成變數，可使用 capture_output = True\ndefault 輸出形式為 bytes，可用 text = True 來更改輸出形式，透過下面例子來比較:1234567a = subprocess.run([&#x27;pwd&#x27;], capture_output = True)print(a.stdout)&gt; b&#x27;/current/working/directory\\n&#x27;a = subprocess.run([&#x27;pwd&#x27;], capture_output = True, text = True)print(a.stdout)&gt; /current/working/directory\n\nsubprocess.Popen()大部分的參數跟 run() 相同，特別的是只有 Popen() 可使用 PIPE 在串聯子進程間的 stdout, stdin, stderr，並搭配 communicate()防止死瑣，詳細內容在Part3注意: run()不能使用 PIPE 和 communicate()\nPart3: 以 PIPE 串聯進程間的輸入\\ 輸出PIPE 觀念相當於 linux 裡的 piping |，可減少中間檔案儲存的冗餘。下面的例子利用 PIPE 將第一個子進程的輸出，當作第二個子進程的輸入\n12cmd1 = subprocess.Popen([&#x27;pwd&#x27;], stdout = PIPE)subprocess.Popen([&#x27;ls&#x27;, &#x27;-alh&#x27;], stdin = cmd1.stdout)\nPIPE 的實用程度高，但當管道內暫存的資料量過大，會造成子進程卡住，永遠無法結束(稱作死瑣)，使用 communicate() 可即時讀取 PIPE 內容:\n123e = subprocess.Popen([&#x27;pwd&#x27;], stdout = PIPE, stdin = PIPE, text = True)out, err = e.communicate() print(out)\n另外也可將 PIPE 的輸出存進檔案，解決死瑣問題\n12f = open(&#x27;save_stdout.txt&#x27;, &#x27;w&#x27;)subprocess.Popen([&#x27;pwd&#x27;], stdout = f, text = True)\n\nPart4: 實例應用Example1:我想檢查幾份log檔是否有回報錯誤訊息，利用 PIPE 加communicate() 將子進程 grep 到的內容存進 out 變數、並判斷是否有錯誤訊息\n12345678910111213import shleximport subprocessfrom subprocess import PIPE, Popenlogs = [&#x27;log.1&#x27;, &#x27;log.2&#x27;]for i in logs:    cmd = shlex.split(&#x27;grep &quot;terminated with an error exit status&quot; &#123;&#125;&#x27;.format(i))    p = subprocess.Popen(cmd, stdout = PIPE, text = True)    out,err = p.communicate()        if out: ## NOT NULL    sys.exit(&#x27;Error occured, please refer to &#123;&#125; for more detail&#x27;.format(i))\n\nExample2:現在有一份vcf原始檔，需要先以bio-tool(using Singularity)做格式轉換，再用python做資料篩選，但我不想產生轉換格式的中間檔，於是寫了以下 python script，以原始vcf做input，先開一個子進程處理vcf，以PIPE儲存輸出，存進 pyton 變數並作後續篩選\n123456789101112import sysimport shleximport subprocessfrom subprocess import PIPE, Popenorigin_vcf = sys.argv[1]cmds = shlex.split(&#x27;singularity exec vcflib_1.0.0-rc2.sif vcf2tsv &#123;&#125;&#x27;.format(origin_vcf))input_vcf = subprocess.run(cmds, stdout = PIPE).stdout.decode(&#x27;utf-8&#x27;).splitlines()for lines in input_vcf: #post-filtering in python\n\n參考資料https://docs.python.org/zh-tw/3/library/subprocess.html#https://www.aikaiyuan.com/4705.html\n","dateCreated":"2024-02-22T19:57:58+08:00","dateModified":"2024-02-23T17:09:21+08:00","datePublished":"2024-02-22T19:57:58+08:00","description":"Photo by Artturi Jalli on Unsplash\n撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\\輸入檔案的方式，產生目標內容。\n同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。","headline":"Python實用系列： subprocess模組管理子進程","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/2024/02/22/20240222/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/2024/02/22/20240222/","keywords":"Python"}</script>
-    <meta name="description" content="Photo by Artturi Jalli on Unsplash 撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\輸入檔案的方式，產生目標內容。 同理我們也能在以 python 做為父進程的情況下，以 subprocess">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"自我介紹Hello World!這是我的第一篇(類似酒精路跑的開頭XD)簡單的自我介紹，生物資訊背景，隨著接觸的程式語言增加對前端產生興趣並開始自學程式精進。主要使用語言／系統: Linux, Python, R, HTML, CSS, JavaScript平時喜好閱讀、音樂廣播、電影，有機會也會分享心得體會。\n為何想寫部落格? 希望將這個網站當成是我的學習筆記，在撰寫同時疏理邏輯脈絡，內化更有效率；而學習過程中、從很多大神的blog獲得知識，自己也想記錄一些coding過程遇到的問題和debug的方法，以後有人遇到類似問題可以快速避坑（避坑避雷你我有責XD）\n最後點播一首張敬軒的My Way，我的副標題亦是取自歌詞 “Baby長大以後就是小軒~”用心去追，感覺就對，I will find my way\n","dateCreated":"2024-01-20T00:00:00+08:00","dateModified":"2024-01-21T10:59:19+08:00","datePublished":"2024-01-20T00:00:00+08:00","description":"","headline":"Introduction","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/introduction/uncategorized/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/introduction/uncategorized/"}</script>
+    <meta name="description" content="自我介紹Hello World!這是我的第一篇(類似酒精路跑的開頭XD)簡單的自我介紹，生物資訊背景，隨著接觸的程式語言增加對前端產生興趣並開始自學程式精進。主要使用語言／系統: Linux, Python, R, HTML, CSS, JavaScript平時喜好閱讀、音樂廣播、電影，有機會也會分享心得體會。 為何想寫部落格? 希望將這個網站當成是我的學習筆記，在撰寫同時疏理邏輯脈絡，內化更有效">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="Python實用系列： subprocess模組管理子進程">
-<meta property="og:url" content="https://pxchen110.github.io/2024/02/22/20240222/index.html">
+<meta property="og:title" content="Introduction">
+<meta property="og:url" content="https://pxchen110.github.io/introduction/uncategorized/index.html">
 <meta property="og:site_name" content="Xuan&#39;s Blog">
-<meta property="og:description" content="Photo by Artturi Jalli on Unsplash 撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\輸入檔案的方式，產生目標內容。 同理我們也能在以 python 做為父進程的情況下，以 subprocess">
+<meta property="og:description" content="自我介紹Hello World!這是我的第一篇(類似酒精路跑的開頭XD)簡單的自我介紹，生物資訊背景，隨著接觸的程式語言增加對前端產生興趣並開始自學程式精進。主要使用語言／系統: Linux, Python, R, HTML, CSS, JavaScript平時喜好閱讀、音樂廣播、電影，有機會也會分享心得體會。 為何想寫部落格? 希望將這個網站當成是我的學習筆記，在撰寫同時疏理邏輯脈絡，內化更有效">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://pxchen110.github.io/2024/02/22/20240222/20240222_img1.jpg">
-<meta property="article:published_time" content="2024-02-22T11:57:58.000Z">
-<meta property="article:modified_time" content="2024-02-23T09:09:21.617Z">
+<meta property="article:published_time" content="2024-01-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-01-21T02:59:19.173Z">
 <meta property="article:author" content="Xuan Chen">
-<meta property="article:tag" content="Python">
+<meta property="article:tag" content="hexo">
+<meta property="article:tag" content="javascript">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pxchen110.github.io/2024/02/22/20240222/20240222_img1.jpg">
     
     
         
@@ -301,22 +300,16 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            Python實用系列： subprocess模組管理子進程
+            Introduction
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2024-02-22T19:57:58+08:00">
+    <time datetime="2024-01-20T00:00:00+08:00">
 	
-		    2024 年 2 月 22 日
+		    2024 年 1 月 20 日
     	
     </time>
-    
-        <span>分類 </span>
-        
-    <a class="category-link" href="/categories/Python/">Python</a>
-
-
     
 </div>
 
@@ -326,39 +319,9 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p><img src="/2024/02/22/20240222/20240222_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
-<p>撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\輸入檔案的方式，產生目標內容。</p>
-<p>同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。</p>
-<span id="more"></span>
-
-<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Part1-subprocess-%E5%A5%97%E4%BB%B6%E5%BC%95%E5%85%A5"><span class="toc-text">Part1: subprocess 套件引入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Part2-%E5%9F%BA%E6%9C%AC%E5%87%BD%E6%95%B8-run-and-Popen"><span class="toc-text">Part2: 基本函數: run() and Popen()</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#subprocess-run"><span class="toc-text">subprocess.run()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#subprocess-Popen"><span class="toc-text">subprocess.Popen()</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Part3-%E4%BB%A5-PIPE-%E4%B8%B2%E8%81%AF%E9%80%B2%E7%A8%8B%E9%96%93%E7%9A%84%E8%BC%B8%E5%85%A5-%E8%BC%B8%E5%87%BA"><span class="toc-text">Part3: 以 PIPE 串聯進程間的輸入\ 輸出</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Part4-%E5%AF%A6%E4%BE%8B%E6%87%89%E7%94%A8"><span class="toc-text">Part4: 實例應用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Example1"><span class="toc-text">Example1:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Example2"><span class="toc-text">Example2:</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-text">參考資料</span></a></li></ol>
-
-
-<h2 id="Part1-subprocess-套件引入"><a href="#Part1-subprocess-套件引入" class="headerlink" title="Part1: subprocess 套件引入"></a>Part1: subprocess 套件引入</h2><p>subprocess 為 Python 內建模組，引入即可使用</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import subprocess</span><br><span class="line">from subprocess import PIPE, Popen</span><br></pre></td></tr></table></figure>
-
-<h2 id="Part2-基本函數-run-and-Popen"><a href="#Part2-基本函數-run-and-Popen" class="headerlink" title="Part2: 基本函數: run() and Popen()"></a>Part2: 基本函數: run() and Popen()</h2><p>subprocess 啟動子進程的方式有兩種 <code>subprocess.run()</code> 和 <code>subprocess.Popen</code><br>其中<code>run()</code>在大部分情況下都可使用，<code>Popen()</code> 則使用於更進階的底層操作<br>兩函數的基本參數都一樣，下面以 <code>run()</code> 來做參數介紹:</p>
-<h3 id="subprocess-run"><a href="#subprocess-run" class="headerlink" title="subprocess.run()"></a>subprocess.run()</h3><ol>
-<li>外部指令的參數有兩種輸入方式，但<strong>建議以list形式</strong>輸入:<br>可以使用 <code>shlex</code> 套件協助將指令 string 切分成 list<br><strong>注意: <code>shell = True</code> 代表允許系統調用shell執行，如同讓主機門戶大開、容易發生 shell injection 的資安風險</strong>，請盡量少用<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># in linux shell</span><br><span class="line">ln -s</span><br><span class="line"># in python subprocess run</span><br><span class="line">## method1: input as list (recommend!)</span><br><span class="line"></span><br><span class="line">## 徒手拆分成list</span><br><span class="line">subprocess.run([&#x27;ln&#x27;, &#x27;-s&#x27;])</span><br><span class="line"></span><br><span class="line">## 用shlex協助拆分成list</span><br><span class="line">cmd_split = shlex.split(&#x27;ln -s&#x27;)</span><br><span class="line">subprocess.run(cmd_split)</span><br><span class="line"></span><br><span class="line">## method2: input as string, with shell = True</span><br><span class="line">subprocess.run(&#x27;ln -s&#x27;, shell = True)</span><br></pre></td></tr></table></figure></li>
-<li>default 情況下，<code>run()</code> 執行無誤 (returncode &#x3D; 0) 後會返回 <code>subprocess.CompletedProcess</code> 的實例並印出結果；如果想查看返回狀況，可加上<code>check = True</code> ， 當 returncode !&#x3D; 0 會抛出 <code>CalledProcessError</code></li>
-<li>default 情況下，<code>run()</code> 將結果直接印出，若想<strong>抓取輸出並存成變數</strong>，可使用 <code>capture_output = True</code></li>
-<li>default 輸出形式為 bytes，可用 <code>text = True</code> 來更改輸出形式，透過下面例子來比較:<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">a = subprocess.run([&#x27;pwd&#x27;], capture_output = True)</span><br><span class="line">print(a.stdout)</span><br><span class="line">&gt; b&#x27;/current/working/directory\n&#x27;</span><br><span class="line"></span><br><span class="line">a = subprocess.run([&#x27;pwd&#x27;], capture_output = True, text = True)</span><br><span class="line">print(a.stdout)</span><br><span class="line">&gt; /current/working/directory</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="subprocess-Popen"><a href="#subprocess-Popen" class="headerlink" title="subprocess.Popen()"></a>subprocess.Popen()</h3><p>大部分的參數跟 <code>run()</code> 相同，特別的是<strong>只有 <code>Popen()</code> 可使用 <code>PIPE</code> 在串聯子進程間的 stdout, stdin, stderr，並搭配 <code>communicate()</code>防止死瑣</strong>，詳細內容在Part3<br><strong>注意: run()不能使用 PIPE 和 communicate()</strong></p>
-<h2 id="Part3-以-PIPE-串聯進程間的輸入-輸出"><a href="#Part3-以-PIPE-串聯進程間的輸入-輸出" class="headerlink" title="Part3: 以 PIPE 串聯進程間的輸入\ 輸出"></a>Part3: 以 PIPE 串聯進程間的輸入\ 輸出</h2><p>PIPE 觀念相當於 linux 裡的 piping <code>|</code>，可減少中間檔案儲存的冗餘。<br>下面的例子利用 PIPE 將第一個子進程的輸出，當作第二個子進程的輸入</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cmd1 = subprocess.Popen([&#x27;pwd&#x27;], stdout = PIPE)</span><br><span class="line">subprocess.Popen([&#x27;ls&#x27;, &#x27;-alh&#x27;], stdin = cmd1.stdout)</span><br></pre></td></tr></table></figure>
-<p>PIPE 的實用程度高，但當管道內暫存的資料量過大，會造成子進程卡住，永遠無法結束(稱作死瑣)，使用 communicate() 可即時讀取 PIPE 內容:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">e = subprocess.Popen([&#x27;pwd&#x27;], stdout = PIPE, stdin = PIPE, text = True)</span><br><span class="line">out, err = e.communicate() </span><br><span class="line">print(out)</span><br></pre></td></tr></table></figure>
-<p>另外也可將 PIPE 的輸出存進檔案，解決死瑣問題</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">f = open(&#x27;save_stdout.txt&#x27;, &#x27;w&#x27;)</span><br><span class="line">subprocess.Popen([&#x27;pwd&#x27;], stdout = f, text = True)</span><br></pre></td></tr></table></figure>
-
-<h2 id="Part4-實例應用"><a href="#Part4-實例應用" class="headerlink" title="Part4: 實例應用"></a>Part4: 實例應用</h2><h3 id="Example1"><a href="#Example1" class="headerlink" title="Example1:"></a>Example1:</h3><p>我想檢查幾份log檔<strong>是否有回報錯誤訊息</strong>，利用 <code>PIPE</code> <code>加communicate() </code>將子進程 grep 到的內容存進 out 變數、並判斷是否有錯誤訊息</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import shlex</span><br><span class="line">import subprocess</span><br><span class="line">from subprocess import PIPE, Popen</span><br><span class="line"></span><br><span class="line">logs = [&#x27;log.1&#x27;, &#x27;log.2&#x27;]</span><br><span class="line"></span><br><span class="line">for i in logs:</span><br><span class="line">    cmd = shlex.split(&#x27;grep &quot;terminated with an error exit status&quot; &#123;&#125;&#x27;.format(i))</span><br><span class="line">    p = subprocess.Popen(cmd, stdout = PIPE, text = True)</span><br><span class="line">    out,err = p.communicate()</span><br><span class="line">    </span><br><span class="line">    if out: ## NOT NULL</span><br><span class="line">    sys.exit(&#x27;Error occured, please refer to &#123;&#125; for more detail&#x27;.format(i))</span><br></pre></td></tr></table></figure>
-
-<h3 id="Example2"><a href="#Example2" class="headerlink" title="Example2:"></a>Example2:</h3><p>現在有一份vcf原始檔，需要先以bio-tool(using Singularity)做格式轉換，再用python做資料篩選，但我<strong>不想產生轉換格式的中間檔</strong>，於是寫了以下 python script，以原始vcf做input，先開一個子進程處理vcf，以PIPE儲存輸出，存進 pyton 變數並作後續篩選</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">import sys</span><br><span class="line">import shlex</span><br><span class="line">import subprocess</span><br><span class="line">from subprocess import PIPE, Popen</span><br><span class="line"></span><br><span class="line">origin_vcf = sys.argv[1]</span><br><span class="line"></span><br><span class="line">cmds = shlex.split(&#x27;singularity exec vcflib_1.0.0-rc2.sif vcf2tsv &#123;&#125;&#x27;.format(origin_vcf))</span><br><span class="line"></span><br><span class="line">input_vcf = subprocess.run(cmds, stdout = PIPE).stdout.decode(&#x27;utf-8&#x27;).splitlines()</span><br><span class="line"></span><br><span class="line">for lines in input_vcf: #post-filtering in python</span><br></pre></td></tr></table></figure>
-
-<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><p><a target="_blank" rel="noopener" href="https://docs.python.org/zh-tw/3/library/subprocess.html#">https://docs.python.org/zh-tw/3/library/subprocess.html#</a><br><a target="_blank" rel="noopener" href="https://www.aikaiyuan.com/4705.html">https://www.aikaiyuan.com/4705.html</a></p>
+            <h2 id="自我介紹"><a href="#自我介紹" class="headerlink" title="自我介紹"></a>自我介紹</h2><p>Hello World!<br>這是我的第一篇(類似酒精路跑的開頭XD)<br>簡單的自我介紹，生物資訊背景，隨著接觸的程式語言增加對前端產生興趣並開始自學程式精進。<br>主要使用語言／系統: Linux, Python, R, HTML, CSS, JavaScript<br>平時喜好閱讀、音樂廣播、電影，有機會也會分享心得體會。</p>
+<p>為何想寫部落格? 希望將這個網站當成是我的學習筆記，在撰寫同時疏理邏輯脈絡，內化更有效率；而學習過程中、從很多大神的blog獲得知識，自己也想記錄一些coding過程遇到的問題和debug的方法，以後有人遇到類似問題可以快速避坑（避坑避雷你我有責XD）</p>
+<p>最後點播一首張敬軒的My Way，我的副標題亦是取自歌詞 “Baby長大以後就是小軒~”<br>用心去追，感覺就對，I will find my way</p>
 
             
 
@@ -366,13 +329,6 @@
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
-        
-            <div class="post-footer-tags">
-                <span class="text-color-light text-small">標籤</span><br/>
-                
-    <a class="tag tag--primary tag--small t-none-link" href="/tags/Python/" rel="tag">Python</a>
-
-            </div>
         
         
             <div class="post-actions-wrap">
@@ -383,9 +339,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2024/02/26/20240226/"
-                    data-tooltip="楊德昌《 一一 》觀後感"
-                    aria-label="上一篇: 楊德昌《 一一 》觀後感"
+                    href="/20240201/Github/"
+                    data-tooltip="用Github+Hexo建立個人部落格：方法與問題紀錄"
+                    aria-label="上一篇: 用Github+Hexo建立個人部落格：方法與問題紀錄"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -394,14 +350,11 @@
             </li>
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2024/02/21/20240221/"
-                    data-tooltip="Python實用系列： 三種引入外部參數的方法"
-                    aria-label="下一篇: Python實用系列： 三種引入外部參數的方法"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
                         <i class="fa fa-angle-right" aria-hidden="true"></i>
                     </a>
@@ -424,7 +377,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/02/22/20240222/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/introduction/uncategorized/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -437,7 +390,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/02/22/20240222/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/introduction/uncategorized/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -450,7 +403,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/02/22/20240222/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/introduction/uncategorized/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -463,7 +416,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目錄">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="post.back_to_top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -487,8 +440,8 @@
         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
         var disqus_config = function () {
-          this.page.url = 'https://pxchen110.github.io/2024/02/22/20240222/';  // Replace PAGE_URL with your page's canonical URL variable
-          this.page.identifier = '1708603078000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          this.page.url = 'https://pxchen110.github.io/introduction/uncategorized/';  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = '1705680000000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
         };
         (function() { // DON'T EDIT BELOW THIS LINE
         var d = document, s = d.createElement('script');
@@ -519,9 +472,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2024/02/26/20240226/"
-                    data-tooltip="楊德昌《 一一 》觀後感"
-                    aria-label="上一篇: 楊德昌《 一一 》觀後感"
+                    href="/20240201/Github/"
+                    data-tooltip="用Github+Hexo建立個人部落格：方法與問題紀錄"
+                    aria-label="上一篇: 用Github+Hexo建立個人部落格：方法與問題紀錄"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -530,14 +483,11 @@
             </li>
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2024/02/21/20240221/"
-                    data-tooltip="Python實用系列： 三種引入外部參數的方法"
-                    aria-label="下一篇: Python實用系列： 三種引入外部參數的方法"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
                         <i class="fa fa-angle-right" aria-hidden="true"></i>
                     </a>
@@ -560,7 +510,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/02/22/20240222/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/introduction/uncategorized/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -573,7 +523,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/02/22/20240222/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/introduction/uncategorized/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -586,7 +536,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/02/22/20240222/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/introduction/uncategorized/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -599,7 +549,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目錄">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="post.back_to_top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -620,7 +570,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/02/22/20240222/"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/introduction/uncategorized/"
                         aria-label="分享到 Facebook"
                     >
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
@@ -633,7 +583,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/02/22/20240222/"
+                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/introduction/uncategorized/"
                         aria-label="分享到 Twitter"
                     >
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
@@ -646,7 +596,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/02/22/20240222/"
+                        href="https://plus.google.com/share?url=https://pxchen110.github.io/introduction/uncategorized/"
                         aria-label="分享到 Google+"
                     >
                         <i class="fab fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
@@ -722,7 +672,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/01/20/introduction/"
+                            href="https://pxchen110.github.io/introduction/uncategorized/"
                             aria-label=": Introduction"
                         >
                             <h3 class="media-heading">Introduction</h3>
@@ -745,7 +695,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/01/20240201/"
+                            href="https://pxchen110.github.io/20240201/Github/"
                             aria-label=": 用Github+Hexo建立個人部落格：方法與問題紀錄"
                         >
                             <h3 class="media-heading">用Github+Hexo建立個人部落格：方法與問題紀錄</h3>
@@ -757,7 +707,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/2024/02/01/20240201/20240201_img0.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@goumbik">Lukas Blazek</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240201/Github/20240201_img0.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@goumbik">Lukas Blazek</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -769,7 +719,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/08/20240208/"
+                            href="https://pxchen110.github.io/20240208/Front-end/"
                             aria-label=": HTML+CSS成果展(1)：可愛貓咪網站"
                         >
                             <h3 class="media-heading">HTML+CSS成果展(1)：可愛貓咪網站</h3>
@@ -781,7 +731,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/2024/02/08/20240208/20240208_img2.png"></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240208/Front-end/20240208_img2.png"></p>
 <p>在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為<strong>要來我家看貓嗎</strong>的小網頁</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -793,7 +743,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/11/20240211/"
+                            href="https://pxchen110.github.io/20240211/Front-end/"
                             aria-label=": HTML+CSS成果展(2)：仿寫拼多多網站"
                         >
                             <h3 class="media-heading">HTML+CSS成果展(2)：仿寫拼多多網站</h3>
@@ -805,7 +755,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/2024/02/11/20240211/20240211_img0.png"></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240211/Front-end/20240211_img0.png"></p>
 <p>參考資料來源：udemy 課程</p>
 <p>從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。</p></div>
                     </div>
@@ -818,7 +768,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/15/20240215/"
+                            href="https://pxchen110.github.io/20240215/Python/"
                             aria-label=": Python實用系列： smtplib 模組實現自動寄信"
                         >
                             <h3 class="media-heading">Python實用系列： smtplib 模組實現自動寄信</h3>
@@ -830,7 +780,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/2024/02/15/20240215/20240215_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@brett_jordan">Brett Jordan</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240215/Python/20240215_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@brett_jordan">Brett Jordan</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>在信箱收件夾，不乏看到許多<strong>自動寄出</strong>的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -842,7 +792,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/21/20240221/"
+                            href="https://pxchen110.github.io/20240221/Python/"
                             aria-label=": Python實用系列： 三種引入外部參數的方法"
                         >
                             <h3 class="media-heading">Python實用系列： 三種引入外部參數的方法</h3>
@@ -854,7 +804,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/2024/02/21/20240221/20240221_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240221/Python/20240221_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: <code>sys</code>, <code>argparse</code>, 以及 <code>click</code>，文章將介紹模組&#x2F;套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -866,7 +816,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/22/20240222/"
+                            href="https://pxchen110.github.io/20240222/Python/"
                             aria-label=": Python實用系列： subprocess模組管理子進程"
                         >
                             <h3 class="media-heading">Python實用系列： subprocess模組管理子進程</h3>
@@ -878,7 +828,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/2024/02/22/20240222/20240222_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240222/Python/20240222_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\輸入檔案的方式，產生目標內容。</p>
 <p>同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。</p></div>
                     </div>
@@ -891,7 +841,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/26/20240226/"
+                            href="https://pxchen110.github.io/20240226/Life/"
                             aria-label=": 楊德昌《 一一 》觀後感"
                         >
                             <h3 class="media-heading">楊德昌《 一一 》觀後感</h3>
@@ -903,7 +853,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>A one and A two…<br><img src="/2024/02/26/20240226/20240226_img1.jpeg"></p>
+                        <div class="media-content hide-xs font-merryweather"><p>A one and A two…<br><img src="/20240226/Life/20240226_img1.jpeg"></p>
 <p>這是一個喜宴開頭喪禮結尾，由一家人的生活片段交疊而成的電影，時空背景設定在沒有智慧型手機的台北，也是我尚未出生的時代，所以電影裡的台北景色對我來說都很新奇: 麥當勞內用區、誠品咖啡廳、或是圓山大飯店的宴會廳，帶有微顆粒感的畫質讓電影更吸引人。</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -915,7 +865,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/27/20240227/"
+                            href="https://pxchen110.github.io/20240227/Life/"
                             aria-label=": 尋覓陽光。追逐小鴨。高雄旅行雜記"
                         >
                             <h3 class="media-heading">尋覓陽光。追逐小鴨。高雄旅行雜記</h3>
@@ -928,7 +878,7 @@
                             </span>
                         </span>
                         <div class="media-content hide-xs font-merryweather"><p><strong>一點渴望加一陣衝動，一場周末的出走就此成形。</strong> </p>
-<p><img src="/2024/02/27/20240227/20240227_img0.jpg"></p>
+<p><img src="/20240227/Life/20240227_img0.jpg"></p>
 <p>2024 Feb</p></div>
                     </div>
                     <div style="clear:both;"></div>

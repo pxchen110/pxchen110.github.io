@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Xuan&#39;s Blog">
-    <title>Python實用系列： smtplib 模組實現自動寄信 - Xuan&#39;s Blog</title>
+    <title>Python實用系列： 三種引入外部參數的方法 - Xuan&#39;s Blog</title>
     <meta name="author" content="Xuan Chen">
     
         <meta name="keywords" content="hexo,javascript,">
@@ -17,23 +17,21 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"Photo by Brett Jordan on Unsplash\n在信箱收件夾，不乏看到許多自動寄出的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信\n\n\n\n\nPart1: SMTP協定介紹通訊協定，是協助資訊在不同軟硬體之間傳輸的方式，例如使用相同IP的兩台電腦，可以突破主機限制互相通訊。網際網路中，常用的通訊協定包含TCP&#x2F;IP, HTTPS(TLS&#x2F;SSL加密)，以及本文要使用的SMTP協定。SMTP全名為簡易郵件傳輸通訊協定 (Simple Mail Transfer Protocol)，是透過網路在電腦與伺服器之間接收與傳送電子郵件的通訊方式。只要知道服務廠商的smtp, port, 並提供一個寄件帳號，就可以自動\\廣發信件給多名收件人。\n常見的廠商與smtp伺服器：\n\ngmail:  smtp.gmail.com\noutlook: smtp-mail.outlook.com\n\n常見的連接埠比較(內容節錄自cloudflare網站) :\n\n連接埠 25 最常用於 SMTP 伺服器之間的連線。如今，用於終端使用者網路的防火牆通常會封鎖該連接埠，因為垃圾郵件發送者嘗試濫用它來傳送大量垃圾郵件。\n連接埠 465 曾經專供具有安全通訊端層 (SSL) 加密的 SMTP 使用。但是 SSL 已被 Transport Layer Security (TLS) 取代，因此現代電子郵件系統不再使用該連接埠。它只存在於舊版（過時的）系統中。\n連接埠 587 現在是電子郵件提交的預設連接埠。透過此連接埠進行的 SMTP 通訊使用 TLS 加密。\n\nPart2: 撰寫python程式python 提供 smtplib 模組來協助 smtp 封裝信息並傳輸給目標端。由於\nstep0: 引入套件和開啟google mail 權限1import smtplib\n除了基本模組，常搭配擴充電子郵件標準套件，來處理內文部分\n12from email.mime.multipart import MIMEMultipart #email內容載體from email.mime.text import MIMEText           #製作郵件內文\n\n若要在gmail使用smtplib，需要到 google 帳戶的安全性頁面 完成帳戶密碼設定(下圖紅框標示處)\n\nstep1: 設定帳戶資訊1234567MAIL_USER = &quot;from_who_user_@gmail...&quot;  #寄件者email帳號MAIL_PASSWD = &quot;......&quot;                 #寄件者email密碼FROM_ADDRESS = MAIL_USER               #和寄件者相同# 郵件平台的主機 port (這裡使用 gmail smtp 伺服器)MAIL_SMTP = &quot;smtp.gmail.com&quot;MAIL_PORT = 587                        #安全加密port &quot;587&quot;\n\nstep2: 撰寫郵件內容與寄件人12to_address = &quot;to_who_@gmail...&quot;        #收件者email帳號body_content = &quot;&quot;                      #輸入郵件內文\n\n\nstep3: 以擴充電子郵件標準來組合 email 結構123456mail = MIMEMultipart()mail[&#x27;From&#x27;] = FROM_ADDRESS            #寄件者mail[&#x27;Subject&#x27;] = &quot;the subject&quot;        #主旨mail[&#x27;To&#x27;] = to_address                #收件者mail.attach(MIMEText(body_content))    #以attach方式貼上內文\n\n\nstep4: 設定smtp伺服器並寄信12345678910111213141516smtpserver = smtplib.SMTP(MAIL_SMTP, MAIL_PORT)# 發出「Hello」訊息，以在用戶端和伺服器之間建立SMTP連線smtpserver.ehlo()   # TLS加密：延伸保護 SMTP 階段作業smtpserver.starttls() # 登入寄件人郵件系統smtpserver.login(MAIL_USER. MAIL_PASSWD) # 將step3產生的信件內容轉成string並寫入smtpserver.sendmail(FROM_ADDRESS, to_address, mail.as_string()) # 結束系統連線server.quit() \n\nPart3: 完整script &amp; 成果展示附上完整的 python script注意: 由於使用個人主機測試，才敢將信箱帳密直接輸入在command line、由 sys 存取，若在公用主機請注意資安考量。\n123456789101112131415161718192021222324252627282930313233#!/usr/bin/env python3import osimport sysimport smtplibfrom email.mime.multipart import MIMEMultipartfrom email.mime.text import MIMETextmail_user = sys.argv[1]mail_passwd = sys.argv[2]from_address = mail_usermail_smtp = &quot;smtp.gmail.com&quot;mail_port = 587to_address = sys.argv[3]body_content = &quot;&quot;&quot;\tThis is the auto-send email test &quot;&quot;&quot;mail = MIMEMultipart()mail[&#x27;From&#x27;] = mail_usermail[&#x27;To&#x27;] = to_addressmail[&#x27;Subject&#x27;] = &quot;Test for smtp email-sender&quot;mail.attach(MIMEText(body_content))server = smtplib.SMTP(mail_smtp, mail_port)server.ehlo()server.starttls()server.login(mail_user, mail_passwd)server.sendmail(mail_user, to_address, mail.as_string())server.quit()\n\n到收件者的信箱查看，成功收到如下圖的信件\n\n參考資料https://aws.amazon.com/tw/what-is/smtp/https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/\n","dateCreated":"2024-02-15T19:21:40+08:00","dateModified":"2024-02-15T19:34:33+08:00","datePublished":"2024-02-15T19:21:40+08:00","description":"Photo by Brett Jordan on Unsplash\n在信箱收件夾，不乏看到許多自動寄出的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信","headline":"Python實用系列： smtplib 模組實現自動寄信","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/2024/02/15/20240215/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/2024/02/15/20240215/","keywords":"Python"}</script>
-    <meta name="description" content="introducing python smtplib module to automatically send email">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"Photo by Artturi Jalli on Unsplash\n撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: sys, argparse, 以及 click，文章將介紹模組&#x2F;套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。\n\n\n\n\nsys 模組sys 屬於 python 內建模組，其下的 sys.argv[index] 是最基本的引入方式。\nsys.argv 的運行方式，是把bash command line 中輸入的指令存成一個list，並引入對應index的內容名稱。\nIndex 對照說明假設撰寫名為 test.py 的 script:\n123456import sysinput_var1 = sys.argv[1] print(&quot;sys index 0 : &quot; + sys.argv[0])print(&quot;sys index 1 : &quot; + input_var1)\n\n在 linux bash 執行 python script :\n1python3 test.py apple\n注意: sys 會將 script 名稱視為 sys.argv[0] 也就是index 0 不能使用，而外部參數的 index 會從 1 開始 \n綜合上述觀念，bash 輸出:\n12sys index 0 : test.pysys index 1 : apple\n實例撰寫名為 test.py 的 script:\n123456import sysfruit = sys.argv[1]price = sys.argv[2]print(&quot;The price of &quot; + fruit + &quot; is &quot; + price)\n\nbash 輸入參數 python3 test.py apple 20 得到\n1The price of apple is 20\n\n\nCommentssys 方式多用於測試階段，或是簡單的個人專案上，若需要引入多個參數，或是有協作專案的需求，sys會面臨以下缺點:\n\nindex 引入很看重順序，參數太多增加錯誤機會\n且無法為下一個使用者解釋輸入參數的內容，降低推廣性\n\n接下來要介紹的兩個模組，都是針對不同參數給予特定名稱，並說明參數要求，提高script的實用性。\nargparse 模組argparse 同屬於 python 內建模組，用於命令列剖析\n引入模組引入模組後先創建 ArgumentParser 物件以及設定參數\n12import argparseparser = argparse.ArgumentParser(prog=None, usage=None, description=None, epilog=None)\n\nprog: program 名稱，不指定寫 None，default 會帶入 python script 名稱usage: 告知使用者說應該怎麼使用 program，default 會帶入 script 名稱加上所有參數description: 一段文字說明程式功能epilog: 添加在 --help 訊息後的補充文字\n例子:\n123456## 撰寫 test.pyimport argparseparser = argparse.ArgumentParser(prog = None,usage = None, description = &#x27;this is description&#x27;, epilog = &#x27;this is eliog&#x27;)\n\n12345678910## 在 bash 輸入 python3 test.py --help 會產生以下內容usage: test.py [-h] --anno ANNOthis is descriptionoptions:  -h, --help   show this help message and exitthis is eliog\n\n添加參數名稱12parser.add_argument(&quot;--anno&quot;, required = T, help = &quot;required arguments&quot;)parser.add_argument(&quot;--input&quot;, default =&quot;none&quot;)\n\n-a / --anno 為自定義的參數flag，以將參數引入特殊變數內required 執行script 必須要有的參數，default &#x3D; Falsedefault 當使用者沒給此項參數，則引入預先設定的default值help 針對參數的說明文字，使用 --help 後會顯示\n將參數後的內容引入變數以 args.parameter_flag 的形式引入特定參數下的內容\n12args = parser.parse_args()a = str(args.anno)\n\n實例撰寫名為 test.py 的 script:\n12345678import argparseparser = argparse.ArgumentParser(description = &quot;print input friut type and their price&quot;)parser.add_argument(&#x27;-f&#x27;, &#x27;--fruit&#x27;, required=True, help= &quot;name of fruit&quot;)parser.add_argument(&#x27;-p&#x27;, &#x27;--price&#x27;, default = 20, help = &quot;price of item&quot;)args = parser.parse_args()print(&quot;The price of &quot; + args.fruit + &quot; is &quot; + args.price)\n\nbash 輸入 python3 test.py --help 查看訊息\n12345678usage: test.py [-h] -f FRUIT [-p PRICE]print input friut type and their priceoptions:  -h, --help               show this help message and exit  -f FRUIT, --fruit FRUIT  name of fruit  -p PRICE, --price PRICE  price of item\n\nbash 輸入參數 python3 test.py --fruit apple --price 20 得到\n1The price of apple is 20\n\nCommentsargparse 模組提升參數引入的複雜性與數量，增加在真實世界的使用機會；但複雜的步驟轉換（建立物件 &gt; add_args &gt; parse_args）讓人頭昏眼花，若能有更簡單的參數設定機制，可以減低程式撰寫的難易度\nclick 套件click 官網以 creating beautiful command line interfaces 形容套件的核心功能\n下載並引入套件後，只需利用 @click.command 和 @click_option 即可產生和argparse等價的結果\n實例12345678910import click@click.command@click.option(&#x27;-f&#x27;, &#x27;--fruit&#x27;,&#x27;fruit&#x27;, required=True, help= &quot;name of fruit&quot;)@click.option(&#x27;-p&#x27;, &#x27;--price&#x27;, &#x27;price&#x27;, default = 20, help = &quot;price of item&quot;)def main(fruit, price):    print(&quot;The price of &quot; + fruit + &quot; is &quot; + str(price))if __name__ == &#x27;__main__&#x27;:    main()\nbash 輸入參數 python3 test.py --fruit apple --price 20  得到相同console:\n1The price of apple is 20\n\nComments和 argparse 相比 click 語法更加簡潔，許多參數都相容，推薦新手可以直接使用click建立參數指令，但請注意 python 版本相容性，詳細可參考官網說明。\n參考資料\nhttps://docs.python.org/zh-tw/3/library/sys.html#sys.argvhttps://docs.python.org/zh-tw/3/howto/argparse.htmlhttps://click.palletsprojects.com/en/8.1.x/https://myapollo.com.tw/blog/python-click/\n\n","dateCreated":"2024-02-21T19:54:10+08:00","dateModified":"2024-03-01T08:57:00+08:00","datePublished":"2024-02-21T19:54:10+08:00","description":"Photo by Artturi Jalli on Unsplash\n撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: sys, argparse, 以及 click，文章將介紹模組&#x2F;套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。","headline":"Python實用系列： 三種引入外部參數的方法","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20240221/Python/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20240221/Python/","keywords":"Python"}</script>
+    <meta name="description" content="introducing three methods to introduce outer parameter in python">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="Python實用系列： smtplib 模組實現自動寄信">
-<meta property="og:url" content="https://pxchen110.github.io/2024/02/15/20240215/index.html">
+<meta property="og:title" content="Python實用系列： 三種引入外部參數的方法">
+<meta property="og:url" content="https://pxchen110.github.io/20240221/Python/index.html">
 <meta property="og:site_name" content="Xuan&#39;s Blog">
-<meta property="og:description" content="introducing python smtplib module to automatically send email">
+<meta property="og:description" content="introducing three methods to introduce outer parameter in python">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://pxchen110.github.io/2024/02/15/20240215/20240215_img1.jpg">
-<meta property="og:image" content="https://pxchen110.github.io/2024/02/15/20240215/20240215_img2.png">
-<meta property="og:image" content="https://pxchen110.github.io/2024/02/15/20240215/20240215_img3.png">
-<meta property="article:published_time" content="2024-02-15T11:21:40.000Z">
-<meta property="article:modified_time" content="2024-02-15T11:34:33.391Z">
+<meta property="og:image" content="https://pxchen110.github.io/20240221/Python/20240221_img1.jpg">
+<meta property="article:published_time" content="2024-02-21T11:54:10.000Z">
+<meta property="article:modified_time" content="2024-03-01T00:57:00.714Z">
 <meta property="article:author" content="Xuan Chen">
 <meta property="article:tag" content="Python">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pxchen110.github.io/2024/02/15/20240215/20240215_img1.jpg">
+<meta name="twitter:image" content="https://pxchen110.github.io/20240221/Python/20240221_img1.jpg">
     
     
         
@@ -303,14 +301,14 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            Python實用系列： smtplib 模組實現自動寄信
+            Python實用系列： 三種引入外部參數的方法
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2024-02-15T19:21:40+08:00">
+    <time datetime="2024-02-21T19:54:10+08:00">
 	
-		    2024 年 2 月 15 日
+		    2024 年 2 月 21 日
     	
     </time>
     
@@ -328,47 +326,71 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p><img src="/2024/02/15/20240215/20240215_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@brett_jordan">Brett Jordan</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
-<p>在信箱收件夾，不乏看到許多<strong>自動寄出</strong>的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信</p>
+            <p><img src="/20240221/Python/20240221_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+<p>撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: <code>sys</code>, <code>argparse</code>, 以及 <code>click</code>，文章將介紹模組&#x2F;套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。</p>
 <span id="more"></span>
 
-<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Part1-SMTP%E5%8D%94%E5%AE%9A%E4%BB%8B%E7%B4%B9"><span class="toc-text">Part1: SMTP協定介紹</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Part2-%E6%92%B0%E5%AF%ABpython%E7%A8%8B%E5%BC%8F"><span class="toc-text">Part2: 撰寫python程式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#step0-%E5%BC%95%E5%85%A5%E5%A5%97%E4%BB%B6%E5%92%8C%E9%96%8B%E5%95%9Fgoogle-mail-%E6%AC%8A%E9%99%90"><span class="toc-text">step0: 引入套件和開啟google mail 權限</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step1-%E8%A8%AD%E5%AE%9A%E5%B8%B3%E6%88%B6%E8%B3%87%E8%A8%8A"><span class="toc-text">step1: 設定帳戶資訊</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step2-%E6%92%B0%E5%AF%AB%E9%83%B5%E4%BB%B6%E5%85%A7%E5%AE%B9%E8%88%87%E5%AF%84%E4%BB%B6%E4%BA%BA"><span class="toc-text">step2: 撰寫郵件內容與寄件人</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step3-%E4%BB%A5%E6%93%B4%E5%85%85%E9%9B%BB%E5%AD%90%E9%83%B5%E4%BB%B6%E6%A8%99%E6%BA%96%E4%BE%86%E7%B5%84%E5%90%88-email-%E7%B5%90%E6%A7%8B"><span class="toc-text">step3: 以擴充電子郵件標準來組合 email 結構</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step4-%E8%A8%AD%E5%AE%9Asmtp%E4%BC%BA%E6%9C%8D%E5%99%A8%E4%B8%A6%E5%AF%84%E4%BF%A1"><span class="toc-text">step4: 設定smtp伺服器並寄信</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Part3-%E5%AE%8C%E6%95%B4script-%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA"><span class="toc-text">Part3: 完整script &amp; 成果展示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-text">參考資料</span></a></li></ol>
+<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#sys-%E6%A8%A1%E7%B5%84"><span class="toc-text">sys 模組</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Index-%E5%B0%8D%E7%85%A7%E8%AA%AA%E6%98%8E"><span class="toc-text">Index 對照說明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%A6%E4%BE%8B"><span class="toc-text">實例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Comments"><span class="toc-text">Comments</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#argparse-%E6%A8%A1%E7%B5%84"><span class="toc-text">argparse 模組</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%95%E5%85%A5%E6%A8%A1%E7%B5%84"><span class="toc-text">引入模組</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E5%8F%83%E6%95%B8%E5%90%8D%E7%A8%B1"><span class="toc-text">添加參數名稱</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%87%E5%8F%83%E6%95%B8%E5%BE%8C%E7%9A%84%E5%85%A7%E5%AE%B9%E5%BC%95%E5%85%A5%E8%AE%8A%E6%95%B8"><span class="toc-text">將參數後的內容引入變數</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%A6%E4%BE%8B-1"><span class="toc-text">實例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Comments-1"><span class="toc-text">Comments</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#click-%E5%A5%97%E4%BB%B6"><span class="toc-text">click 套件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%A6%E4%BE%8B-2"><span class="toc-text">實例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Comments-2"><span class="toc-text">Comments</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-text">參考資料</span></a></li></ol>
 
-<h2 id="Part1-SMTP協定介紹"><a href="#Part1-SMTP協定介紹" class="headerlink" title="Part1: SMTP協定介紹"></a>Part1: SMTP協定介紹</h2><p>通訊協定，是協助資訊在不同軟硬體之間傳輸的方式，例如使用相同IP的兩台電腦，可以突破主機限制互相通訊。網際網路中，常用的通訊協定包含TCP&#x2F;IP, HTTPS(TLS&#x2F;SSL加密)，以及本文要使用的SMTP協定。<br>SMTP全名為簡易郵件傳輸通訊協定 (Simple Mail Transfer Protocol)，是透過網路在電腦與伺服器之間<strong>接收與傳送電子郵件</strong>的通訊方式。只要知道服務廠商的smtp, port, 並提供一個寄件帳號，就可以自動\廣發信件給多名收件人。</p>
-<p>常見的廠商與smtp伺服器：</p>
+<h2 id="sys-模組"><a href="#sys-模組" class="headerlink" title="sys 模組"></a>sys 模組</h2><p><code>sys</code> 屬於 python 內建模組，其下的 <code>sys.argv[index]</code> 是最基本的引入方式。</p>
+<p><code>sys.argv</code> 的運行方式，是把bash command line 中輸入的指令存成一個list，並引入對應index的內容名稱。</p>
+<h3 id="Index-對照說明"><a href="#Index-對照說明" class="headerlink" title="Index 對照說明"></a>Index 對照說明</h3><p>假設撰寫名為 <code>test.py</code> 的 script:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">import sys</span><br><span class="line"></span><br><span class="line">input_var1 = sys.argv[1] </span><br><span class="line"></span><br><span class="line">print(&quot;sys index 0 : &quot; + sys.argv[0])</span><br><span class="line">print(&quot;sys index 1 : &quot; + input_var1)</span><br></pre></td></tr></table></figure>
+
+<p>在 linux bash 執行 python script :</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 test.py apple</span><br></pre></td></tr></table></figure>
+<p><strong>注意: <code>sys</code> 會將 script 名稱視為 <code>sys.argv[0]</code> 也就是index 0 不能使用</strong>，而外部參數的 index 會從 <strong>1</strong> 開始 </p>
+<p>綜合上述觀念，bash 輸出:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sys index 0 : test.py</span><br><span class="line">sys index 1 : apple</span><br></pre></td></tr></table></figure>
+<h3 id="實例"><a href="#實例" class="headerlink" title="實例"></a>實例</h3><p>撰寫名為 <code>test.py</code> 的 script:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">import sys</span><br><span class="line"></span><br><span class="line">fruit = sys.argv[1]</span><br><span class="line">price = sys.argv[2]</span><br><span class="line"></span><br><span class="line">print(&quot;The price of &quot; + fruit + &quot; is &quot; + price)</span><br></pre></td></tr></table></figure>
+
+<p>bash 輸入參數 <code>python3 test.py apple 20</code> 得到</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The price of apple is 20</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="Comments"><a href="#Comments" class="headerlink" title="Comments"></a>Comments</h3><p>sys 方式多用於測試階段，或是簡單的個人專案上，若需要<strong>引入多個參數，或是有協作專案的需求</strong>，sys會面臨以下缺點:</p>
 <ul>
-<li>gmail:  <code>smtp.gmail.com</code></li>
-<li>outlook: <code>smtp-mail.outlook.com</code></li>
+<li>index 引入很看重順序，參數太多增加錯誤機會</li>
+<li>且無法為下一個使用者<strong>解釋輸入參數的內容</strong>，降低推廣性</li>
 </ul>
-<p>常見的連接埠比較(內容節錄自<a target="_blank" rel="noopener" href="https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/">cloudflare網站</a>) :</p>
-<blockquote>
-<p>連接埠 25 最常用於 SMTP 伺服器之間的連線。如今，用於終端使用者網路的防火牆通常會封鎖該連接埠，因為垃圾郵件發送者嘗試濫用它來傳送大量垃圾郵件。</p>
-<p>連接埠 465 曾經專供具有安全通訊端層 (SSL) 加密的 SMTP 使用。但是 SSL 已被 Transport Layer Security (TLS) 取代，因此現代電子郵件系統不再使用該連接埠。它只存在於舊版（過時的）系統中。</p>
-<p>連接埠 587 現在是電子郵件提交的預設連接埠。透過此連接埠進行的 SMTP 通訊使用 TLS 加密。</p>
+<p>接下來要介紹的兩個模組，都是針對不同參數給予特定名稱，並說明參數要求，提高script的實用性。</p>
+<h2 id="argparse-模組"><a href="#argparse-模組" class="headerlink" title="argparse 模組"></a>argparse 模組</h2><p><code>argparse</code> 同屬於 python 內建模組，用於命令列剖析</p>
+<h3 id="引入模組"><a href="#引入模組" class="headerlink" title="引入模組"></a>引入模組</h3><p>引入模組後先創建 <code>ArgumentParser</code> 物件以及設定參數</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import argparse</span><br><span class="line">parser = argparse.ArgumentParser(prog=None, usage=None, description=None, epilog=None)</span><br></pre></td></tr></table></figure>
+
+<p><code>prog</code>: program 名稱，不指定寫 None，default 會帶入 python script 名稱<br><code>usage</code>: 告知使用者說應該怎麼使用 program，default 會帶入 script 名稱加上所有參數<br><code>description</code>: 一段文字說明程式功能<br><code>epilog</code>: 添加在 <code>--help</code> 訊息後的補充文字</p>
+<p>例子:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">## 撰寫 test.py</span><br><span class="line">import argparse</span><br><span class="line"></span><br><span class="line">parser = argparse.ArgumentParser(prog = None,</span><br><span class="line">usage = None, description = &#x27;this is description&#x27;, </span><br><span class="line">epilog = &#x27;this is eliog&#x27;)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">## 在 bash 輸入 python3 test.py --help 會產生以下內容</span><br><span class="line"></span><br><span class="line">usage: test.py [-h] --anno ANNO</span><br><span class="line"></span><br><span class="line">this is description</span><br><span class="line"></span><br><span class="line">options:</span><br><span class="line">  -h, --help   show this help message and exit</span><br><span class="line"></span><br><span class="line">this is eliog</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加參數名稱"><a href="#添加參數名稱" class="headerlink" title="添加參數名稱"></a>添加參數名稱</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">parser.add_argument(&quot;--anno&quot;, required = T, help = &quot;required arguments&quot;)</span><br><span class="line">parser.add_argument(&quot;--input&quot;, default =&quot;none&quot;)</span><br></pre></td></tr></table></figure>
+
+<p><code>-a / --anno</code> 為自定義的參數flag，以將參數引入特殊變數內<br><code>required</code> 執行script 必須要有的參數，default &#x3D; False<br><code>default</code> 當使用者沒給此項參數，則引入預先設定的default值<br><code>help</code> 針對參數的說明文字，使用 <code>--help</code> 後會顯示</p>
+<h3 id="將參數後的內容引入變數"><a href="#將參數後的內容引入變數" class="headerlink" title="將參數後的內容引入變數"></a>將參數後的內容引入變數</h3><p>以 <code>args.parameter_flag</code> 的形式引入特定參數下的內容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">args = parser.parse_args()</span><br><span class="line">a = str(args.anno)</span><br></pre></td></tr></table></figure>
+
+<h3 id="實例-1"><a href="#實例-1" class="headerlink" title="實例"></a>實例</h3><p>撰寫名為 <code>test.py</code> 的 script:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">import argparse</span><br><span class="line"></span><br><span class="line">parser = argparse.ArgumentParser(description = &quot;print input friut type and their price&quot;)</span><br><span class="line">parser.add_argument(&#x27;-f&#x27;, &#x27;--fruit&#x27;, required=True, help= &quot;name of fruit&quot;)</span><br><span class="line">parser.add_argument(&#x27;-p&#x27;, &#x27;--price&#x27;, default = 20, help = &quot;price of item&quot;)</span><br><span class="line"></span><br><span class="line">args = parser.parse_args()</span><br><span class="line">print(&quot;The price of &quot; + args.fruit + &quot; is &quot; + args.price)</span><br></pre></td></tr></table></figure>
+
+<p>bash 輸入 <code>python3 test.py --help</code> 查看訊息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">usage: test.py [-h] -f FRUIT [-p PRICE]</span><br><span class="line"></span><br><span class="line">print input friut type and their price</span><br><span class="line"></span><br><span class="line">options:</span><br><span class="line">  -h, --help               show this help message and exit</span><br><span class="line">  -f FRUIT, --fruit FRUIT  name of fruit</span><br><span class="line">  -p PRICE, --price PRICE  price of item</span><br></pre></td></tr></table></figure>
+
+<p>bash 輸入參數 <code>python3 test.py --fruit apple --price 20</code> 得到</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The price of apple is 20</span><br></pre></td></tr></table></figure>
+
+<h3 id="Comments-1"><a href="#Comments-1" class="headerlink" title="Comments"></a>Comments</h3><p><code>argparse</code> 模組提升參數引入的複雜性與數量，增加在真實世界的使用機會；<strong>但複雜的步驟</strong>轉換（建立物件 &gt; add_args &gt; parse_args）讓人頭昏眼花，若能有更簡單的參數設定機制，可以減低程式撰寫的難易度</p>
+<h2 id="click-套件"><a href="#click-套件" class="headerlink" title="click 套件"></a>click 套件</h2><p>click 官網以 <strong>creating beautiful command line interfaces</strong> 形容套件的核心功能</p>
+<p>下載並引入套件後，只需利用 <code>@click.command</code> 和 <code>@click_option</code> 即可產生和<code>argparse</code>等價的結果</p>
+<h3 id="實例-2"><a href="#實例-2" class="headerlink" title="實例"></a>實例</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import click</span><br><span class="line"></span><br><span class="line">@click.command</span><br><span class="line">@click.option(&#x27;-f&#x27;, &#x27;--fruit&#x27;,&#x27;fruit&#x27;, required=True, help= &quot;name of fruit&quot;)</span><br><span class="line">@click.option(&#x27;-p&#x27;, &#x27;--price&#x27;, &#x27;price&#x27;, default = 20, help = &quot;price of item&quot;)</span><br><span class="line">def main(fruit, price):</span><br><span class="line">    print(&quot;The price of &quot; + fruit + &quot; is &quot; + str(price))</span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<p>bash 輸入參數 <code>python3 test.py --fruit apple --price 20</code>  得到相同console:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The price of apple is 20</span><br></pre></td></tr></table></figure>
+
+<h3 id="Comments-2"><a href="#Comments-2" class="headerlink" title="Comments"></a>Comments</h3><p>和 <code>argparse</code> 相比 <code>click</code> 語法更加簡潔，許多參數都相容，推薦新手可以直接使用click建立參數指令，但請注意 python 版本相容性，詳細可參考官網說明。</p>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><blockquote>
+<p><a target="_blank" rel="noopener" href="https://docs.python.org/zh-tw/3/library/sys.html#sys.argv">https://docs.python.org/zh-tw/3/library/sys.html#sys.argv</a><br><a target="_blank" rel="noopener" href="https://docs.python.org/zh-tw/3/howto/argparse.html">https://docs.python.org/zh-tw/3/howto/argparse.html</a><br><a target="_blank" rel="noopener" href="https://click.palletsprojects.com/en/8.1.x/">https://click.palletsprojects.com/en/8.1.x/</a><br><a target="_blank" rel="noopener" href="https://myapollo.com.tw/blog/python-click/">https://myapollo.com.tw/blog/python-click/</a></p>
 </blockquote>
-<h2 id="Part2-撰寫python程式"><a href="#Part2-撰寫python程式" class="headerlink" title="Part2: 撰寫python程式"></a>Part2: 撰寫python程式</h2><p>python 提供 smtplib 模組來協助 smtp 封裝信息並傳輸給目標端。由於</p>
-<h3 id="step0-引入套件和開啟google-mail-權限"><a href="#step0-引入套件和開啟google-mail-權限" class="headerlink" title="step0: 引入套件和開啟google mail 權限"></a>step0: 引入套件和開啟google mail 權限</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">import smtplib</span><br></pre></td></tr></table></figure>
-<p>除了基本模組，常搭配擴充電子郵件標準套件，來處理內文部分</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">from email.mime.multipart import MIMEMultipart #email內容載體</span><br><span class="line">from email.mime.text import MIMEText           #製作郵件內文</span><br></pre></td></tr></table></figure>
-
-<p>若要在gmail使用smtplib，需要到 <a target="_blank" rel="noopener" href="https://myaccount.google.com/security">google 帳戶的安全性頁面</a> 完成帳戶密碼設定(下圖紅框標示處)</p>
-<p><img src="/2024/02/15/20240215/20240215_img2.png"></p>
-<h3 id="step1-設定帳戶資訊"><a href="#step1-設定帳戶資訊" class="headerlink" title="step1: 設定帳戶資訊"></a>step1: 設定帳戶資訊</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">MAIL_USER = &quot;from_who_user_@gmail...&quot;  #寄件者email帳號</span><br><span class="line">MAIL_PASSWD = &quot;......&quot;                 #寄件者email密碼</span><br><span class="line">FROM_ADDRESS = MAIL_USER               #和寄件者相同</span><br><span class="line"></span><br><span class="line"># 郵件平台的主機 port (這裡使用 gmail smtp 伺服器)</span><br><span class="line">MAIL_SMTP = &quot;smtp.gmail.com&quot;</span><br><span class="line">MAIL_PORT = 587                        #安全加密port &quot;587&quot;</span><br></pre></td></tr></table></figure>
-
-<h3 id="step2-撰寫郵件內容與寄件人"><a href="#step2-撰寫郵件內容與寄件人" class="headerlink" title="step2: 撰寫郵件內容與寄件人"></a>step2: 撰寫郵件內容與寄件人</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">to_address = &quot;to_who_@gmail...&quot;        #收件者email帳號</span><br><span class="line">body_content = &quot;&quot;                      #輸入郵件內文</span><br></pre></td></tr></table></figure>
-
-
-<h3 id="step3-以擴充電子郵件標準來組合-email-結構"><a href="#step3-以擴充電子郵件標準來組合-email-結構" class="headerlink" title="step3: 以擴充電子郵件標準來組合 email 結構"></a>step3: 以擴充電子郵件標準來組合 email 結構</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mail = MIMEMultipart()</span><br><span class="line">mail[&#x27;From&#x27;] = FROM_ADDRESS            #寄件者</span><br><span class="line">mail[&#x27;Subject&#x27;] = &quot;the subject&quot;        #主旨</span><br><span class="line">mail[&#x27;To&#x27;] = to_address                #收件者</span><br><span class="line"></span><br><span class="line">mail.attach(MIMEText(body_content))    #以attach方式貼上內文</span><br></pre></td></tr></table></figure>
-
-
-<h3 id="step4-設定smtp伺服器並寄信"><a href="#step4-設定smtp伺服器並寄信" class="headerlink" title="step4: 設定smtp伺服器並寄信"></a>step4: 設定smtp伺服器並寄信</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">smtpserver = smtplib.SMTP(MAIL_SMTP, MAIL_PORT)</span><br><span class="line"></span><br><span class="line"># 發出「Hello」訊息，以在用戶端和伺服器之間建立SMTP連線</span><br><span class="line">smtpserver.ehlo()   </span><br><span class="line"></span><br><span class="line"># TLS加密：延伸保護 SMTP 階段作業</span><br><span class="line">smtpserver.starttls() </span><br><span class="line"></span><br><span class="line"># 登入寄件人郵件系統</span><br><span class="line">smtpserver.login(MAIL_USER. MAIL_PASSWD) </span><br><span class="line"></span><br><span class="line"># 將step3產生的信件內容轉成string並寫入</span><br><span class="line">smtpserver.sendmail(FROM_ADDRESS, to_address, mail.as_string()) </span><br><span class="line"></span><br><span class="line"># 結束系統連線</span><br><span class="line">server.quit() </span><br></pre></td></tr></table></figure>
-
-<h2 id="Part3-完整script-成果展示"><a href="#Part3-完整script-成果展示" class="headerlink" title="Part3: 完整script &amp; 成果展示"></a>Part3: 完整script &amp; 成果展示</h2><p>附上完整的 python script<br><strong>注意: 由於使用個人主機測試，才敢將信箱帳密直接輸入在command line、由 sys 存取，若在公用主機請注意資安考量。</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python3</span><br><span class="line"></span><br><span class="line">import os</span><br><span class="line">import sys</span><br><span class="line">import smtplib</span><br><span class="line">from email.mime.multipart import MIMEMultipart</span><br><span class="line">from email.mime.text import MIMEText</span><br><span class="line"></span><br><span class="line">mail_user = sys.argv[1]</span><br><span class="line">mail_passwd = sys.argv[2]</span><br><span class="line">from_address = mail_user</span><br><span class="line"></span><br><span class="line">mail_smtp = &quot;smtp.gmail.com&quot;</span><br><span class="line">mail_port = 587</span><br><span class="line"></span><br><span class="line">to_address = sys.argv[3]</span><br><span class="line">body_content = &quot;&quot;&quot;</span><br><span class="line">	This is the auto-send email test </span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">mail = MIMEMultipart()</span><br><span class="line">mail[&#x27;From&#x27;] = mail_user</span><br><span class="line">mail[&#x27;To&#x27;] = to_address</span><br><span class="line">mail[&#x27;Subject&#x27;] = &quot;Test for smtp email-sender&quot;</span><br><span class="line"></span><br><span class="line">mail.attach(MIMEText(body_content))</span><br><span class="line"></span><br><span class="line">server = smtplib.SMTP(mail_smtp, mail_port)</span><br><span class="line">server.ehlo()</span><br><span class="line">server.starttls()</span><br><span class="line">server.login(mail_user, mail_passwd)</span><br><span class="line">server.sendmail(mail_user, to_address, mail.as_string())</span><br><span class="line">server.quit()</span><br></pre></td></tr></table></figure>
-
-<p>到收件者的信箱查看，成功收到如下圖的信件</p>
-<p><img src="/2024/02/15/20240215/20240215_img3.png"></p>
-<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><p><a target="_blank" rel="noopener" href="https://aws.amazon.com/tw/what-is/smtp/">https://aws.amazon.com/tw/what-is/smtp/</a><br><a target="_blank" rel="noopener" href="https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/">https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/</a></p>
 
             
 
@@ -393,9 +415,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2024/02/21/20240221/"
-                    data-tooltip="Python實用系列： 三種引入外部參數的方法"
-                    aria-label="上一篇: Python實用系列： 三種引入外部參數的方法"
+                    href="/20240222/Python/"
+                    data-tooltip="Python實用系列： subprocess模組管理子進程"
+                    aria-label="上一篇: Python實用系列： subprocess模組管理子進程"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -407,9 +429,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2024/02/11/20240211/"
-                    data-tooltip="HTML+CSS成果展(2)：仿寫拼多多網站"
-                    aria-label="下一篇: HTML+CSS成果展(2)：仿寫拼多多網站"
+                    href="/20240215/Python/"
+                    data-tooltip="Python實用系列： smtplib 模組實現自動寄信"
+                    aria-label="下一篇: Python實用系列： smtplib 模組實現自動寄信"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -434,7 +456,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/02/15/20240215/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240221/Python/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -447,7 +469,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/02/15/20240215/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240221/Python/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -460,7 +482,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/02/15/20240215/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240221/Python/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -497,8 +519,8 @@
         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
         var disqus_config = function () {
-          this.page.url = 'https://pxchen110.github.io/2024/02/15/20240215/';  // Replace PAGE_URL with your page's canonical URL variable
-          this.page.identifier = '1707996100000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          this.page.url = 'https://pxchen110.github.io/20240221/Python/';  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = '1708516450000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
         };
         (function() { // DON'T EDIT BELOW THIS LINE
         var d = document, s = d.createElement('script');
@@ -529,9 +551,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2024/02/21/20240221/"
-                    data-tooltip="Python實用系列： 三種引入外部參數的方法"
-                    aria-label="上一篇: Python實用系列： 三種引入外部參數的方法"
+                    href="/20240222/Python/"
+                    data-tooltip="Python實用系列： subprocess模組管理子進程"
+                    aria-label="上一篇: Python實用系列： subprocess模組管理子進程"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -543,9 +565,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/2024/02/11/20240211/"
-                    data-tooltip="HTML+CSS成果展(2)：仿寫拼多多網站"
-                    aria-label="下一篇: HTML+CSS成果展(2)：仿寫拼多多網站"
+                    href="/20240215/Python/"
+                    data-tooltip="Python實用系列： smtplib 模組實現自動寄信"
+                    aria-label="下一篇: Python實用系列： smtplib 模組實現自動寄信"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -570,7 +592,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/02/15/20240215/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240221/Python/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -583,7 +605,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/02/15/20240215/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240221/Python/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -596,7 +618,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/02/15/20240215/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240221/Python/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -630,7 +652,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/2024/02/15/20240215/"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240221/Python/"
                         aria-label="分享到 Facebook"
                     >
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
@@ -643,7 +665,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/2024/02/15/20240215/"
+                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240221/Python/"
                         aria-label="分享到 Twitter"
                     >
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
@@ -656,7 +678,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://plus.google.com/share?url=https://pxchen110.github.io/2024/02/15/20240215/"
+                        href="https://plus.google.com/share?url=https://pxchen110.github.io/20240221/Python/"
                         aria-label="分享到 Google+"
                     >
                         <i class="fab fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
@@ -732,7 +754,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/01/20/introduction/"
+                            href="https://pxchen110.github.io/introduction/uncategorized/"
                             aria-label=": Introduction"
                         >
                             <h3 class="media-heading">Introduction</h3>
@@ -755,7 +777,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/01/20240201/"
+                            href="https://pxchen110.github.io/20240201/Github/"
                             aria-label=": 用Github+Hexo建立個人部落格：方法與問題紀錄"
                         >
                             <h3 class="media-heading">用Github+Hexo建立個人部落格：方法與問題紀錄</h3>
@@ -767,7 +789,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/2024/02/01/20240201/20240201_img0.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@goumbik">Lukas Blazek</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240201/Github/20240201_img0.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@goumbik">Lukas Blazek</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -779,7 +801,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/08/20240208/"
+                            href="https://pxchen110.github.io/20240208/Front-end/"
                             aria-label=": HTML+CSS成果展(1)：可愛貓咪網站"
                         >
                             <h3 class="media-heading">HTML+CSS成果展(1)：可愛貓咪網站</h3>
@@ -791,7 +813,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/2024/02/08/20240208/20240208_img2.png"></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240208/Front-end/20240208_img2.png"></p>
 <p>在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為<strong>要來我家看貓嗎</strong>的小網頁</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -803,7 +825,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/11/20240211/"
+                            href="https://pxchen110.github.io/20240211/Front-end/"
                             aria-label=": HTML+CSS成果展(2)：仿寫拼多多網站"
                         >
                             <h3 class="media-heading">HTML+CSS成果展(2)：仿寫拼多多網站</h3>
@@ -815,7 +837,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/2024/02/11/20240211/20240211_img0.png"></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240211/Front-end/20240211_img0.png"></p>
 <p>參考資料來源：udemy 課程</p>
 <p>從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。</p></div>
                     </div>
@@ -828,7 +850,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/15/20240215/"
+                            href="https://pxchen110.github.io/20240215/Python/"
                             aria-label=": Python實用系列： smtplib 模組實現自動寄信"
                         >
                             <h3 class="media-heading">Python實用系列： smtplib 模組實現自動寄信</h3>
@@ -840,7 +862,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/2024/02/15/20240215/20240215_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@brett_jordan">Brett Jordan</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240215/Python/20240215_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@brett_jordan">Brett Jordan</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>在信箱收件夾，不乏看到許多<strong>自動寄出</strong>的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -852,7 +874,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/21/20240221/"
+                            href="https://pxchen110.github.io/20240221/Python/"
                             aria-label=": Python實用系列： 三種引入外部參數的方法"
                         >
                             <h3 class="media-heading">Python實用系列： 三種引入外部參數的方法</h3>
@@ -864,7 +886,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/2024/02/21/20240221/20240221_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240221/Python/20240221_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: <code>sys</code>, <code>argparse</code>, 以及 <code>click</code>，文章將介紹模組&#x2F;套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -876,7 +898,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/22/20240222/"
+                            href="https://pxchen110.github.io/20240222/Python/"
                             aria-label=": Python實用系列： subprocess模組管理子進程"
                         >
                             <h3 class="media-heading">Python實用系列： subprocess模組管理子進程</h3>
@@ -888,7 +910,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/2024/02/22/20240222/20240222_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240222/Python/20240222_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\輸入檔案的方式，產生目標內容。</p>
 <p>同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。</p></div>
                     </div>
@@ -901,7 +923,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/26/20240226/"
+                            href="https://pxchen110.github.io/20240226/Life/"
                             aria-label=": 楊德昌《 一一 》觀後感"
                         >
                             <h3 class="media-heading">楊德昌《 一一 》觀後感</h3>
@@ -913,7 +935,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>A one and A two…<br><img src="/2024/02/26/20240226/20240226_img1.jpeg"></p>
+                        <div class="media-content hide-xs font-merryweather"><p>A one and A two…<br><img src="/20240226/Life/20240226_img1.jpeg"></p>
 <p>這是一個喜宴開頭喪禮結尾，由一家人的生活片段交疊而成的電影，時空背景設定在沒有智慧型手機的台北，也是我尚未出生的時代，所以電影裡的台北景色對我來說都很新奇: 麥當勞內用區、誠品咖啡廳、或是圓山大飯店的宴會廳，帶有微顆粒感的畫質讓電影更吸引人。</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -925,7 +947,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/2024/02/27/20240227/"
+                            href="https://pxchen110.github.io/20240227/Life/"
                             aria-label=": 尋覓陽光。追逐小鴨。高雄旅行雜記"
                         >
                             <h3 class="media-heading">尋覓陽光。追逐小鴨。高雄旅行雜記</h3>
@@ -938,7 +960,7 @@
                             </span>
                         </span>
                         <div class="media-content hide-xs font-merryweather"><p><strong>一點渴望加一陣衝動，一場周末的出走就此成形。</strong> </p>
-<p><img src="/2024/02/27/20240227/20240227_img0.jpg"></p>
+<p><img src="/20240227/Life/20240227_img0.jpg"></p>
 <p>2024 Feb</p></div>
                     </div>
                     <div style="clear:both;"></div>
