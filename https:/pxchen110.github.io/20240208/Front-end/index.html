@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Xuan&#39;s Blog">
-    <title>Python實用系列： smtplib 模組實現自動寄信 - Xuan&#39;s Blog</title>
+    <title>HTML+CSS成果展(1)：可愛貓咪網站 - Xuan&#39;s Blog</title>
     <meta name="author" content="Xuan Chen">
     
         <meta name="keywords" content="hexo,javascript,">
@@ -17,23 +17,25 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"Photo by Brett Jordan on Unsplash\n在信箱收件夾，不乏看到許多自動寄出的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信\n\n\n\n\nPart1: SMTP協定介紹通訊協定，是協助資訊在不同軟硬體之間傳輸的方式，例如使用相同IP的兩台電腦，可以突破主機限制互相通訊。網際網路中，常用的通訊協定包含TCP&#x2F;IP, HTTPS(TLS&#x2F;SSL加密)，以及本文要使用的SMTP協定。SMTP全名為簡易郵件傳輸通訊協定 (Simple Mail Transfer Protocol)，是透過網路在電腦與伺服器之間接收與傳送電子郵件的通訊方式。只要知道服務廠商的smtp, port, 並提供一個寄件帳號，就可以自動\\廣發信件給多名收件人。\n常見的廠商與smtp伺服器：\n\ngmail:  smtp.gmail.com\noutlook: smtp-mail.outlook.com\n\n常見的連接埠比較(內容節錄自cloudflare網站) :\n\n連接埠 25 最常用於 SMTP 伺服器之間的連線。如今，用於終端使用者網路的防火牆通常會封鎖該連接埠，因為垃圾郵件發送者嘗試濫用它來傳送大量垃圾郵件。\n連接埠 465 曾經專供具有安全通訊端層 (SSL) 加密的 SMTP 使用。但是 SSL 已被 Transport Layer Security (TLS) 取代，因此現代電子郵件系統不再使用該連接埠。它只存在於舊版（過時的）系統中。\n連接埠 587 現在是電子郵件提交的預設連接埠。透過此連接埠進行的 SMTP 通訊使用 TLS 加密。\n\nPart2: 撰寫python程式python 提供 smtplib 模組來協助 smtp 封裝信息並傳輸給目標端。由於\nstep0: 引入套件和開啟google mail 權限1import smtplib\n除了基本模組，常搭配擴充電子郵件標準套件，來處理內文部分\n12from email.mime.multipart import MIMEMultipart #email內容載體from email.mime.text import MIMEText           #製作郵件內文\n\n若要在gmail使用smtplib，需要到 google 帳戶的安全性頁面 完成帳戶密碼設定(下圖紅框標示處)\n\nstep1: 設定帳戶資訊1234567MAIL_USER = &quot;from_who_user_@gmail...&quot;  #寄件者email帳號MAIL_PASSWD = &quot;......&quot;                 #寄件者email密碼FROM_ADDRESS = MAIL_USER               #和寄件者相同# 郵件平台的主機 port (這裡使用 gmail smtp 伺服器)MAIL_SMTP = &quot;smtp.gmail.com&quot;MAIL_PORT = 587                        #安全加密port &quot;587&quot;\n\nstep2: 撰寫郵件內容與寄件人12to_address = &quot;to_who_@gmail...&quot;        #收件者email帳號body_content = &quot;&quot;                      #輸入郵件內文\n\n\nstep3: 以擴充電子郵件標準來組合 email 結構123456mail = MIMEMultipart()mail[&#x27;From&#x27;] = FROM_ADDRESS            #寄件者mail[&#x27;Subject&#x27;] = &quot;the subject&quot;        #主旨mail[&#x27;To&#x27;] = to_address                #收件者mail.attach(MIMEText(body_content))    #以attach方式貼上內文\n\n\nstep4: 設定smtp伺服器並寄信12345678910111213141516smtpserver = smtplib.SMTP(MAIL_SMTP, MAIL_PORT)# 發出「Hello」訊息，以在用戶端和伺服器之間建立SMTP連線smtpserver.ehlo()   # TLS加密：延伸保護 SMTP 階段作業smtpserver.starttls() # 登入寄件人郵件系統smtpserver.login(MAIL_USER. MAIL_PASSWD) # 將step3產生的信件內容轉成string並寫入smtpserver.sendmail(FROM_ADDRESS, to_address, mail.as_string()) # 結束系統連線server.quit() \n\nPart3: 完整script &amp; 成果展示附上完整的 python script注意: 由於使用個人主機測試，才敢將信箱帳密直接輸入在command line、由 sys 存取，若在公用主機請注意資安考量。\n123456789101112131415161718192021222324252627282930313233#!/usr/bin/env python3import osimport sysimport smtplibfrom email.mime.multipart import MIMEMultipartfrom email.mime.text import MIMETextmail_user = sys.argv[1]mail_passwd = sys.argv[2]from_address = mail_usermail_smtp = &quot;smtp.gmail.com&quot;mail_port = 587to_address = sys.argv[3]body_content = &quot;&quot;&quot;\tThis is the auto-send email test &quot;&quot;&quot;mail = MIMEMultipart()mail[&#x27;From&#x27;] = mail_usermail[&#x27;To&#x27;] = to_addressmail[&#x27;Subject&#x27;] = &quot;Test for smtp email-sender&quot;mail.attach(MIMEText(body_content))server = smtplib.SMTP(mail_smtp, mail_port)server.ehlo()server.starttls()server.login(mail_user, mail_passwd)server.sendmail(mail_user, to_address, mail.as_string())server.quit()\n\n到收件者的信箱查看，成功收到如下圖的信件\n\n參考資料https://aws.amazon.com/tw/what-is/smtp/https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/\n","dateCreated":"2024-02-15T19:21:40+08:00","dateModified":"2024-03-01T08:57:40+08:00","datePublished":"2024-02-15T19:21:40+08:00","description":"Photo by Brett Jordan on Unsplash\n在信箱收件夾，不乏看到許多自動寄出的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信","headline":"Python實用系列： smtplib 模組實現自動寄信","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20240215/Python/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20240215/Python/","keywords":"Python"}</script>
-    <meta name="description" content="introducing python smtplib module to automatically send email">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"\n在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為要來我家看貓嗎的小網頁\n\n\n\n\n切版架構\n可以分成兩大區塊:\n\nheader section\nbody section\n\nheader sectionhtml元素: 單純地用h1做大標題\ncss樣式設計:\n\n整體div固定在最上方，並加上z-index讓body上滑不會蓋住它1234567position: fixed; z-index: 2;top: 0;border: 1px solid lightblue;background-color: lightblue;width: 100%; /*fill all broswer*/height: 50px;\n\nbody sectionbody部分以 display:flex 排列，並添加 wrapper 讓每行可以依照視窗大小改變容器數量每個容器包含img,固定寬度200px加上一些文字描述，和尚未引入javascript的button，其中有添加cursor樣式以及hover的pseudo element為了讓文字與圖片置中排列於容器內，以position: relative 定位，使用 left: 50%; margin-left:-(img_width/2); 來置中\nhtml元素:\n\n區塊模板相同，每個div由上到下依序為標題div、圖檔img、文字div、以及按鈕button\n\ncss樣式設計:\n\n整體body沒有加定位樣式，因此設margin-top來預防被header遮蓋\n對於內部區塊模板，以flex呈現水平排列，並設定flex-wrap來允許視窗大小改變時，div能變成多行排列1234567display: flex;flex-direction: row;flex-wrap: wrap; align-content: flex-start;margin: 50px;margin-top: 200px; /*solving position:fixed covering problem*/width:auto;\n針對區塊模板，給予寬度後設定 margin:auto 來均分左右空間，border調整圓弧形12345margin: auto; /*share left space equally*/border: 1px solid lightblue;border-radius: 10%;width: 300px;height: 400px; \n區塊內部的按鈕，加上鼠標移上去的偽元素樣式123.but-class-name:hover &#123;    background-color: lightcoral;&#125; \n\n成果展示Github 原始碼\n從下兩張圖比對，可以看到當螢幕尺寸改變，每行可容納的div數量也會彈性調整\n\n\n","dateCreated":"2024-02-08T21:14:35+08:00","dateModified":"2024-03-01T12:39:48+08:00","datePublished":"2024-02-08T21:14:35+08:00","description":"\n在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為要來我家看貓嗎的小網頁","headline":"HTML+CSS成果展(1)：可愛貓咪網站","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/","keywords":"HTML, CSS"}</script>
+    <meta name="description" content="在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為要來我家看貓嗎的小網頁">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="Python實用系列： smtplib 模組實現自動寄信">
-<meta property="og:url" content="https://pxchen110.github.io/20240215/Python/index.html">
+<meta property="og:title" content="HTML+CSS成果展(1)：可愛貓咪網站">
+<meta property="og:url" content="https://pxchen110.github.io/20240208/Front-end/index.html">
 <meta property="og:site_name" content="Xuan&#39;s Blog">
-<meta property="og:description" content="introducing python smtplib module to automatically send email">
+<meta property="og:description" content="在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為要來我家看貓嗎的小網頁">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://pxchen110.github.io/20240215/Python/20240215_img1.jpg">
-<meta property="og:image" content="https://pxchen110.github.io/20240215/Python/20240215_img2.png">
-<meta property="og:image" content="https://pxchen110.github.io/20240215/Python/20240215_img3.png">
-<meta property="article:published_time" content="2024-02-15T11:21:40.000Z">
-<meta property="article:modified_time" content="2024-03-01T00:57:40.482Z">
+<meta property="og:image" content="https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/20240208_img2.png">
+<meta property="og:image" content="https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/20240208_img1.png">
+<meta property="og:image" content="https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/20240208_img2.png">
+<meta property="og:image" content="https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/20240208_img3.png">
+<meta property="article:published_time" content="2024-02-08T13:14:35.000Z">
+<meta property="article:modified_time" content="2024-03-01T04:39:48.715Z">
 <meta property="article:author" content="Xuan Chen">
-<meta property="article:tag" content="Python">
+<meta property="article:tag" content="HTML">
+<meta property="article:tag" content="CSS">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pxchen110.github.io/20240215/Python/20240215_img1.jpg">
+<meta name="twitter:image" content="https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/20240208_img2.png">
     
     
         
@@ -303,20 +305,20 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            Python實用系列： smtplib 模組實現自動寄信
+            HTML+CSS成果展(1)：可愛貓咪網站
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2024-02-15T19:21:40+08:00">
+    <time datetime="2024-02-08T21:14:35+08:00">
 	
-		    2024 年 2 月 15 日
+		    2024 年 2 月 8 日
     	
     </time>
     
         <span>分類 </span>
         
-    <a class="category-link" href="/categories/Python/">Python</a>
+    <a class="category-link" href="/categories/Front-end/">Front-end</a>
 
 
     
@@ -328,47 +330,39 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p><img src="/20240215/Python/20240215_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@brett_jordan">Brett Jordan</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
-<p>在信箱收件夾，不乏看到許多<strong>自動寄出</strong>的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信</p>
+            <p><img src="/https:/pxchen110.github.io/20240208/Front-end/20240208_img2.png"></p>
+<p>在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為<strong>要來我家看貓嗎</strong>的小網頁</p>
 <span id="more"></span>
 
-<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Part1-SMTP%E5%8D%94%E5%AE%9A%E4%BB%8B%E7%B4%B9"><span class="toc-text">Part1: SMTP協定介紹</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Part2-%E6%92%B0%E5%AF%ABpython%E7%A8%8B%E5%BC%8F"><span class="toc-text">Part2: 撰寫python程式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#step0-%E5%BC%95%E5%85%A5%E5%A5%97%E4%BB%B6%E5%92%8C%E9%96%8B%E5%95%9Fgoogle-mail-%E6%AC%8A%E9%99%90"><span class="toc-text">step0: 引入套件和開啟google mail 權限</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step1-%E8%A8%AD%E5%AE%9A%E5%B8%B3%E6%88%B6%E8%B3%87%E8%A8%8A"><span class="toc-text">step1: 設定帳戶資訊</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step2-%E6%92%B0%E5%AF%AB%E9%83%B5%E4%BB%B6%E5%85%A7%E5%AE%B9%E8%88%87%E5%AF%84%E4%BB%B6%E4%BA%BA"><span class="toc-text">step2: 撰寫郵件內容與寄件人</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step3-%E4%BB%A5%E6%93%B4%E5%85%85%E9%9B%BB%E5%AD%90%E9%83%B5%E4%BB%B6%E6%A8%99%E6%BA%96%E4%BE%86%E7%B5%84%E5%90%88-email-%E7%B5%90%E6%A7%8B"><span class="toc-text">step3: 以擴充電子郵件標準來組合 email 結構</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step4-%E8%A8%AD%E5%AE%9Asmtp%E4%BC%BA%E6%9C%8D%E5%99%A8%E4%B8%A6%E5%AF%84%E4%BF%A1"><span class="toc-text">step4: 設定smtp伺服器並寄信</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Part3-%E5%AE%8C%E6%95%B4script-%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA"><span class="toc-text">Part3: 完整script &amp; 成果展示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-text">參考資料</span></a></li></ol>
+<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%87%E7%89%88%E6%9E%B6%E6%A7%8B"><span class="toc-text">切版架構</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#header-section"><span class="toc-text">header section</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#body-section"><span class="toc-text">body section</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA"><span class="toc-text">成果展示</span></a></li></ol>
 
-<h2 id="Part1-SMTP協定介紹"><a href="#Part1-SMTP協定介紹" class="headerlink" title="Part1: SMTP協定介紹"></a>Part1: SMTP協定介紹</h2><p>通訊協定，是協助資訊在不同軟硬體之間傳輸的方式，例如使用相同IP的兩台電腦，可以突破主機限制互相通訊。網際網路中，常用的通訊協定包含TCP&#x2F;IP, HTTPS(TLS&#x2F;SSL加密)，以及本文要使用的SMTP協定。<br>SMTP全名為簡易郵件傳輸通訊協定 (Simple Mail Transfer Protocol)，是透過網路在電腦與伺服器之間<strong>接收與傳送電子郵件</strong>的通訊方式。只要知道服務廠商的smtp, port, 並提供一個寄件帳號，就可以自動\廣發信件給多名收件人。</p>
-<p>常見的廠商與smtp伺服器：</p>
+<h2 id="切版架構"><a href="#切版架構" class="headerlink" title="切版架構"></a>切版架構</h2><p><img src="/https:/pxchen110.github.io/20240208/Front-end/20240208_img1.png"></p>
+<p>可以分成兩大區塊:</p>
 <ul>
-<li>gmail:  <code>smtp.gmail.com</code></li>
-<li>outlook: <code>smtp-mail.outlook.com</code></li>
+<li>header section</li>
+<li>body section</li>
 </ul>
-<p>常見的連接埠比較(內容節錄自<a target="_blank" rel="noopener" href="https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/">cloudflare網站</a>) :</p>
-<blockquote>
-<p>連接埠 25 最常用於 SMTP 伺服器之間的連線。如今，用於終端使用者網路的防火牆通常會封鎖該連接埠，因為垃圾郵件發送者嘗試濫用它來傳送大量垃圾郵件。</p>
-<p>連接埠 465 曾經專供具有安全通訊端層 (SSL) 加密的 SMTP 使用。但是 SSL 已被 Transport Layer Security (TLS) 取代，因此現代電子郵件系統不再使用該連接埠。它只存在於舊版（過時的）系統中。</p>
-<p>連接埠 587 現在是電子郵件提交的預設連接埠。透過此連接埠進行的 SMTP 通訊使用 TLS 加密。</p>
-</blockquote>
-<h2 id="Part2-撰寫python程式"><a href="#Part2-撰寫python程式" class="headerlink" title="Part2: 撰寫python程式"></a>Part2: 撰寫python程式</h2><p>python 提供 smtplib 模組來協助 smtp 封裝信息並傳輸給目標端。由於</p>
-<h3 id="step0-引入套件和開啟google-mail-權限"><a href="#step0-引入套件和開啟google-mail-權限" class="headerlink" title="step0: 引入套件和開啟google mail 權限"></a>step0: 引入套件和開啟google mail 權限</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">import smtplib</span><br></pre></td></tr></table></figure>
-<p>除了基本模組，常搭配擴充電子郵件標準套件，來處理內文部分</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">from email.mime.multipart import MIMEMultipart #email內容載體</span><br><span class="line">from email.mime.text import MIMEText           #製作郵件內文</span><br></pre></td></tr></table></figure>
-
-<p>若要在gmail使用smtplib，需要到 <a target="_blank" rel="noopener" href="https://myaccount.google.com/security">google 帳戶的安全性頁面</a> 完成帳戶密碼設定(下圖紅框標示處)</p>
-<p><img src="/20240215/Python/20240215_img2.png"></p>
-<h3 id="step1-設定帳戶資訊"><a href="#step1-設定帳戶資訊" class="headerlink" title="step1: 設定帳戶資訊"></a>step1: 設定帳戶資訊</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">MAIL_USER = &quot;from_who_user_@gmail...&quot;  #寄件者email帳號</span><br><span class="line">MAIL_PASSWD = &quot;......&quot;                 #寄件者email密碼</span><br><span class="line">FROM_ADDRESS = MAIL_USER               #和寄件者相同</span><br><span class="line"></span><br><span class="line"># 郵件平台的主機 port (這裡使用 gmail smtp 伺服器)</span><br><span class="line">MAIL_SMTP = &quot;smtp.gmail.com&quot;</span><br><span class="line">MAIL_PORT = 587                        #安全加密port &quot;587&quot;</span><br></pre></td></tr></table></figure>
-
-<h3 id="step2-撰寫郵件內容與寄件人"><a href="#step2-撰寫郵件內容與寄件人" class="headerlink" title="step2: 撰寫郵件內容與寄件人"></a>step2: 撰寫郵件內容與寄件人</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">to_address = &quot;to_who_@gmail...&quot;        #收件者email帳號</span><br><span class="line">body_content = &quot;&quot;                      #輸入郵件內文</span><br></pre></td></tr></table></figure>
-
-
-<h3 id="step3-以擴充電子郵件標準來組合-email-結構"><a href="#step3-以擴充電子郵件標準來組合-email-結構" class="headerlink" title="step3: 以擴充電子郵件標準來組合 email 結構"></a>step3: 以擴充電子郵件標準來組合 email 結構</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mail = MIMEMultipart()</span><br><span class="line">mail[&#x27;From&#x27;] = FROM_ADDRESS            #寄件者</span><br><span class="line">mail[&#x27;Subject&#x27;] = &quot;the subject&quot;        #主旨</span><br><span class="line">mail[&#x27;To&#x27;] = to_address                #收件者</span><br><span class="line"></span><br><span class="line">mail.attach(MIMEText(body_content))    #以attach方式貼上內文</span><br></pre></td></tr></table></figure>
-
-
-<h3 id="step4-設定smtp伺服器並寄信"><a href="#step4-設定smtp伺服器並寄信" class="headerlink" title="step4: 設定smtp伺服器並寄信"></a>step4: 設定smtp伺服器並寄信</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">smtpserver = smtplib.SMTP(MAIL_SMTP, MAIL_PORT)</span><br><span class="line"></span><br><span class="line"># 發出「Hello」訊息，以在用戶端和伺服器之間建立SMTP連線</span><br><span class="line">smtpserver.ehlo()   </span><br><span class="line"></span><br><span class="line"># TLS加密：延伸保護 SMTP 階段作業</span><br><span class="line">smtpserver.starttls() </span><br><span class="line"></span><br><span class="line"># 登入寄件人郵件系統</span><br><span class="line">smtpserver.login(MAIL_USER. MAIL_PASSWD) </span><br><span class="line"></span><br><span class="line"># 將step3產生的信件內容轉成string並寫入</span><br><span class="line">smtpserver.sendmail(FROM_ADDRESS, to_address, mail.as_string()) </span><br><span class="line"></span><br><span class="line"># 結束系統連線</span><br><span class="line">server.quit() </span><br></pre></td></tr></table></figure>
-
-<h2 id="Part3-完整script-成果展示"><a href="#Part3-完整script-成果展示" class="headerlink" title="Part3: 完整script &amp; 成果展示"></a>Part3: 完整script &amp; 成果展示</h2><p>附上完整的 python script<br><strong>注意: 由於使用個人主機測試，才敢將信箱帳密直接輸入在command line、由 sys 存取，若在公用主機請注意資安考量。</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python3</span><br><span class="line"></span><br><span class="line">import os</span><br><span class="line">import sys</span><br><span class="line">import smtplib</span><br><span class="line">from email.mime.multipart import MIMEMultipart</span><br><span class="line">from email.mime.text import MIMEText</span><br><span class="line"></span><br><span class="line">mail_user = sys.argv[1]</span><br><span class="line">mail_passwd = sys.argv[2]</span><br><span class="line">from_address = mail_user</span><br><span class="line"></span><br><span class="line">mail_smtp = &quot;smtp.gmail.com&quot;</span><br><span class="line">mail_port = 587</span><br><span class="line"></span><br><span class="line">to_address = sys.argv[3]</span><br><span class="line">body_content = &quot;&quot;&quot;</span><br><span class="line">	This is the auto-send email test </span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">mail = MIMEMultipart()</span><br><span class="line">mail[&#x27;From&#x27;] = mail_user</span><br><span class="line">mail[&#x27;To&#x27;] = to_address</span><br><span class="line">mail[&#x27;Subject&#x27;] = &quot;Test for smtp email-sender&quot;</span><br><span class="line"></span><br><span class="line">mail.attach(MIMEText(body_content))</span><br><span class="line"></span><br><span class="line">server = smtplib.SMTP(mail_smtp, mail_port)</span><br><span class="line">server.ehlo()</span><br><span class="line">server.starttls()</span><br><span class="line">server.login(mail_user, mail_passwd)</span><br><span class="line">server.sendmail(mail_user, to_address, mail.as_string())</span><br><span class="line">server.quit()</span><br></pre></td></tr></table></figure>
-
-<p>到收件者的信箱查看，成功收到如下圖的信件</p>
-<p><img src="/20240215/Python/20240215_img3.png"></p>
-<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><p><a target="_blank" rel="noopener" href="https://aws.amazon.com/tw/what-is/smtp/">https://aws.amazon.com/tw/what-is/smtp/</a><br><a target="_blank" rel="noopener" href="https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/">https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/</a></p>
+<h2 id="header-section"><a href="#header-section" class="headerlink" title="header section"></a>header section</h2><p>html元素: 單純地用h1做大標題</p>
+<p>css樣式設計:</p>
+<ul>
+<li>整體div固定在最上方，並加上z-index讓body上滑不會蓋住它<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">position: fixed; </span><br><span class="line">z-index: 2;</span><br><span class="line">top: 0;</span><br><span class="line">border: 1px solid lightblue;</span><br><span class="line">background-color: lightblue;</span><br><span class="line">width: 100%; /*fill all broswer*/</span><br><span class="line">height: 50px;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="body-section"><a href="#body-section" class="headerlink" title="body section"></a>body section</h2><p>body部分以 <code>display:flex</code> 排列，並添加 wrapper 讓每行可以依照視窗大小改變容器數量<br>每個容器包含img,固定寬度200px<br>加上一些文字描述，和尚未引入javascript的button，其中有添加cursor樣式以及hover的pseudo element<br>為了讓文字與圖片置中排列於容器內，以position: relative 定位，使用 <code>left: 50%; margin-left:-(img_width/2);</code> 來置中</p>
+<p>html元素:</p>
+<ul>
+<li>區塊模板相同，每個div由上到下依序為標題div、圖檔img、文字div、以及按鈕button</li>
+</ul>
+<p>css樣式設計:</p>
+<ul>
+<li>整體body沒有加定位樣式，因此設margin-top來預防被header遮蓋</li>
+<li>對於內部區塊模板，以flex呈現水平排列，並設定flex-wrap來允許視窗大小改變時，div能變成多行排列<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">display: flex;</span><br><span class="line">flex-direction: row;</span><br><span class="line">flex-wrap: wrap; </span><br><span class="line">align-content: flex-start;</span><br><span class="line">margin: 50px;</span><br><span class="line">margin-top: 200px; /*solving position:fixed covering problem*/</span><br><span class="line">width:auto;</span><br></pre></td></tr></table></figure></li>
+<li>針對區塊模板，給予寬度後設定 <code>margin:auto</code> 來均分左右空間，border調整圓弧形<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">margin: auto; /*share left space equally*/</span><br><span class="line">border: 1px solid lightblue;</span><br><span class="line">border-radius: 10%;</span><br><span class="line">width: 300px;</span><br><span class="line">height: 400px; </span><br></pre></td></tr></table></figure></li>
+<li>區塊內部的按鈕，加上鼠標移上去的偽元素樣式<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.but-class-name:hover &#123;</span><br><span class="line">    background-color: lightcoral;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="成果展示"><a href="#成果展示" class="headerlink" title="成果展示"></a>成果展示</h2><p><a target="_blank" rel="noopener" href="https://github.com/pxchen110/html_case/tree/main/cute_cat_html">Github 原始碼</a></p>
+<p>從下兩張圖比對，可以看到當螢幕尺寸改變，每行可容納的div數量也會彈性調整</p>
+<p><img src="/https:/pxchen110.github.io/20240208/Front-end/20240208_img2.png"></p>
+<p><img src="/https:/pxchen110.github.io/20240208/Front-end/20240208_img3.png"></p>
 
             
 
@@ -380,7 +374,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">標籤</span><br/>
                 
-    <a class="tag tag--primary tag--small t-none-link" href="/tags/Python/" rel="tag">Python</a>
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/CSS/" rel="tag">CSS</a> <a class="tag tag--primary tag--small t-none-link" href="/tags/HTML/" rel="tag">HTML</a>
 
             </div>
         
@@ -393,9 +387,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240221/Python/"
-                    data-tooltip="Python實用系列： 三種引入外部參數的方法"
-                    aria-label="上一篇: Python實用系列： 三種引入外部參數的方法"
+                    href="/https:/pxchen110.github.io/20240211/Front-end/"
+                    data-tooltip="HTML+CSS成果展(2)：仿寫拼多多網站"
+                    aria-label="上一篇: HTML+CSS成果展(2)：仿寫拼多多網站"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -407,9 +401,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240211/Front-end/"
-                    data-tooltip="HTML+CSS成果展(2)：仿寫拼多多網站"
-                    aria-label="下一篇: HTML+CSS成果展(2)：仿寫拼多多網站"
+                    href="/https:/pxchen110.github.io/20240201/Github/"
+                    data-tooltip="用Github+Hexo建立個人部落格：方法與問題紀錄"
+                    aria-label="下一篇: 用Github+Hexo建立個人部落格：方法與問題紀錄"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -434,7 +428,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240215/Python/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -447,7 +441,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240215/Python/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -460,7 +454,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240215/Python/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -497,8 +491,8 @@
         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
         var disqus_config = function () {
-          this.page.url = 'https://pxchen110.github.io/20240215/Python/';  // Replace PAGE_URL with your page's canonical URL variable
-          this.page.identifier = '1707996100000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          this.page.url = 'https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/';  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = '1707398075000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
         };
         (function() { // DON'T EDIT BELOW THIS LINE
         var d = document, s = d.createElement('script');
@@ -529,9 +523,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240221/Python/"
-                    data-tooltip="Python實用系列： 三種引入外部參數的方法"
-                    aria-label="上一篇: Python實用系列： 三種引入外部參數的方法"
+                    href="/https:/pxchen110.github.io/20240211/Front-end/"
+                    data-tooltip="HTML+CSS成果展(2)：仿寫拼多多網站"
+                    aria-label="上一篇: HTML+CSS成果展(2)：仿寫拼多多網站"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -543,9 +537,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240211/Front-end/"
-                    data-tooltip="HTML+CSS成果展(2)：仿寫拼多多網站"
-                    aria-label="下一篇: HTML+CSS成果展(2)：仿寫拼多多網站"
+                    href="/https:/pxchen110.github.io/20240201/Github/"
+                    data-tooltip="用Github+Hexo建立個人部落格：方法與問題紀錄"
+                    aria-label="下一篇: 用Github+Hexo建立個人部落格：方法與問題紀錄"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -570,7 +564,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240215/Python/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -583,7 +577,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240215/Python/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -596,7 +590,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240215/Python/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -630,7 +624,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240215/Python/"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/"
                         aria-label="分享到 Facebook"
                     >
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
@@ -643,7 +637,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240215/Python/"
+                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/"
                         aria-label="分享到 Twitter"
                     >
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
@@ -656,7 +650,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://plus.google.com/share?url=https://pxchen110.github.io/20240215/Python/"
+                        href="https://plus.google.com/share?url=https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/"
                         aria-label="分享到 Google+"
                     >
                         <i class="fab fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
@@ -755,7 +749,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/20240201/Github/"
+                            href="https://pxchen110.github.io/https:/pxchen110.github.io/20240201/Github/"
                             aria-label=": 用Github+Hexo建立個人部落格：方法與問題紀錄"
                         >
                             <h3 class="media-heading">用Github+Hexo建立個人部落格：方法與問題紀錄</h3>
@@ -767,7 +761,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240201/Github/20240201_img0.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@goumbik">Lukas Blazek</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/https:/pxchen110.github.io/20240201/Github/20240201_img0.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@goumbik">Lukas Blazek</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -779,7 +773,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/20240208/Front-end/"
+                            href="https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/"
                             aria-label=": HTML+CSS成果展(1)：可愛貓咪網站"
                         >
                             <h3 class="media-heading">HTML+CSS成果展(1)：可愛貓咪網站</h3>
@@ -791,7 +785,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240208/Front-end/20240208_img2.png"></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/https:/pxchen110.github.io/20240208/Front-end/20240208_img2.png"></p>
 <p>在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為<strong>要來我家看貓嗎</strong>的小網頁</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -803,7 +797,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/20240211/Front-end/"
+                            href="https://pxchen110.github.io/https:/pxchen110.github.io/20240211/Front-end/"
                             aria-label=": HTML+CSS成果展(2)：仿寫拼多多網站"
                         >
                             <h3 class="media-heading">HTML+CSS成果展(2)：仿寫拼多多網站</h3>
@@ -815,7 +809,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240211/Front-end/20240211_img0.png"></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/https:/pxchen110.github.io/20240211/Front-end/20240211_img0.png"></p>
 <p>參考資料來源：udemy 課程</p>
 <p>從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。</p></div>
                     </div>
@@ -828,7 +822,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/20240215/Python/"
+                            href="https://pxchen110.github.io/https:/pxchen110.github.io/20240215/Python/"
                             aria-label=": Python實用系列： smtplib 模組實現自動寄信"
                         >
                             <h3 class="media-heading">Python實用系列： smtplib 模組實現自動寄信</h3>
@@ -840,7 +834,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240215/Python/20240215_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@brett_jordan">Brett Jordan</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/https:/pxchen110.github.io/20240215/Python/20240215_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@brett_jordan">Brett Jordan</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>在信箱收件夾，不乏看到許多<strong>自動寄出</strong>的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -852,7 +846,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/20240221/Python/"
+                            href="https://pxchen110.github.io/https:/pxchen110.github.io/20240221/Python/"
                             aria-label=": Python實用系列： 三種引入外部參數的方法"
                         >
                             <h3 class="media-heading">Python實用系列： 三種引入外部參數的方法</h3>
@@ -864,7 +858,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240221/Python/20240221_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/https:/pxchen110.github.io/20240221/Python/20240221_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: <code>sys</code>, <code>argparse</code>, 以及 <code>click</code>，文章將介紹模組&#x2F;套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -876,7 +870,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/20240222/Python/"
+                            href="https://pxchen110.github.io/https:/pxchen110.github.io/20240222/Python/"
                             aria-label=": Python實用系列： subprocess模組管理子進程"
                         >
                             <h3 class="media-heading">Python實用系列： subprocess模組管理子進程</h3>
@@ -888,7 +882,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240222/Python/20240222_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/https:/pxchen110.github.io/20240222/Python/20240222_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\輸入檔案的方式，產生目標內容。</p>
 <p>同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。</p></div>
                     </div>
@@ -901,7 +895,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/20240226/Life/"
+                            href="https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/"
                             aria-label=": 楊德昌《 一一 》觀後感"
                         >
                             <h3 class="media-heading">楊德昌《 一一 》觀後感</h3>
@@ -913,7 +907,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>A one and A two…<br><img src="/20240226/Life/20240226_img1.jpeg"></p>
+                        <div class="media-content hide-xs font-merryweather"><p>A one and A two…<br><img src="/https:/pxchen110.github.io/20240226/Life/20240226_img1.jpeg"></p>
 <p>這是一個喜宴開頭喪禮結尾，由一家人的生活片段交疊而成的電影，時空背景設定在沒有智慧型手機的台北，也是我尚未出生的時代，所以電影裡的台北景色對我來說都很新奇: 麥當勞內用區、誠品咖啡廳、或是圓山大飯店的宴會廳，帶有微顆粒感的畫質讓電影更吸引人。</p></div>
                     </div>
                     <div style="clear:both;"></div>

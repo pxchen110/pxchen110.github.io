@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Xuan&#39;s Blog">
-    <title>HTML+CSS成果展(2)：仿寫拼多多網站 - Xuan&#39;s Blog</title>
+    <title>楊德昌《 一一 》觀後感 - Xuan&#39;s Blog</title>
     <meta name="author" content="Xuan Chen">
     
         <meta name="keywords" content="hexo,javascript,">
@@ -17,26 +17,24 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"\n參考資料來源：udemy 課程\n從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。\n\n\n學習流程：將影片要仿寫的部份截圖-&gt;自己寫看看-&gt;觀看課程影片比對老師和我的作法差異-&gt;改善程式-&gt;完成！\n\n\n大致的切版規劃:\n切版成三區塊，以及一個固定於網頁左下方的qrcode，在html會分成四個&lt;div&gt;&lt;/div&gt;撰寫\n\nheader+nav(嚴格來說只有navigation bar)\nbody(以相同模板套用內容並垂直排列)\nfooter(下方聯絡資訊等樣式)\nqrcode banner\n\nHeader+nav section切版設計:\nhtml元素:\n\n圖片和nav文字都是 &lt;a&gt;&lt;/a&gt; 元素\n\ncss樣式重點:\n\n網頁滑動仍固定於上方:1234position: fixed; /*固定在最上面*/top: 0; /*定位*/left: 0; /*定位*/z-index: 999; /*滑動時不會被上來的div蓋住*/\nnav的div以flex呈現水平排列，以border作為間隔，並清除尾端div的border12display: flex; /*將div以flex規劃排列方式，呈現清單*/flex-direction: row; \nnav 下面的小div以border作為間隔\n在倒數個div加上class name(.g-header-list-re)，練習以+方式清除最後一個div元素的border12345border-right: 1px solid gray; .g-header-list-re + div  &#123; /*清除最後一個元素的border*/border-right: none;  &#125;\n\nbody section切版設計:\nhtml元素:\n\n由於區塊模板相似，做好一個候可以重複套用添加內容\n一個區塊以div包覆，下面分三個小div操作\n最上div面用 &lt;p&gt;&lt;/p&gt; 和 &lt;a&gt;&lt;/a&gt; 放置文字與連結點選\n中間div放大圖片\n下方div包含三個小div，放置圖片，文字等商品資訊\n\ncss樣式重點:\n\nbody整體以header做父元素定位，並做水平置中\nbody寬度以view point為單位設定，使其可依照視窗縮放比例\n區塊模板以flex呈垂直排列1234567891011position: absolute; top: 40%;left: 50%; /*搭配margin-left: -(width/2)做水平置中*/overflow: hidden;display: flex;flex-direction: column;gap: 50px;margin-left: -40vw; /*寬度的一半做水平置中*/width: 80vw;\n區塊模版最上方的&lt;p&gt;和&lt;a&gt; 分別以 float: left; float: right; 浮動\n區塊模板下方再套用flex呈水平排列123display: flex;flex-direction: row;gap: 10px;\n\nfooter section切版設計:\nhtml元素:\n\n上方div內有兩個小div，分別放置qrcode跟聯絡資訊\n下方div跟header的nav清單相似，但以list寫法呈現\n\ncss樣式重點:\n\nfooter整體以body做父元素定位\n使用預先知道得body total height作為top距離，讓footer銜接在body下方123456position:absolute;top: 3000px; /*不太好得做法，以body為父元素，body height為top距離*/padding-top: 60px;width:100vw; /*可依視窗大小縮放的寬度單位*/height:300px;background-color: lightgray;\n上方div內的兩個小div以float:left;做浮動\n左側div以flex讓內部三個div呈水平排列，同時設定跟右側div相同的高度\n右側div主要調整的是p元素的間隔，高寬，以及與左側div的距離，並以border做區隔12345/*左側div css*/display: flex; /*flex方式排列qrcodes*/flex-direction: row;gap: 10px; height: 240px; /*讓img+text總高和右側聯絡資訊一樣*/\n12345678/*右側div css*/text-align: left;border-left: 1px solid black;margin-left: 15px;margin-bottom: 20px;padding-left: 45px;line-height: 30px;font-size: 20px;\n\n\n下方div(.g-footer-list)的list以更改display:inline-block;的方式呈水平排列，並保留設定元素寬度的能力\n練習以last-child或first-child方式移除頭尾元素的border123456.g-footer-list ul li &#123; /*以inline-block displayed list製作清單*/display: inline-block; /*可設長寬的元素*/border-left: 1px solid black;margin: 0 auto; /*給予寬度的情況下，margin auto可置中*/width: 100px;&#125;\n123    .g-footer-list li:first-child &#123; /*remove border for the first element in the list*/    border: none;&#125;\n\nqrcode bannerhtml元素:\n\ndiv包含img和兩個小div\n\ncss樣式設計:\n\n整體定位，以網頁為父元素，固定浮動於左下方\n設定z-index浮動在body和footer上方1234567position: fixed; /*固定浮動在網頁左下方*/bottom: 50px;left: 100px;z-index: 998; /*不被body蓋住*/padding: 10px 30px;border: 1px solid gray;background-color: white;\n先設定圖片寬度，配合left和margin-left讓圖片水平置中於div內123456img &#123;    position: relative;    left: 50%;    margin-left: -75px;     width: 150px;&#125;\n\n成果展示Github 原始碼 \n一併附上拚多多網站連結\n檢討回顧以上就是我得第一版網站仿寫，過程歷經許多trial and error，像是沒規劃好區塊，等寫到60%時又重新修改架構，打掉重練的狀況；也蠻常遇到加了css樣式但卻出不來的困惑。最後列出幾點我在udemy上學到的技巧，以及這一版仿寫有待改進的部分:\n\nnavigation bar 應該也改成list製作會比較簡單，開太多div來包感覺沒意義\nfooter出現在尾端的定位方式非robust，和body依賴性太高，萬一body新增內容豈不是要調整top數值?\n佔滿視窗大小並依比例調整，改用100%會比100vw好，原因可以參考此網站的解釋\n透過將float: left;`` float: right; 設成一個class name，當有元素需要就加上這個class是有效率的方法\n同理可以新增清除浮動的class，有需要就加上12345 .clearfix::after &#123; /*清除浮動    content: &quot;&quot;;    display: block;    clear: both;&#125; \n一開始就設定所有的a元素都移除下底線，或所有list都移除符號\n\n","dateCreated":"2024-02-11T18:28:37+08:00","dateModified":"2024-03-01T08:58:09+08:00","datePublished":"2024-02-11T18:28:37+08:00","description":"\n參考資料來源：udemy 課程\n從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。","headline":"HTML+CSS成果展(2)：仿寫拼多多網站","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20240211/Front-end/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20240211/Front-end/","keywords":"HTML, CSS"}</script>
-    <meta name="description" content="introduce html and css coding results">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"A one and A two…\n這是一個喜宴開頭喪禮結尾，由一家人的生活片段交疊而成的電影，時空背景設定在沒有智慧型手機的台北，也是我尚未出生的時代，所以電影裡的台北景色對我來說都很新奇: 麥當勞內用區、誠品咖啡廳、或是圓山大飯店的宴會廳，帶有微顆粒感的畫質讓電影更吸引人。\n\n\n\n\n人物與課題電影裡的一家四口，雖然戲份佔比不一，但如導演所說，在不同年紀看，都能在某位角色身上映射出相似的課題與身影\n\n媽媽希望透過信仰的力量，讓奶奶早日醒來，但在希望來臨前、一成不變的光景讓她感到無力，對現況的失望被她歸咎於自己在都市內無法堅定信仰，於是亦然決定到山上進修。我本身的家庭背景也有一定程度的信仰，所以能理解她想透過祈禱來安定內心的想法，但在事與願違下，我或許會選擇一邊祈禱一邊接納現實、尋求另外的方法努力（理性層面是這樣想），而非選擇逃避。\n爸爸在理想與現實衝突下，聽到了來自內心的反抗，並試圖逃離功成名就，面對舊情人不解當年的分手，他雲淡風輕的說出當時的感受\n\n考上電機系後，我爸爸很開心，我媽媽很開心，妳也很開心，只有我不開心，我只感到悲哀 \n\n最後他仍為家人責任妥協於現實、成為背道而馳的自己，面對商場的唯利主義，真誠的心一次次被澆熄與欺騙。\n電影裡當他在日本面對不告而別的舊情人、以及同事不重視誠信的態度，頓時跌入失望的谷底，和滿心期待的啟航畫面呈現強烈對比。\n大女兒是和我年齡最接近的角色，而生活給予她兩件歷練使她成長：沒倒垃圾與奶奶昏迷的愧疚感，以及在友情與懞懂愛情間拉扯的灼烈罪惡感，電影裡小莉的質問使她頓時心虛細語，午夜時分無法入眠。\n\n這些沒有回應的、無疾而終的經歷在她生命裡畫上幾道痕跡，最終趴在奶奶腿上、一幅歲月靜好的稀釋這些成長痛。\n小兒子對我來說是一個的小屁孩（誤，他帶有童真的眼光，讓本應圓滑的世俗稜角變得更為單純有創造力，像是他拿著底片相機拍著”別人看不見的另外一面”、試圖記錄吵醒人的蚊子身影，這些行為讓人不自覺露出微笑。\n只可惜現在的我已是接近訓導主任的心靈，面對童心未泯的事物，常帶著過於世俗的眼神去審視甚至曲解，或許我們應該喚起內心沉睡的小孩來看待事物。最後在喪禮上，導演也透過他用較為童真的眼光去解讀死亡這件事。\n\n\n他們都說你走了，但我不明白你去哪裡，或許有一天我們還會再見面，到時你再帶我去看你去了哪裡\n\n即使每個人都各自面臨生活課題與情緒，但仍踏入家門同坐一桌吃飯，聊著不著邊際試圖關心對方的話題，家人之間既疏離又接近得情感，或許也是最難能可貴的關係。\n印象深刻的場景一: 跟奶奶說話奶奶的房間就像是告解室，讓觀眾有機會傾聽角色內心獨白的場景，因為沒有人回應，就像爸爸坦白地說道 \n\n其實這樣自言自語對我來說蠻難得，我這樣講你不要生氣，我覺得，好像在拜拜。除了不知道對方是不是聽得到之外，對我自己講的話是不是真心的，好像也沒什麼把握\n\n那裏是角色內心世界的延伸，和與外界互動的所武裝起來的堅硬外層相比，人物更加深情、但相反也更加沈默 “即使悲傷也無人應答”想起自己也曾躺在床上，手握護身符，多次向神訴說我的心情、祈求一個應許，以及一個不可能的回應，雖然生活物理上一成不變，但我想這股聲音中就能被聽見，並自我寬慰，比起悶在心裡會更好受一點。\n印象深刻的場景二：台日兩地穿插的約會場景電影以交叉蒙太奇的手法，呈現兩代人在情感約會上的重疊相似性，一邊是遠在東京街頭漫步的中年男女，另一邊是在信義區初次相約的年輕男女，互相靠近的心與牽起的手，情感展開的不言而喻。\n印象深刻的場景三：拍下別人看不見的另一面\n我們是不是只能知道一半的事情啊？我們只能看到前面，看不到後面，這樣不就有一半的事情看不到了嗎？\n\n童真的眼光總能犀利點出長大成人後被遺忘的真理，我們常因片面的善惡去評判對方的言行舉止，更可能忽略人(包含自己)擁有多個面向的事實，以詼諧地拍攝物理上看不見的那面，來激發我們沉思。\n最後…這部電影雖無驚險刺激的場景，楊德昌導演透過仔細雕琢的劇本，呈現出平淡而飽滿的故事，那些虛構角色身上、以最大公約的方式交疊了世間許多課題，也成功引起廣大共鳴，不用旁白敘述而用動作台詞，就能讓我們聯想這些角色的性格與境遇，是很高明的成就。導演先前拍攝的牯嶺街少年殺人事件，也同樣在3個小時的有限框架下，以精心設計的鏡頭故事，刻畫出有血有肉的時代與角色輪廓，很容易與之共情。\n參考資料（劇照來源）https://plaza.openmuseum.twhttps://blog.addmusic.tw/2019/01/17/金獎剪接師陳博文：「好的剪接師，要對音樂有敏/s_23ff5b50ed7c50b7235542b67cc577c5b2302e81e52c007f9219e21ecef04ef5_1546932553956_imagelab-nownews-com_/https://www.ettoday.net/dalemon/post/38955\n","dateCreated":"2024-02-26T19:50:24+08:00","dateModified":"2024-03-01T12:38:31+08:00","datePublished":"2024-02-26T19:50:24+08:00","description":"A one and A two…\n這是一個喜宴開頭喪禮結尾，由一家人的生活片段交疊而成的電影，時空背景設定在沒有智慧型手機的台北，也是我尚未出生的時代，所以電影裡的台北景色對我來說都很新奇: 麥當勞內用區、誠品咖啡廳、或是圓山大飯店的宴會廳，帶有微顆粒感的畫質讓電影更吸引人。","headline":"楊德昌《 一一 》觀後感","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/","keywords":"Movie"}</script>
+    <meta name="description" content="thoughts from Taiwan classic movie">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="HTML+CSS成果展(2)：仿寫拼多多網站">
-<meta property="og:url" content="https://pxchen110.github.io/20240211/Front-end/index.html">
+<meta property="og:title" content="楊德昌《 一一 》觀後感">
+<meta property="og:url" content="https://pxchen110.github.io/20240226/Life/index.html">
 <meta property="og:site_name" content="Xuan&#39;s Blog">
-<meta property="og:description" content="introduce html and css coding results">
+<meta property="og:description" content="thoughts from Taiwan classic movie">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://pxchen110.github.io/20240211/Front-end/20240211_img0.png">
-<meta property="og:image" content="https://pxchen110.github.io/20240211/Front-end/20240211_img1.png">
-<meta property="og:image" content="https://pxchen110.github.io/20240211/Front-end/20240211_img2.png">
-<meta property="og:image" content="https://pxchen110.github.io/20240211/Front-end/20240211_img3.png">
-<meta property="og:image" content="https://pxchen110.github.io/20240211/Front-end/20240211_img4.png">
-<meta property="article:published_time" content="2024-02-11T10:28:37.000Z">
-<meta property="article:modified_time" content="2024-03-01T00:58:09.696Z">
+<meta property="og:image" content="https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/20240226_img1.jpeg">
+<meta property="og:image" content="https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/20240226_img2.jpg">
+<meta property="og:image" content="https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/20240226_img3.jpg">
+<meta property="og:image" content="https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/20240226_img4.jpg">
+<meta property="article:published_time" content="2024-02-26T11:50:24.000Z">
+<meta property="article:modified_time" content="2024-03-01T04:38:31.861Z">
 <meta property="article:author" content="Xuan Chen">
-<meta property="article:tag" content="HTML">
-<meta property="article:tag" content="CSS">
+<meta property="article:tag" content="Movie">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pxchen110.github.io/20240211/Front-end/20240211_img0.png">
+<meta name="twitter:image" content="https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/20240226_img1.jpeg">
     
     
         
@@ -306,20 +304,20 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            HTML+CSS成果展(2)：仿寫拼多多網站
+            楊德昌《 一一 》觀後感
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2024-02-11T18:28:37+08:00">
+    <time datetime="2024-02-26T19:50:24+08:00">
 	
-		    2024 年 2 月 11 日
+		    2024 年 2 月 26 日
     	
     </time>
     
         <span>分類 </span>
         
-    <a class="category-link" href="/categories/Front-end/">Front-end</a>
+    <a class="category-link" href="/categories/Life/">Life</a>
 
 
     
@@ -331,92 +329,43 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p><img src="/20240211/Front-end/20240211_img0.png"></p>
-<p>參考資料來源：udemy 課程</p>
-<p>從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。</p>
+            <p>A one and A two…<br><img src="/https:/pxchen110.github.io/20240226/Life/20240226_img1.jpeg"></p>
+<p>這是一個喜宴開頭喪禮結尾，由一家人的生活片段交疊而成的電影，時空背景設定在沒有智慧型手機的台北，也是我尚未出生的時代，所以電影裡的台北景色對我來說都很新奇: 麥當勞內用區、誠品咖啡廳、或是圓山大飯店的宴會廳，帶有微顆粒感的畫質讓電影更吸引人。</p>
 <span id="more"></span>
 
-<p>學習流程：將影片要仿寫的部份截圖-&gt;自己寫看看-&gt;觀看課程影片比對老師和我的作法差異-&gt;改善程式-&gt;完成！</p>
-<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%A7%E8%87%B4%E7%9A%84%E5%88%87%E7%89%88%E8%A6%8F%E5%8A%83"><span class="toc-text">大致的切版規劃:</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Header-nav-section"><span class="toc-text">Header+nav section</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#body-section"><span class="toc-text">body section</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#footer-section"><span class="toc-text">footer section</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#qrcode-banner"><span class="toc-text">qrcode banner</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA"><span class="toc-text">成果展示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AA%A2%E8%A8%8E%E5%9B%9E%E9%A1%A7"><span class="toc-text">檢討回顧</span></a></li></ol>
+<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%BA%E7%89%A9%E8%88%87%E8%AA%B2%E9%A1%8C"><span class="toc-text">人物與課題</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%B0%E8%B1%A1%E6%B7%B1%E5%88%BB%E7%9A%84%E5%A0%B4%E6%99%AF%E4%B8%80-%E8%B7%9F%E5%A5%B6%E5%A5%B6%E8%AA%AA%E8%A9%B1"><span class="toc-text">印象深刻的場景一: 跟奶奶說話</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%B0%E8%B1%A1%E6%B7%B1%E5%88%BB%E7%9A%84%E5%A0%B4%E6%99%AF%E4%BA%8C%EF%BC%9A%E5%8F%B0%E6%97%A5%E5%85%A9%E5%9C%B0%E7%A9%BF%E6%8F%92%E7%9A%84%E7%B4%84%E6%9C%83%E5%A0%B4%E6%99%AF"><span class="toc-text">印象深刻的場景二：台日兩地穿插的約會場景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%B0%E8%B1%A1%E6%B7%B1%E5%88%BB%E7%9A%84%E5%A0%B4%E6%99%AF%E4%B8%89%EF%BC%9A%E6%8B%8D%E4%B8%8B%E5%88%A5%E4%BA%BA%E7%9C%8B%E4%B8%8D%E8%A6%8B%E7%9A%84%E5%8F%A6%E4%B8%80%E9%9D%A2"><span class="toc-text">印象深刻的場景三：拍下別人看不見的另一面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%BE%8C%E2%80%A6"><span class="toc-text">最後…</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99%EF%BC%88%E5%8A%87%E7%85%A7%E4%BE%86%E6%BA%90%EF%BC%89"><span class="toc-text">參考資料（劇照來源）</span></a></li></ol>
 
-<h2 id="大致的切版規劃"><a href="#大致的切版規劃" class="headerlink" title="大致的切版規劃:"></a>大致的切版規劃:</h2><p><img src="/20240211/Front-end/20240211_img1.png"></p>
-<p>切版成三區塊，以及一個固定於網頁左下方的qrcode，在html會分成四個<code>&lt;div&gt;&lt;/div&gt;</code>撰寫</p>
-<ul>
-<li>header+nav(嚴格來說只有navigation bar)</li>
-<li>body(以相同模板套用內容並垂直排列)</li>
-<li>footer(下方聯絡資訊等樣式)</li>
-<li>qrcode banner</li>
-</ul>
-<h2 id="Header-nav-section"><a href="#Header-nav-section" class="headerlink" title="Header+nav section"></a>Header+nav section</h2><p>切版設計:<br><img src="/20240211/Front-end/20240211_img2.png"></p>
-<p>html元素:</p>
-<ul>
-<li>圖片和nav文字都是 <code>&lt;a&gt;&lt;/a&gt;</code> 元素</li>
-</ul>
-<p>css樣式重點:</p>
-<ul>
-<li>網頁滑動仍固定於上方:<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">position: fixed; /*固定在最上面*/</span><br><span class="line">top: 0; /*定位*/</span><br><span class="line">left: 0; /*定位*/</span><br><span class="line">z-index: 999; /*滑動時不會被上來的div蓋住*/</span><br></pre></td></tr></table></figure></li>
-<li>nav的div以flex呈現水平排列，以border作為間隔，並清除尾端div的border<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">display: flex; /*將div以flex規劃排列方式，呈現清單*/</span><br><span class="line">flex-direction: row; </span><br></pre></td></tr></table></figure></li>
-<li>nav 下面的小div以border作為間隔</li>
-<li>在倒數個div加上class name(.g-header-list-re)，練習以<code>+</code>方式清除最後一個div元素的border<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">border-right: 1px solid gray; </span><br><span class="line"></span><br><span class="line">.g-header-list-re + div  &#123; /*清除最後一個元素的border*/</span><br><span class="line">border-right: none;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="body-section"><a href="#body-section" class="headerlink" title="body section"></a>body section</h2><p>切版設計:<br><img src="/20240211/Front-end/20240211_img3.png"></p>
-<p>html元素:</p>
-<ul>
-<li>由於區塊模板相似，做好一個候可以重複套用添加內容</li>
-<li>一個區塊以div包覆，下面分三個小div操作</li>
-<li>最上div面用 <code>&lt;p&gt;&lt;/p&gt;</code> 和 <code>&lt;a&gt;&lt;/a&gt;</code> 放置文字與連結點選</li>
-<li>中間div放大圖片</li>
-<li>下方div包含三個小div，放置圖片，文字等商品資訊</li>
-</ul>
-<p>css樣式重點:</p>
-<ul>
-<li>body整體以header做父元素定位，並做水平置中</li>
-<li>body寬度以view point為單位設定，使其可依照視窗縮放比例</li>
-<li>區塊模板以flex呈垂直排列<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">position: absolute; </span><br><span class="line">top: 40%;</span><br><span class="line">left: 50%; /*搭配margin-left: -(width/2)做水平置中*/</span><br><span class="line">overflow: hidden;</span><br><span class="line"></span><br><span class="line">display: flex;</span><br><span class="line">flex-direction: column;</span><br><span class="line">gap: 50px;</span><br><span class="line"></span><br><span class="line">margin-left: -40vw; /*寬度的一半做水平置中*/</span><br><span class="line">width: 80vw;</span><br></pre></td></tr></table></figure></li>
-<li>區塊模版最上方的<code>&lt;p&gt;</code>和<code>&lt;a&gt;</code> 分別以 <code>float: left; float: right;</code> 浮動</li>
-<li>區塊模板下方再套用flex呈水平排列<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">display: flex;</span><br><span class="line">flex-direction: row;</span><br><span class="line">gap: 10px;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="footer-section"><a href="#footer-section" class="headerlink" title="footer section"></a>footer section</h2><p>切版設計:<br><img src="/20240211/Front-end/20240211_img4.png"></p>
-<p>html元素:</p>
-<ul>
-<li>上方div內有兩個小div，分別放置qrcode跟聯絡資訊</li>
-<li>下方div跟header的nav清單相似，但以list寫法呈現</li>
-</ul>
-<p>css樣式重點:</p>
-<ul>
-<li>footer整體以body做父元素定位</li>
-<li>使用預先知道得body total height作為top距離，讓footer銜接在body下方<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">position:absolute;</span><br><span class="line">top: 3000px; /*不太好得做法，以body為父元素，body height為top距離*/</span><br><span class="line">padding-top: 60px;</span><br><span class="line">width:100vw; /*可依視窗大小縮放的寬度單位*/</span><br><span class="line">height:300px;</span><br><span class="line">background-color: lightgray;</span><br></pre></td></tr></table></figure></li>
-<li>上方div內的兩個小div以<code>float:left;</code>做浮動<ul>
-<li>左側div以flex讓內部三個div呈水平排列，同時設定跟右側div相同的高度</li>
-<li>右側div主要調整的是p元素的間隔，高寬，以及與左側div的距離，並以border做區隔<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/*左側div css*/</span><br><span class="line">display: flex; /*flex方式排列qrcodes*/</span><br><span class="line">flex-direction: row;</span><br><span class="line">gap: 10px; </span><br><span class="line">height: 240px; /*讓img+text總高和右側聯絡資訊一樣*/</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/*右側div css*/</span><br><span class="line">text-align: left;</span><br><span class="line">border-left: 1px solid black;</span><br><span class="line">margin-left: 15px;</span><br><span class="line">margin-bottom: 20px;</span><br><span class="line">padding-left: 45px;</span><br><span class="line">line-height: 30px;</span><br><span class="line">font-size: 20px;</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li>下方div(.g-footer-list)的list以更改<code>display:inline-block;</code>的方式呈水平排列，並保留設定元素寬度的能力</li>
-<li>練習以last-child或first-child方式移除頭尾元素的border<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">.g-footer-list ul li &#123; /*以inline-block displayed list製作清單*/</span><br><span class="line">display: inline-block; /*可設長寬的元素*/</span><br><span class="line">border-left: 1px solid black;</span><br><span class="line">margin: 0 auto; /*給予寬度的情況下，margin auto可置中*/</span><br><span class="line">width: 100px;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">    .g-footer-list li:first-child &#123; /*remove border for the first element in the list*/</span><br><span class="line">    border: none;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="qrcode-banner"><a href="#qrcode-banner" class="headerlink" title="qrcode banner"></a>qrcode banner</h2><p>html元素:</p>
-<ul>
-<li>div包含img和兩個小div</li>
-</ul>
-<p>css樣式設計:</p>
-<ul>
-<li>整體定位，以網頁為父元素，固定浮動於左下方</li>
-<li>設定z-index浮動在body和footer上方<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">position: fixed; /*固定浮動在網頁左下方*/</span><br><span class="line">bottom: 50px;</span><br><span class="line">left: 100px;</span><br><span class="line">z-index: 998; /*不被body蓋住*/</span><br><span class="line">padding: 10px 30px;</span><br><span class="line">border: 1px solid gray;</span><br><span class="line">background-color: white;</span><br></pre></td></tr></table></figure></li>
-<li>先設定圖片寬度，配合left和margin-left讓圖片水平置中於div內<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">img &#123;</span><br><span class="line">    position: relative;</span><br><span class="line">    left: 50%;</span><br><span class="line">    margin-left: -75px; </span><br><span class="line">    width: 150px;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="成果展示"><a href="#成果展示" class="headerlink" title="成果展示"></a>成果展示</h2><p><a target="_blank" rel="noopener" href="https://github.com/pxchen110/html_case/tree/main/true_web_practice1">Github 原始碼 </a></p>
-<p>一併附上拚<a target="_blank" rel="noopener" href="https://m.pinduoduo.com/">多多網站連結</a></p>
-<h2 id="檢討回顧"><a href="#檢討回顧" class="headerlink" title="檢討回顧"></a>檢討回顧</h2><p>以上就是我得第一版網站仿寫，過程歷經許多trial and error，像是沒規劃好區塊，等寫到60%時又重新修改架構，打掉重練的狀況；也蠻常遇到加了css樣式但卻出不來的困惑。最後列出幾點我在udemy上學到的技巧，以及這一版仿寫有待改進的部分:</p>
-<ul>
-<li>navigation bar 應該也改成list製作會比較簡單，開太多div來包感覺沒意義</li>
-<li>footer出現在尾端的定位方式非robust，和body依賴性太高，萬一body新增內容豈不是要調整top數值?</li>
-<li>佔滿視窗大小並依比例調整，改用<strong>100%<strong>會比</strong>100vw</strong>好，原因可以參考<a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10251849">此網站的解釋</a></li>
-<li>透過將<code>float: left;`` float: right;</code> 設成一個class name，當有元素需要就加上這個class是有效率的方法</li>
-<li>同理可以新增清除浮動的class，有需要就加上<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"> .clearfix::after &#123; /*清除浮動</span><br><span class="line">    content: &quot;&quot;;</span><br><span class="line">    display: block;</span><br><span class="line">    clear: both;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure></li>
-<li>一開始就設定所有的a元素都移除下底線，或所有list都移除符號</li>
-</ul>
+<h2 id="人物與課題"><a href="#人物與課題" class="headerlink" title="人物與課題"></a>人物與課題</h2><p>電影裡的一家四口，雖然戲份佔比不一，但如導演所說，在不同年紀看，都能在某位角色身上映射出相似的課題與身影</p>
+<p><img src="/https:/pxchen110.github.io/20240226/Life/20240226_img2.jpg"></p>
+<p>媽媽希望透過信仰的力量，讓奶奶早日醒來，但在希望來臨前、一成不變的光景讓她感到無力，對現況的失望被她歸咎於自己在都市內無法堅定信仰，於是亦然決定到山上進修。<br>我本身的家庭背景也有一定程度的信仰，所以能理解她想透過祈禱來安定內心的想法，但在事與願違下，我或許會選擇一邊祈禱一邊接納現實、尋求另外的方法努力（理性層面是這樣想），而非選擇逃避。</p>
+<p>爸爸在理想與現實衝突下，聽到了來自內心的反抗，並試圖逃離功成名就，面對舊情人不解當年的分手，他雲淡風輕的說出當時的感受</p>
+<blockquote>
+<p>考上電機系後，我爸爸很開心，我媽媽很開心，妳也很開心，只有我不開心，我只感到悲哀 </p>
+</blockquote>
+<p>最後他仍為家人責任妥協於現實、成為背道而馳的自己，面對商場的唯利主義，真誠的心一次次被澆熄與欺騙。</p>
+<p>電影裡當他在日本面對不告而別的舊情人、以及同事不重視誠信的態度，頓時跌入失望的谷底，和滿心期待的啟航畫面呈現強烈對比。</p>
+<p>大女兒是和我年齡最接近的角色，而生活給予她兩件歷練使她成長：沒倒垃圾與奶奶昏迷的愧疚感，以及在友情與懞懂愛情間拉扯的灼烈罪惡感，電影裡小莉的質問使她頓時心虛細語，午夜時分無法入眠。</p>
+<p><img src="/https:/pxchen110.github.io/20240226/Life/20240226_img3.jpg"></p>
+<p>這些沒有回應的、無疾而終的經歷在她生命裡畫上幾道痕跡，最終趴在奶奶腿上、一幅歲月靜好的稀釋這些成長痛。</p>
+<p>小兒子對我來說是一個的小屁孩（誤，他帶有童真的眼光，讓本應圓滑的世俗稜角變得更為單純有創造力，像是他拿著底片相機拍著”別人看不見的另外一面”、試圖記錄吵醒人的蚊子身影，這些行為讓人不自覺露出微笑。</p>
+<p>只可惜現在的我已是接近訓導主任的心靈，面對童心未泯的事物，常帶著過於世俗的眼神去審視甚至曲解，或許我們應該喚起內心沉睡的小孩來看待事物。最後在喪禮上，導演也透過他用較為童真的眼光去解讀死亡這件事。</p>
+<p><img src="/https:/pxchen110.github.io/20240226/Life/20240226_img4.jpg"></p>
+<blockquote>
+<p>他們都說你走了，但我不明白你去哪裡，或許有一天我們還會再見面，到時你再帶我去看你去了哪裡</p>
+</blockquote>
+<p>即使每個人都各自面臨生活課題與情緒，但仍踏入家門同坐一桌吃飯，聊著不著邊際試圖關心對方的話題，家人之間既疏離又接近得情感，或許也是最難能可貴的關係。</p>
+<h2 id="印象深刻的場景一-跟奶奶說話"><a href="#印象深刻的場景一-跟奶奶說話" class="headerlink" title="印象深刻的場景一: 跟奶奶說話"></a>印象深刻的場景一: 跟奶奶說話</h2><p>奶奶的房間就像是告解室，讓觀眾有機會傾聽角色內心獨白的場景，因為沒有人回應，就像爸爸坦白地說道 </p>
+<blockquote>
+<p>其實這樣自言自語對我來說蠻難得，我這樣講你不要生氣，我覺得，好像在拜拜。除了不知道對方是不是聽得到之外，對我自己講的話是不是真心的，好像也沒什麼把握</p>
+</blockquote>
+<p>那裏是角色內心世界的延伸，和與外界互動的所武裝起來的堅硬外層相比，人物更加深情、但相反也更加沈默 “即使悲傷也無人應答”<br>想起自己也曾躺在床上，手握護身符，多次向神訴說我的心情、祈求一個應許，以及一個不可能的回應，雖然生活物理上一成不變，但我想這股聲音中就能被聽見，並自我寬慰，比起悶在心裡會更好受一點。</p>
+<h2 id="印象深刻的場景二：台日兩地穿插的約會場景"><a href="#印象深刻的場景二：台日兩地穿插的約會場景" class="headerlink" title="印象深刻的場景二：台日兩地穿插的約會場景"></a>印象深刻的場景二：台日兩地穿插的約會場景</h2><p>電影以交叉蒙太奇的手法，呈現兩代人在情感約會上的重疊相似性，一邊是遠在東京街頭漫步的中年男女，另一邊是在信義區初次相約的年輕男女，互相靠近的心與牽起的手，情感展開的不言而喻。</p>
+<h2 id="印象深刻的場景三：拍下別人看不見的另一面"><a href="#印象深刻的場景三：拍下別人看不見的另一面" class="headerlink" title="印象深刻的場景三：拍下別人看不見的另一面"></a>印象深刻的場景三：拍下別人看不見的另一面</h2><blockquote>
+<p>我們是不是只能知道一半的事情啊？我們只能看到前面，看不到後面，這樣不就有一半的事情看不到了嗎？</p>
+</blockquote>
+<p>童真的眼光總能犀利點出長大成人後被遺忘的真理，我們常因片面的善惡去評判對方的言行舉止，更可能忽略人(包含自己)擁有多個面向的事實，以詼諧地拍攝物理上看不見的那面，來激發我們沉思。</p>
+<h2 id="最後…"><a href="#最後…" class="headerlink" title="最後…"></a>最後…</h2><p>這部電影雖無驚險刺激的場景，楊德昌導演透過仔細雕琢的劇本，呈現出平淡而飽滿的故事，那些虛構角色身上、以最大公約的方式交疊了世間許多課題，也成功引起廣大共鳴，不用旁白敘述而用動作台詞，就能讓我們聯想這些角色的性格與境遇，是很高明的成就。導演先前拍攝的牯嶺街少年殺人事件，也同樣在3個小時的有限框架下，以精心設計的鏡頭故事，刻畫出有血有肉的時代與角色輪廓，很容易與之共情。</p>
+<h2 id="參考資料（劇照來源）"><a href="#參考資料（劇照來源）" class="headerlink" title="參考資料（劇照來源）"></a>參考資料（劇照來源）</h2><p><a target="_blank" rel="noopener" href="https://plaza.openmuseum.tw/">https://plaza.openmuseum.tw</a><br><a target="_blank" rel="noopener" href="https://blog.addmusic.tw/2019/01/17/%E9%87%91%E7%8D%8E%E5%89%AA%E6%8E%A5%E5%B8%AB%E9%99%B3%E5%8D%9A%E6%96%87%EF%BC%9A%E3%80%8C%E5%A5%BD%E7%9A%84%E5%89%AA%E6%8E%A5%E5%B8%AB%EF%BC%8C%E8%A6%81%E5%B0%8D%E9%9F%B3%E6%A8%82%E6%9C%89%E6%95%8F/s_23ff5b50ed7c50b7235542b67cc577c5b2302e81e52c007f9219e21ecef04ef5_1546932553956_imagelab-nownews-com_/">https://blog.addmusic.tw/2019/01/17/金獎剪接師陳博文：「好的剪接師，要對音樂有敏/s_23ff5b50ed7c50b7235542b67cc577c5b2302e81e52c007f9219e21ecef04ef5_1546932553956_imagelab-nownews-com_/</a><br><a target="_blank" rel="noopener" href="https://www.ettoday.net/dalemon/post/38955">https://www.ettoday.net/dalemon/post/38955</a></p>
 
             
 
@@ -428,7 +377,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">標籤</span><br/>
                 
-    <a class="tag tag--primary tag--small t-none-link" href="/tags/CSS/" rel="tag">CSS</a> <a class="tag tag--primary tag--small t-none-link" href="/tags/HTML/" rel="tag">HTML</a>
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/Movie/" rel="tag">Movie</a>
 
             </div>
         
@@ -441,9 +390,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240215/Python/"
-                    data-tooltip="Python實用系列： smtplib 模組實現自動寄信"
-                    aria-label="上一篇: Python實用系列： smtplib 模組實現自動寄信"
+                    href="/https:/pxchen110.github.io/20240227/Life/"
+                    data-tooltip="尋覓陽光。追逐小鴨。高雄旅行雜記"
+                    aria-label="上一篇: 尋覓陽光。追逐小鴨。高雄旅行雜記"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -455,9 +404,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240208/Front-end/"
-                    data-tooltip="HTML+CSS成果展(1)：可愛貓咪網站"
-                    aria-label="下一篇: HTML+CSS成果展(1)：可愛貓咪網站"
+                    href="/https:/pxchen110.github.io/20240222/Python/"
+                    data-tooltip="Python實用系列： subprocess模組管理子進程"
+                    aria-label="下一篇: Python實用系列： subprocess模組管理子進程"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -482,7 +431,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240211/Front-end/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -495,7 +444,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240211/Front-end/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -508,7 +457,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240211/Front-end/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -545,8 +494,8 @@
         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
         var disqus_config = function () {
-          this.page.url = 'https://pxchen110.github.io/20240211/Front-end/';  // Replace PAGE_URL with your page's canonical URL variable
-          this.page.identifier = '1707647317000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          this.page.url = 'https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/';  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = '1708948224000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
         };
         (function() { // DON'T EDIT BELOW THIS LINE
         var d = document, s = d.createElement('script');
@@ -577,9 +526,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240215/Python/"
-                    data-tooltip="Python實用系列： smtplib 模組實現自動寄信"
-                    aria-label="上一篇: Python實用系列： smtplib 模組實現自動寄信"
+                    href="/https:/pxchen110.github.io/20240227/Life/"
+                    data-tooltip="尋覓陽光。追逐小鴨。高雄旅行雜記"
+                    aria-label="上一篇: 尋覓陽光。追逐小鴨。高雄旅行雜記"
                 >
                     
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -591,9 +540,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240208/Front-end/"
-                    data-tooltip="HTML+CSS成果展(1)：可愛貓咪網站"
-                    aria-label="下一篇: HTML+CSS成果展(1)：可愛貓咪網站"
+                    href="/https:/pxchen110.github.io/20240222/Python/"
+                    data-tooltip="Python實用系列： subprocess模組管理子進程"
+                    aria-label="下一篇: Python實用系列： subprocess模組管理子進程"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -618,7 +567,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240211/Front-end/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -631,7 +580,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240211/Front-end/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -644,7 +593,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240211/Front-end/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -678,7 +627,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240211/Front-end/"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/"
                         aria-label="分享到 Facebook"
                     >
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
@@ -691,7 +640,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240211/Front-end/"
+                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/"
                         aria-label="分享到 Twitter"
                     >
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
@@ -704,7 +653,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://plus.google.com/share?url=https://pxchen110.github.io/20240211/Front-end/"
+                        href="https://plus.google.com/share?url=https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/"
                         aria-label="分享到 Google+"
                     >
                         <i class="fab fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
@@ -803,7 +752,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/20240201/Github/"
+                            href="https://pxchen110.github.io/https:/pxchen110.github.io/20240201/Github/"
                             aria-label=": 用Github+Hexo建立個人部落格：方法與問題紀錄"
                         >
                             <h3 class="media-heading">用Github+Hexo建立個人部落格：方法與問題紀錄</h3>
@@ -815,7 +764,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240201/Github/20240201_img0.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@goumbik">Lukas Blazek</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/https:/pxchen110.github.io/20240201/Github/20240201_img0.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@goumbik">Lukas Blazek</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -827,7 +776,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/20240208/Front-end/"
+                            href="https://pxchen110.github.io/https:/pxchen110.github.io/20240208/Front-end/"
                             aria-label=": HTML+CSS成果展(1)：可愛貓咪網站"
                         >
                             <h3 class="media-heading">HTML+CSS成果展(1)：可愛貓咪網站</h3>
@@ -839,7 +788,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240208/Front-end/20240208_img2.png"></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/https:/pxchen110.github.io/20240208/Front-end/20240208_img2.png"></p>
 <p>在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為<strong>要來我家看貓嗎</strong>的小網頁</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -851,7 +800,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/20240211/Front-end/"
+                            href="https://pxchen110.github.io/https:/pxchen110.github.io/20240211/Front-end/"
                             aria-label=": HTML+CSS成果展(2)：仿寫拼多多網站"
                         >
                             <h3 class="media-heading">HTML+CSS成果展(2)：仿寫拼多多網站</h3>
@@ -863,7 +812,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240211/Front-end/20240211_img0.png"></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/https:/pxchen110.github.io/20240211/Front-end/20240211_img0.png"></p>
 <p>參考資料來源：udemy 課程</p>
 <p>從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。</p></div>
                     </div>
@@ -876,7 +825,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/20240215/Python/"
+                            href="https://pxchen110.github.io/https:/pxchen110.github.io/20240215/Python/"
                             aria-label=": Python實用系列： smtplib 模組實現自動寄信"
                         >
                             <h3 class="media-heading">Python實用系列： smtplib 模組實現自動寄信</h3>
@@ -888,7 +837,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240215/Python/20240215_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@brett_jordan">Brett Jordan</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/https:/pxchen110.github.io/20240215/Python/20240215_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@brett_jordan">Brett Jordan</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>在信箱收件夾，不乏看到許多<strong>自動寄出</strong>的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -900,7 +849,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/20240221/Python/"
+                            href="https://pxchen110.github.io/https:/pxchen110.github.io/20240221/Python/"
                             aria-label=": Python實用系列： 三種引入外部參數的方法"
                         >
                             <h3 class="media-heading">Python實用系列： 三種引入外部參數的方法</h3>
@@ -912,7 +861,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240221/Python/20240221_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/https:/pxchen110.github.io/20240221/Python/20240221_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: <code>sys</code>, <code>argparse</code>, 以及 <code>click</code>，文章將介紹模組&#x2F;套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。</p></div>
                     </div>
                     <div style="clear:both;"></div>
@@ -924,7 +873,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/20240222/Python/"
+                            href="https://pxchen110.github.io/https:/pxchen110.github.io/20240222/Python/"
                             aria-label=": Python實用系列： subprocess模組管理子進程"
                         >
                             <h3 class="media-heading">Python實用系列： subprocess模組管理子進程</h3>
@@ -936,7 +885,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240222/Python/20240222_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/https:/pxchen110.github.io/20240222/Python/20240222_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\輸入檔案的方式，產生目標內容。</p>
 <p>同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。</p></div>
                     </div>
@@ -949,7 +898,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/20240226/Life/"
+                            href="https://pxchen110.github.io/https:/pxchen110.github.io/20240226/Life/"
                             aria-label=": 楊德昌《 一一 》觀後感"
                         >
                             <h3 class="media-heading">楊德昌《 一一 》觀後感</h3>
@@ -961,7 +910,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p>A one and A two…<br><img src="/20240226/Life/20240226_img1.jpeg"></p>
+                        <div class="media-content hide-xs font-merryweather"><p>A one and A two…<br><img src="/https:/pxchen110.github.io/20240226/Life/20240226_img1.jpeg"></p>
 <p>這是一個喜宴開頭喪禮結尾，由一家人的生活片段交疊而成的電影，時空背景設定在沒有智慧型手機的台北，也是我尚未出生的時代，所以電影裡的台北景色對我來說都很新奇: 麥當勞內用區、誠品咖啡廳、或是圓山大飯店的宴會廳，帶有微顆粒感的畫質讓電影更吸引人。</p></div>
                     </div>
                     <div style="clear:both;"></div>
