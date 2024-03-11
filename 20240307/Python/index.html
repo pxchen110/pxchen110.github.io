@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"Photo by Artturi Jalli on Unsplash\n大家在撰寫 python 是否有遇到以下問題&#x2F;需求:\n\n目標檔案與路徑需要不停切換\n想自動化的遍歷目標路徑下是否有目標檔案，若檔案存在才進行後續處理\n在 python 環境下想跳轉至 linux 執行系統命令\n\n以上這些問題都可以使用 python 強大的內建模組 os (operating system) 來完成! 本文將介紹常用的 os 函式，特別是文件與路徑操作相關的內容，以及其實際應用。\n\n\n\n引入模組os 屬於內建模組，直接引入即可使用\n1import os\nos 在路徑名稱的操作函式為 os.path()，如等下會介紹的 os.path.join(), os.path.exists() 等，要寫完整才不會報錯\n目標1: 操作目標路徑與檔案\nos.getcwd() 取得當前路徑，等同 linux 的 pwd\nos.chdir(path) 變換預設的工作路徑，等同於 linux 的 cd /to/path\n在路徑的操作，除了直接打出絕對路徑，也可以使用os.path.join() 來更靈活的操作路徑，下面舉一個例子:12345678910# 假設在 /home/dirs/ 下有兩個資料夾 a, b，我想要分別以這兩資料夾為工作路徑來做事，# 直接設兩個變數分別存 a, b路徑，有點浪費a_path = &#x27;/home/dirs/a&#x27;b_path = &#x27;/home/dirs/b&#x27;# 設相同的路徑為變數，並以 os.path.join 產生a, b 的路徑root_dir = &#x27;/home/dirs&#x27;os.path.join(root_dir, &#x27;a&#x27;) # 等價於 a_pathos.path.join(root_dir, &#x27;b&#x27;) # 等價於 b_path\nos.path.basename(path) 可取出目標路徑中最底層的資料夾&#x2F;檔案名稱；反之 os.path.dirname(path) 可取出最底層以上的路徑，下面舉個例子比較1234paths = &#x27;/home/dirs/a/a.txt&#x27;print(os.path.basename(paths)) # &gt;&gt; a.txtprint(os.path.dirname(paths))  # &gt;&gt; /home/dirs/a\nos.path.abspath(file_name) 和 os.path.realpath(file_name) 都可以找出目標檔案的絕對路徑12345678# 假設有一個檔案位於 /home/dirs/a/a.txtfile_name = &#x27;a.txt&#x27;print(os.path.abspath(file_name))# &gt;&gt; /home/dirs/a/a.txtprint(os.path.realpath(file_name))# &gt;&gt; /home/dirs/a/a.txt\n\n注意: 兩者的差別在於，若是 soft link 指向的目標檔案，os.path.realpath() 會印出原始檔案的路徑! 請看下面例子\n12345678# 假設目標檔案是 ln -s /home/dirs/a.txt /home/dirs/b.txtprint(os.path.abspath(&#x27;b.txt&#x27;))# &gt;&gt; /home/dirs/b.txtprint(os.path.realpath(&#x27;b.txt&#x27;))# &gt;&gt; /home/dirs/a.txt\n\n\nos.path.realpath(__file__) 為常見寫法，用來獲取當前執行 python script 的絕對路徑，其中 __file__ 指的是目前引用的 python script\n\n1234567# 假設我的 python script 名為 test.py、位於 /home/dirs 底下print(os.path.realpath(__file__))# &gt;&gt; /home/dirs/test.py# 若只想要獲取路徑，可搭配 os.path.dirname() 來操作print(os.path.dirname(os.path.realpath(__file__)))# &gt;&gt; /home/dirs\n注意: 若 python script 存在的路徑與執行 script 路徑不同，執行 os.path.realpath()與os.getcwd() 的結果會不同!\n12345678# 假設我的 python script 名為 test.py、位於 /home/dirs 底下# 現在我到 /home 路徑下執行 python script: python3 test.pyprint(os.path.dirname(os.path.realpath(__file__)))# &gt;&gt; /home/dirs# print(os.getcwd())# &gt;&gt; /home\n補充: os.path.abspath(os.path.dirname(__file__)) 和 os.path.dirname(os.path.abspath(__file__)) 順序有差嗎? 參考網站\n總結一下，在印出路徑這件事上，受到相對路徑、絕對路徑與鏈結等多重因素大亂鬥，請小心使用測試\n目標2: 檢查目標路徑&#x2F;檔案的存在性如果想確認目標路徑是否存在，os 能協助確認並返回boolean值；以下列出常用的函數與使用區別:\n\nos.path.isdir() 可以確認資料夾路徑是否存在\nos.path.exists() 可以確認資料夾路徑和檔案是否存在\nos.path.isfile() 可以確認檔案是否存在\n\n舉一個實例比較: \n12345678910111213141516# 假設在 /home/dirs 路徑下存在一份名為 file.txt 的檔案# dirs/# └── file.txtexist_path = &#x27;/home/dirs&#x27;exist_file = os.path.join(exist_path, &#x27;file.txt&#x27;)# 確認路徑是否存在os.path.isdir(exist_path)  # &gt;&gt; Trueos.path.exists(exist_path) # &gt;&gt; Trueos.path.isfile(exist_path) # &gt;&gt; False isfile 不能判斷路徑是否存在!!# 確認檔案是否存在os.path.isdir(exist_file)  # &gt;&gt; False isdir 不能判斷檔案是否存在!!os.path.exists(exist_file) # &gt;&gt; Trueos.path.isfile(exist_file) # &gt;&gt; True\n\n注意: 從上面的例子可知，即使路徑檔案都存在，os.path.isdir() / os.path.isfile() 都有各自的判斷侷限，建議多使用 os.path.exists() 來減少麻煩，更多討論請參考這個網址\n目標3: 創建資料夾如果想在目標路徑中創建資料夾，os 有兩個相當於 linux mkdir 的函數:\n\nos.mkdir(): 只能創立一層(最底層)資料夾，若上層資料夾不存在會報錯\nos.makedirs(): 可以創立多層。為了保險起見建議多使用os.makedirs減少報錯麻煩\n\n另外有點要注意，若路徑已經存在 os 也會報錯，因此常見的寫法是先用 os.path.exists() 判斷目標路徑是否存在，再來創建資料夾，下面舉一個程式實例:\n12345678# 假設我們想將 /home/dirs/folder1 設為當前的工作目錄，但又不確定 dirs/folder1 是否存在work_path = &#x27;/home/dirs/folder1&#x27;if os.path.exists(work_path): # if return True    os.chdir(work_path)else:                         # if return False    os.makedirs(work_path)    # create dirs     os.chdir(work_path)\n\n目標4: 遍歷目標路徑下的所有檔案如果目標路徑下包含多層子路徑與檔案，使用者不可能一層層去探訪篩選，模組 os 提供強大的函數 os.walk 協助走訪遍歷路徑下所有角落，如同 linux tree 一樣走訪(並印出)路徑下所有內容\nos.walk 會輸出三數值為一組的tuple (dirpath, dirnames, filenames)，一般會搭配迴圈來寫，並將三個輸出分別命名為 root, dirs, 以及 files:\n假設我們想走訪 /home/dirs 路徑下的內容，透過 tree 已知有這些路徑&#x2F;檔案\n1234567├── a│   └── a.txt├── b│   └── b.txt├── c│   └── c.txt└── file.txt\n基本的 python code:\n123path = &#x27;/home/dirs&#x27;for root, dirs, files in os.walk(path):    ...\nprint(root)12for root, dirs, files in os.walk(path):    print(roots)\n\n得到以下輸出，可以看到 root 會隨深入下層資料夾而改變:\n1234/home/dirs/home/dirs/a/home/dirs/b/home/dirs/c\n\nprint(dirs)12for root, dirs, files in os.walk(path):    print(dirs)\n得到以下輸出，和 root 輸出順序相對應，可看到 dirs 列出的是當前 root 路徑下包含的資料夾名稱\n1234[&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;] # /home/dirs 下有三個資料夾[]              # /home/dirs/a 下沒有資料夾[]           []\n\nprint(files)12for root, dirs, files in os.walk(path):    print(files)\n得到以下輸出，和 root, dirs 輸出順序相對應，可看到 files 的是當前 root 路徑下包含的檔案名稱\n1234[&#x27;file.txt&#x27;]    # /home/dirs 下有一個檔案[&#x27;a.txt&#x27;]       # /home/dirs/a 下有一個檔案[&#x27;b.txt&#x27;][&#x27;c.txt&#x27;]\n因為 files 只有檔案名稱，常利用 os.path.join(root, f) 來取得檔案的絕對路徑\n實例了解基本構造後，透過實例來了解 os.walk() 的可以如何使用。假設我想取出每個樣本名稱folder中，結尾包含 .tab.gz 的檔案來操作目標路徑大致的結構如下:\n12345678910111213141516171819202122/home/dirs/folders/├── annotation│   ├── AD_sample1│       ├── AD_sample1.annotation.tab.gz│   ├── AD_sample2│       ├── AD_sample2.annotation.tab.gz│   ├── AD_sample3│       ├── AD_sample3.annotation.tab.gz│   ├── BS_sample12│       ├── BS_sample12.annotation.tab.gz│   ├── BS_sample14│       ├── BS_sample14.annotation.tab.gz│   ├── BS_sample17│       ├── BS_sample17.annotation.tab.gz│   ├── BS_sample18│       ├── BS_sample18.annotation.tab.gz│   └── BS_sample19│       ├── BS_sample19.annotation.tab.gz├── csv├── multiqc├── logs└── reports\npython code:\n1234567work_path = &#x27;/home/dirs/folders/&#x27;for root, dirs, files in os.walk(work_path):    for f in files:        if f.endswith(&#x27;.tab.gz&#x27;):            file_name = os.path.join(root, f)            with open(file_name, &#x27;r&#x27;) as fh:                ...\n\n目標5: 產生symlink和 linux 中的 ln -s 相同，os 也可協助建立連結以節省空間使用\n\nos.symlink(sourec_path, dest_path) 相當於 ln -s\nos.islink() 相當於用 ls -alh 檢查\nos.unlink() 相當於 unlink，注意資料夾不能加 / 不然移除無效\n\n目標6: 執行系統命令os.system(cmd) 也可以在 python 環境下執行系統命令，和 subprocess 模組功能相似，但較為陽春\n參考資料與補充python 3.4 後有新的模組 pathlib (物件導向的操作) 其功能和 os 相似，有興趣可以參考，由於目前 os 使用上沒太大問題，就沒有特別轉換模組https://docs.python.org/zh-tw/3/library/os.html#files-and-directories\n","dateCreated":"2024-03-07T20:16:41+08:00","dateModified":"2024-03-07T20:24:12+08:00","datePublished":"2024-03-07T20:16:41+08:00","description":"Photo by Artturi Jalli on Unsplash\n大家在撰寫 python 是否有遇到以下問題&#x2F;需求:\n\n目標檔案與路徑需要不停切換\n想自動化的遍歷目標路徑下是否有目標檔案，若檔案存在才進行後續處理\n在 python 環境下想跳轉至 linux 執行系統命令\n\n以上這些問題都可以使用 python 強大的內建模組 os (operating system) 來完成! 本文將介紹常用的 os 函式，特別是文件與路徑操作相關的內容，以及其實際應用。","headline":"Python實用系列：使用 os 成為系統操作大師","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/https:/pxchen110.github.io/20240307/Python/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/https:/pxchen110.github.io/20240307/Python/","keywords":"Python"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg"},"articleBody":"Photo by Artturi Jalli on Unsplash\n大家在撰寫 python 是否有遇到以下問題&#x2F;需求:\n\n目標檔案與路徑需要不停切換\n想自動化的遍歷目標路徑下是否有目標檔案，若檔案存在才進行後續處理\n在 python 環境下想跳轉至 linux 執行系統命令\n\n以上這些問題都可以使用 python 強大的內建模組 os (operating system) 來完成! 本文將介紹常用的 os 函式，特別是文件與路徑操作相關的內容，以及其實際應用。\n\n\n\n引入模組os 屬於內建模組，直接引入即可使用\n1import os\nos 在路徑名稱的操作函式為 os.path()，如等下會介紹的 os.path.join(), os.path.exists() 等，要寫完整才不會報錯\n目標1: 操作目標路徑與檔案\nos.getcwd() 取得當前路徑，等同 linux 的 pwd\nos.chdir(path) 變換預設的工作路徑，等同於 linux 的 cd /to/path\n在路徑的操作，除了直接打出絕對路徑，也可以使用os.path.join() 來更靈活的操作路徑，下面舉一個例子:12345678910# 假設在 /home/dirs/ 下有兩個資料夾 a, b，我想要分別以這兩資料夾為工作路徑來做事，# 直接設兩個變數分別存 a, b路徑，有點浪費a_path = &#x27;/home/dirs/a&#x27;b_path = &#x27;/home/dirs/b&#x27;# 設相同的路徑為變數，並以 os.path.join 產生a, b 的路徑root_dir = &#x27;/home/dirs&#x27;os.path.join(root_dir, &#x27;a&#x27;) # 等價於 a_pathos.path.join(root_dir, &#x27;b&#x27;) # 等價於 b_path\nos.path.basename(path) 可取出目標路徑中最底層的資料夾&#x2F;檔案名稱；反之 os.path.dirname(path) 可取出最底層以上的路徑，下面舉個例子比較1234paths = &#x27;/home/dirs/a/a.txt&#x27;print(os.path.basename(paths)) # &gt;&gt; a.txtprint(os.path.dirname(paths))  # &gt;&gt; /home/dirs/a\nos.path.abspath(file_name) 和 os.path.realpath(file_name) 都可以找出目標檔案的絕對路徑12345678# 假設有一個檔案位於 /home/dirs/a/a.txtfile_name = &#x27;a.txt&#x27;print(os.path.abspath(file_name))# &gt;&gt; /home/dirs/a/a.txtprint(os.path.realpath(file_name))# &gt;&gt; /home/dirs/a/a.txt\n\n注意: 兩者的差別在於，若是 soft link 指向的目標檔案，os.path.realpath() 會印出原始檔案的路徑! 請看下面例子\n12345678# 假設目標檔案是 ln -s /home/dirs/a.txt /home/dirs/b.txtprint(os.path.abspath(&#x27;b.txt&#x27;))# &gt;&gt; /home/dirs/b.txtprint(os.path.realpath(&#x27;b.txt&#x27;))# &gt;&gt; /home/dirs/a.txt\n\n\nos.path.realpath(__file__) 為常見寫法，用來獲取當前執行 python script 的絕對路徑，其中 __file__ 指的是目前引用的 python script\n\n1234567# 假設我的 python script 名為 test.py、位於 /home/dirs 底下print(os.path.realpath(__file__))# &gt;&gt; /home/dirs/test.py# 若只想要獲取路徑，可搭配 os.path.dirname() 來操作print(os.path.dirname(os.path.realpath(__file__)))# &gt;&gt; /home/dirs\n注意: 若 python script 存在的路徑與執行 script 路徑不同，執行 os.path.realpath()與os.getcwd() 的結果會不同!\n12345678# 假設我的 python script 名為 test.py、位於 /home/dirs 底下# 現在我到 /home 路徑下執行 python script: python3 test.pyprint(os.path.dirname(os.path.realpath(__file__)))# &gt;&gt; /home/dirs# print(os.getcwd())# &gt;&gt; /home\n補充: os.path.abspath(os.path.dirname(__file__)) 和 os.path.dirname(os.path.abspath(__file__)) 順序有差嗎? 參考網站\n總結一下，在印出路徑這件事上，受到相對路徑、絕對路徑與鏈結等多重因素大亂鬥，請小心使用測試\n目標2: 檢查目標路徑&#x2F;檔案的存在性如果想確認目標路徑是否存在，os 能協助確認並返回boolean值；以下列出常用的函數與使用區別:\n\nos.path.isdir() 可以確認資料夾路徑是否存在\nos.path.exists() 可以確認資料夾路徑和檔案是否存在\nos.path.isfile() 可以確認檔案是否存在\n\n舉一個實例比較: \n12345678910111213141516# 假設在 /home/dirs 路徑下存在一份名為 file.txt 的檔案# dirs/# └── file.txtexist_path = &#x27;/home/dirs&#x27;exist_file = os.path.join(exist_path, &#x27;file.txt&#x27;)# 確認路徑是否存在os.path.isdir(exist_path)  # &gt;&gt; Trueos.path.exists(exist_path) # &gt;&gt; Trueos.path.isfile(exist_path) # &gt;&gt; False isfile 不能判斷路徑是否存在!!# 確認檔案是否存在os.path.isdir(exist_file)  # &gt;&gt; False isdir 不能判斷檔案是否存在!!os.path.exists(exist_file) # &gt;&gt; Trueos.path.isfile(exist_file) # &gt;&gt; True\n\n注意: 從上面的例子可知，即使路徑檔案都存在，os.path.isdir() / os.path.isfile() 都有各自的判斷侷限，建議多使用 os.path.exists() 來減少麻煩，更多討論請參考這個網址\n目標3: 創建資料夾如果想在目標路徑中創建資料夾，os 有兩個相當於 linux mkdir 的函數:\n\nos.mkdir(): 只能創立一層(最底層)資料夾，若上層資料夾不存在會報錯\nos.makedirs(): 可以創立多層。為了保險起見建議多使用os.makedirs減少報錯麻煩\n\n另外有點要注意，若路徑已經存在 os 也會報錯，因此常見的寫法是先用 os.path.exists() 判斷目標路徑是否存在，再來創建資料夾，下面舉一個程式實例:\n12345678# 假設我們想將 /home/dirs/folder1 設為當前的工作目錄，但又不確定 dirs/folder1 是否存在work_path = &#x27;/home/dirs/folder1&#x27;if os.path.exists(work_path): # if return True    os.chdir(work_path)else:                         # if return False    os.makedirs(work_path)    # create dirs     os.chdir(work_path)\n\n目標4: 遍歷目標路徑下的所有檔案如果目標路徑下包含多層子路徑與檔案，使用者不可能一層層去探訪篩選，模組 os 提供強大的函數 os.walk 協助走訪遍歷路徑下所有角落，如同 linux tree 一樣走訪(並印出)路徑下所有內容\nos.walk 會輸出三數值為一組的tuple (dirpath, dirnames, filenames)，一般會搭配迴圈來寫，並將三個輸出分別命名為 root, dirs, 以及 files:\n假設我們想走訪 /home/dirs 路徑下的內容，透過 tree 已知有這些路徑&#x2F;檔案\n1234567├── a│   └── a.txt├── b│   └── b.txt├── c│   └── c.txt└── file.txt\n基本的 python code:\n123path = &#x27;/home/dirs&#x27;for root, dirs, files in os.walk(path):    ...\nprint(root)12for root, dirs, files in os.walk(path):    print(roots)\n\n得到以下輸出，可以看到 root 會隨深入下層資料夾而改變:\n1234/home/dirs/home/dirs/a/home/dirs/b/home/dirs/c\n\nprint(dirs)12for root, dirs, files in os.walk(path):    print(dirs)\n得到以下輸出，和 root 輸出順序相對應，可看到 dirs 列出的是當前 root 路徑下包含的資料夾名稱\n1234[&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;] # /home/dirs 下有三個資料夾[]              # /home/dirs/a 下沒有資料夾[]           []\n\nprint(files)12for root, dirs, files in os.walk(path):    print(files)\n得到以下輸出，和 root, dirs 輸出順序相對應，可看到 files 的是當前 root 路徑下包含的檔案名稱\n1234[&#x27;file.txt&#x27;]    # /home/dirs 下有一個檔案[&#x27;a.txt&#x27;]       # /home/dirs/a 下有一個檔案[&#x27;b.txt&#x27;][&#x27;c.txt&#x27;]\n因為 files 只有檔案名稱，常利用 os.path.join(root, f) 來取得檔案的絕對路徑\n實例了解基本構造後，透過實例來了解 os.walk() 的可以如何使用。假設我想取出每個樣本名稱folder中，結尾包含 .tab.gz 的檔案來操作目標路徑大致的結構如下:\n12345678910111213141516171819202122/home/dirs/folders/├── annotation│   ├── AD_sample1│       ├── AD_sample1.annotation.tab.gz│   ├── AD_sample2│       ├── AD_sample2.annotation.tab.gz│   ├── AD_sample3│       ├── AD_sample3.annotation.tab.gz│   ├── BS_sample12│       ├── BS_sample12.annotation.tab.gz│   ├── BS_sample14│       ├── BS_sample14.annotation.tab.gz│   ├── BS_sample17│       ├── BS_sample17.annotation.tab.gz│   ├── BS_sample18│       ├── BS_sample18.annotation.tab.gz│   └── BS_sample19│       ├── BS_sample19.annotation.tab.gz├── csv├── multiqc├── logs└── reports\npython code:\n1234567work_path = &#x27;/home/dirs/folders/&#x27;for root, dirs, files in os.walk(work_path):    for f in files:        if f.endswith(&#x27;.tab.gz&#x27;):            file_name = os.path.join(root, f)            with open(file_name, &#x27;r&#x27;) as fh:                ...\n\n目標5: 產生symlink和 linux 中的 ln -s 相同，os 也可協助建立連結以節省空間使用\n\nos.symlink(sourec_path, dest_path) 相當於 ln -s\nos.islink() 相當於用 ls -alh 檢查\nos.unlink() 相當於 unlink，注意資料夾不能加 / 不然移除無效\n\n目標6: 執行系統命令os.system(cmd) 也可以在 python 環境下執行系統命令，和 subprocess 模組功能相似，但較為陽春\n參考資料與補充python 3.4 後有新的模組 pathlib (物件導向的操作) 其功能和 os 相似，有興趣可以參考，由於目前 os 使用上沒太大問題，就沒有特別轉換模組https://docs.python.org/zh-tw/3/library/os.html#files-and-directories\n","dateCreated":"2024-03-07T20:16:41+08:00","dateModified":"2024-03-11T13:19:12+08:00","datePublished":"2024-03-07T20:16:41+08:00","description":"Photo by Artturi Jalli on Unsplash\n大家在撰寫 python 是否有遇到以下問題&#x2F;需求:\n\n目標檔案與路徑需要不停切換\n想自動化的遍歷目標路徑下是否有目標檔案，若檔案存在才進行後續處理\n在 python 環境下想跳轉至 linux 執行系統命令\n\n以上這些問題都可以使用 python 強大的內建模組 os (operating system) 來完成! 本文將介紹常用的 os 函式，特別是文件與路徑操作相關的內容，以及其實際應用。","headline":"Python實用系列：使用 os 成為系統操作大師","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20240307/Python/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users","https://facebook.com/","https://plus.google.com/"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20240307/Python/","keywords":"Python"}</script>
     <meta name="description" content="introducing python module os and its functions">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Python實用系列：使用 os 成為系統操作大師">
@@ -25,13 +25,13 @@
 <meta property="og:site_name" content="Xuan&#39;s Blog">
 <meta property="og:description" content="introducing python module os and its functions">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://pxchen110.github.io/https:/pxchen110.github.io/20240307/Python/20240307_img1.jpg">
+<meta property="og:image" content="https://pxchen110.github.io/20240307/Python/20240307_img1.jpg">
 <meta property="article:published_time" content="2024-03-07T12:16:41.000Z">
-<meta property="article:modified_time" content="2024-03-07T12:24:12.809Z">
+<meta property="article:modified_time" content="2024-03-11T05:19:12.090Z">
 <meta property="article:author" content="Xuan Chen">
 <meta property="article:tag" content="Python">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pxchen110.github.io/https:/pxchen110.github.io/20240307/Python/20240307_img1.jpg">
+<meta name="twitter:image" content="https://pxchen110.github.io/20240307/Python/20240307_img1.jpg">
     
     
         
@@ -326,7 +326,7 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p><img src="/https:/pxchen110.github.io/20240307/Python/20240307_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+            <p><img src="/20240307/Python/20240307_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>大家在撰寫 python 是否有遇到以下問題&#x2F;需求:</p>
 <ul>
 <li>目標檔案與路徑需要不停切換</li>
@@ -470,7 +470,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/https:/pxchen110.github.io/20240307/Python/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240307/Python/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -483,7 +483,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/https:/pxchen110.github.io/20240307/Python/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240307/Python/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -496,7 +496,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/https:/pxchen110.github.io/20240307/Python/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240307/Python/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -533,7 +533,7 @@
         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
         var disqus_config = function () {
-          this.page.url = 'https://pxchen110.github.io/https:/pxchen110.github.io/20240307/Python/';  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.url = 'https://pxchen110.github.io/20240307/Python/';  // Replace PAGE_URL with your page's canonical URL variable
           this.page.identifier = '1709813801000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
         };
         (function() { // DON'T EDIT BELOW THIS LINE
@@ -603,7 +603,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/https:/pxchen110.github.io/20240307/Python/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240307/Python/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -616,7 +616,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/https:/pxchen110.github.io/20240307/Python/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240307/Python/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -629,7 +629,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/https:/pxchen110.github.io/20240307/Python/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240307/Python/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -663,7 +663,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/https:/pxchen110.github.io/20240307/Python/"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240307/Python/"
                         aria-label="分享到 Facebook"
                     >
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
@@ -676,7 +676,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/https:/pxchen110.github.io/20240307/Python/"
+                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240307/Python/"
                         aria-label="分享到 Twitter"
                     >
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
@@ -689,7 +689,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://plus.google.com/share?url=https://pxchen110.github.io/https:/pxchen110.github.io/20240307/Python/"
+                        href="https://plus.google.com/share?url=https://pxchen110.github.io/20240307/Python/"
                         aria-label="分享到 Google+"
                     >
                         <i class="fab fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
@@ -983,7 +983,7 @@
                     <div class="media-body">
                         <a
                             class="link-unstyled"
-                            href="https://pxchen110.github.io/https:/pxchen110.github.io/20240307/Python/"
+                            href="https://pxchen110.github.io/20240307/Python/"
                             aria-label=": Python實用系列：使用 os 成為系統操作大師"
                         >
                             <h3 class="media-heading">Python實用系列：使用 os 成為系統操作大師</h3>
@@ -995,7 +995,7 @@
                                 
                             </span>
                         </span>
-                        <div class="media-content hide-xs font-merryweather"><p><img src="/https:/pxchen110.github.io/20240307/Python/20240307_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240307/Python/20240307_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
 <p>大家在撰寫 python 是否有遇到以下問題&#x2F;需求:</p>
 <ul>
 <li>目標檔案與路徑需要不停切換</li>
