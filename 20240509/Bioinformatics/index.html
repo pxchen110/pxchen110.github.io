@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Xuan&#39;s Blog">
-    <title>Python實用系列： smtplib 模組實現自動寄信 - Xuan&#39;s Blog</title>
+    <title>生資系列：All of US research program 介紹 - Xuan&#39;s Blog</title>
     <meta name="author" content="Xuan Chen">
     
         <meta name="keywords" content="hexo,javascript,">
@@ -17,23 +17,28 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg"},"articleBody":"Photo by Brett Jordan on Unsplash\n在信箱收件夾，不乏看到許多自動寄出的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信\n\n\n\n\nPart1: SMTP協定介紹通訊協定，是協助資訊在不同軟硬體之間傳輸的方式，例如使用相同IP的兩台電腦，可以突破主機限制互相通訊。網際網路中，常用的通訊協定包含TCP&#x2F;IP, HTTPS(TLS&#x2F;SSL加密)，以及本文要使用的SMTP協定。SMTP全名為簡易郵件傳輸通訊協定 (Simple Mail Transfer Protocol)，是透過網路在電腦與伺服器之間接收與傳送電子郵件的通訊方式。只要知道服務廠商的smtp, port, 並提供一個寄件帳號，就可以自動\\廣發信件給多名收件人。\n常見的廠商與smtp伺服器：\n\ngmail:  smtp.gmail.com\noutlook: smtp-mail.outlook.com\n\n常見的連接埠比較(內容節錄自cloudflare網站) :\n\n連接埠 25 最常用於 SMTP 伺服器之間的連線。如今，用於終端使用者網路的防火牆通常會封鎖該連接埠，因為垃圾郵件發送者嘗試濫用它來傳送大量垃圾郵件。\n連接埠 465 曾經專供具有安全通訊端層 (SSL) 加密的 SMTP 使用。但是 SSL 已被 Transport Layer Security (TLS) 取代，因此現代電子郵件系統不再使用該連接埠。它只存在於舊版（過時的）系統中。\n連接埠 587 現在是電子郵件提交的預設連接埠。透過此連接埠進行的 SMTP 通訊使用 TLS 加密。\n\nPart2: 撰寫python程式python 提供 smtplib 模組來協助 smtp 封裝信息並傳輸給目標端。由於\nstep0: 引入套件和開啟google mail 權限1import smtplib\n除了基本模組，常搭配擴充電子郵件標準套件，來處理內文部分\n12from email.mime.multipart import MIMEMultipart #email內容載體from email.mime.text import MIMEText           #製作郵件內文\n\n若要在gmail使用smtplib，需要到 google 帳戶的安全性頁面 完成帳戶密碼設定(下圖紅框標示處)\n\nstep1: 設定帳戶資訊1234567MAIL_USER = &quot;from_who_user_@gmail...&quot;  #寄件者email帳號MAIL_PASSWD = &quot;......&quot;                 #寄件者email密碼FROM_ADDRESS = MAIL_USER               #和寄件者相同# 郵件平台的主機 port (這裡使用 gmail smtp 伺服器)MAIL_SMTP = &quot;smtp.gmail.com&quot;MAIL_PORT = 587                        #安全加密port &quot;587&quot;\n\nstep2: 撰寫郵件內容與寄件人12to_address = &quot;to_who_@gmail...&quot;        #收件者email帳號body_content = &quot;&quot;                      #輸入郵件內文\n\n\nstep3: 以擴充電子郵件標準來組合 email 結構123456mail = MIMEMultipart()mail[&#x27;From&#x27;] = FROM_ADDRESS            #寄件者mail[&#x27;Subject&#x27;] = &quot;the subject&quot;        #主旨mail[&#x27;To&#x27;] = to_address                #收件者mail.attach(MIMEText(body_content))    #以attach方式貼上內文\n\n\nstep4: 設定smtp伺服器並寄信12345678910111213141516smtpserver = smtplib.SMTP(MAIL_SMTP, MAIL_PORT)# 發出「Hello」訊息，以在用戶端和伺服器之間建立SMTP連線smtpserver.ehlo()   # TLS加密：延伸保護 SMTP 階段作業smtpserver.starttls() # 登入寄件人郵件系統smtpserver.login(MAIL_USER. MAIL_PASSWD) # 將step3產生的信件內容轉成string並寫入smtpserver.sendmail(FROM_ADDRESS, to_address, mail.as_string()) # 結束系統連線server.quit() \n\nPart3: 完整script &amp; 成果展示附上完整的 python script注意: 由於使用個人主機測試，才敢將信箱帳密直接輸入在command line、由 sys 存取，若在公用主機請注意資安考量。\n123456789101112131415161718192021222324252627282930313233#!/usr/bin/env python3import osimport sysimport smtplibfrom email.mime.multipart import MIMEMultipartfrom email.mime.text import MIMETextmail_user = sys.argv[1]mail_passwd = sys.argv[2]from_address = mail_usermail_smtp = &quot;smtp.gmail.com&quot;mail_port = 587to_address = sys.argv[3]body_content = &quot;&quot;&quot;\tThis is the auto-send email test &quot;&quot;&quot;mail = MIMEMultipart()mail[&#x27;From&#x27;] = mail_usermail[&#x27;To&#x27;] = to_addressmail[&#x27;Subject&#x27;] = &quot;Test for smtp email-sender&quot;mail.attach(MIMEText(body_content))server = smtplib.SMTP(mail_smtp, mail_port)server.ehlo()server.starttls()server.login(mail_user, mail_passwd)server.sendmail(mail_user, to_address, mail.as_string())server.quit()\n\n到收件者的信箱查看，成功收到如下圖的信件\n\n參考資料https://aws.amazon.com/tw/what-is/smtp/https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/\n","dateCreated":"2024-02-15T19:21:40+08:00","dateModified":"2024-03-11T13:21:19+08:00","datePublished":"2024-02-15T19:21:40+08:00","description":"Photo by Brett Jordan on Unsplash\n在信箱收件夾，不乏看到許多自動寄出的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信","headline":"Python實用系列： smtplib 模組實現自動寄信","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20240215/Python/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20240215/Python/","keywords":"Python"}</script>
-    <meta name="description" content="introducing python smtplib module to automatically send email">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg"},"articleBody":"(Program Image from NIH website)\n\n\n\n前言隨定序技術的發展演進，定序分析已從單一樣本的探討、家族segregation analysis，擴展至大規模族群分析的階段。近年來已有許多國家或計畫組織，積極地針對群體健康，建立具價值的人體生物資料庫: UK Biobank, gnomAD, 或 Taiwan Biobank 等結果林立，並實際應用至臨床研究。今日要介紹的定序計畫，是由美國 National Institutes of Health (NIH) 主持的 All of Us Research Program，本文內容包含計畫簡介，收案狀況與近期成果。\n計畫簡介All of US 起源於 2015 美國發起之精準醫療計畫 (Precision Medicine Initiative)，針對美國多元族群進行大規模的資料收集與討論\n\nAll of Us is working to improve health care through research. Unlike research studies that focus on one disease or group of people, All of Us is building a diverse database that can inform thousands of studies on a variety of health conditions. This creates more opportunities to:\n\nKnow the risk factors for certain diseases\nFigure out which treatments work best for people of different backgrounds\nConnect people with the right clinical studies for their needs\nLearn how technologies can help us take steps to be healthier\n\n\n從官網的簡介可知多元族群與資料類型為計畫核心，也勢必是基因體分析的發展趨勢\n計畫特點大規模的樣本收案美國幅員廣闊，又因歷史發展族群多元，使收案數量大族群多元。至2024年4月已有近80萬人註冊網站，近55萬人完成初步收案與調查，根據官方釋出(來自問卷)的族群統計，非歐洲族群的比例大幅提高。\n\n下表為2024最新研究成果所公布的資料類別與族群樣本數，其實可發現擁有完整WGS資料的比例仍佔少數，並持續提升\n\n多元資料類型問卷收集資訊包含基本生活習慣，還有因應前幾年COVID-19的追蹤。有些問題很有趣: 像是社交軟體帳號、管制藥品使用史(列出許多毒品名稱，還有正在服用的選項)、社區環境狀況等，和 Taiwan Biobank 相比，多收集許多環境與心理健康的資訊。族群詢問上相當詳細，依地區劃分後再分國家，如Asian下可再勾選Asian Indian, Chinese, Filipino, Japanese, Korean, Vietnamese… 以協助 PCA clustering 或model training 時做特徵依據\n除了問卷調查，All of US 也收集許多來源的個人資料: \n\n生物檢體(biosamples): blood, saliva, and&#x2F;or urine sample 主要進行定序分析\n電子病例紀錄(electronic health records，EHR): 收集樣本相關疾病與生理測量數值，在前面 Data Broswer 網站也有釋出部分統計結果，資料使用前會經由 Observational Medical Outcomes Partnership (OMOP) 進行術語轉換與數據標準化\n體檢數值(physical measurement): 參與者可至合作醫院進行檢查，量測身高、體重、血壓等\n穿戴式裝置紀錄: 與Fitbit合作，當使用者同意共享紀錄，即可獲得如心跳、運動與睡眠狀態等監測數值\n\n目前收集狀況穩健，引述自最新發表文章:\n\n99% of participants with WGS data also have survey data and physical measurements, and 84% also have EHR data. \n\n具一定準確度的分析架構All of US 以多元平台定序(short-read whole genome sequencing, long-read whole genome sequencing, and genome-wide genotyping arrays)，並偵測個體與族群階層的變異，分析流程皆以GIAB truth set與標準品衡量準確度\n以 short-read WGS sequencing data 分析為例:\n\nPCR-free barcoded Illumina Kapa HyperPrep kit\nsequenced on the Illumina NovaSeq 6000 instrument\nGRCh38dh as reference\nIllumina DRAGEN v3.4.12 for preprocessing and variant calling，當時使用的command line 有公布在 illumina 官網\nQC measures for each steps\nannotation using using Illumina Nirvana\n\n\n分析流程中的Quality Control:\n\nsingle sample QC: (sample removal)\nfingerprint concordance between the array and WGS data (selected 113 sites)\nsex concordance (seq result vs. self-report)\ncross-individual contamination rate (related to call rate) by counting number of reads at common homozygous alternate SNP\nmean coverage (threshold of ≥30×)\ngenome coverage (threshold of ≥90% at 20×)\ncoverage of hereditary disease risk genes (threshold of ≥95% at 20×)\naligned Q30 bases (threshold of ≥8 × 1010)\n\n\njoint callset QC: (similar to that of gnomAD 3.1, only flagged as failing QC)\npopulation outlier through PCA\nvariant hard filters ex: GQ, DP, QUAL flags, PASS filter…\nVQSR\nrelatedness: kniship calculated by Hail\n\n\n\nWorkflow Benchmarking使用 GIABv4.2.1 truth set: HG001(NA12878), HG003, HG004(parents of AJ trio), and HG005(son of Han trio)從下表的比對結果可知，All of US workflow 在 SNV&#x2F;indel 的 Precision 超過 99%，代表偵測到的變異幾乎都為真( QC 做得很好，顯著降低false-positives)\n\n雲端式共享空間All of US 官方網站 依照使用者身分與目的提供不同資源，主要分兩大類:\n\n\nData Broswer: 開源的族群性(aggregate-level data)統計成果\n\n以 GENOMICS VARIANT 為例，可用基因名稱、rs number 甚至是基因區段搜尋族群偵測到的變異位點，下圖示範以TP53搜尋結果\n\n網站很讚的地方是提供**客製化的篩選(圖中黃色標示處)**，可以用註釋結果如 VEP consequence, ClinVar, 或族群頻率如allele count threshold 等篩出感興趣的位點。此外點選ID還有更詳細的統計，跟gnomAD broswer有得拚! 但目前網站只提供瀏覽功能，還沒找到export 按鈕\n\nResearcher Workbench: 若學術單位或研究者想使用資料，只要申請平台使用權，購買credit(儲存空間分析費用)，即可自由在雲端workspace下開創 project、上傳資料和使用pipeline。\n\n雲端分析的另一優點即是節省各自備份或傳輸資料的開銷:\n\nStoring one copy per institution of this data at 556 registered institutions would cost about US$1.16 billion per year. By contrast, storing a central cloud copy costs about US$1.14 million per year\n\n近期研究成果2024年2月團隊於 Nature 期刊發表最新研究成果:\n\nThe All of Us Research Program Genomics Investigators. Genomic data in the All of Us Research Program. Nature 627, 340–346 (2024).https://doi.org/10.1038/s41586-023-06957-x\n\n現階段收案情況與重點成果:\n\nrelease of 245,388 clinical-grade genome sequences, and identified more than 1 billion genetic variants\nnew genotype-phenotype associations using longitudinal electronic health record\nSummary-level data are publicly available, and individual-level data can be accessed by researchers\n\nVariant discovery in joint callset\n將joint callset結果和dbSNP v153版資料庫位點比對，分別在 non-coding 跟 coding region 找到 272,051,104 和 3,913,722 個新位點\n依照族群 MAF 分類發現 99.98% 的 coding variants 屬於 MAF &lt; 1% 的罕見變異(rare variant)；有趣的是找到 0.01% 變異的屬於在非歐洲族群普遍(MAF &gt; 1%)，但單看歐洲族群屬於罕見的變異位點\n利用illumina Nirvana (DRAGEN implemented annotation tool) 進行註釋，並統計不同族群具有被 Clinvar 判定為 Likely Pathogenic 以上的位點數，利用OR、p-value等數值衡量後，發現歐洲族群發現rare pathogenic variant的比例最高，其他族群可能受限於樣本數大小而降低統計結果的顯著性。\n\n\nAncestry and relatedness問卷的族群統計有 51.1% 屬於非歐洲族群，使用基因資訊進行族群分類:\n分類方式參考gnomAD資料庫的做法:\n\ntraining a random forest (RF) classifier on a subset of samples with provided genetic ancestry labels using the principal components from the PCA as features.\n\n使用 HGDP and 1000 Genomes 計畫樣本作為 training set，並從 gnomAD 資料庫取得變異位點資訊當作PCA input，clustering 後取前 16PC 當作 random forest input，並輸出族群分類結果。\n將模型套用至 All of US 3202 個樣本上，發現問卷回答之族群(self-reported ethnicity) 與基因預測之族群結果一致性達87%\nGenotype-by-phenotype associations大量的樣本與 variant genotype 很適合做GWAS，以 LDL-C phenotye 為例，從 manhattan plot 看到許多顯著關聯的位點，和過去從TOPMed資料庫偵測之顯著關聯位點做關聯性比較，發現兩計畫的beta (odds ratio) 值高度相關，代表位點對特徵的趨勢一致。但由於統計模型、族群組成的不同，使每個 variant loci 的 effect size 不同。\n此外也參照 phenotype-genotype reference map (PGRM) 來驗證 All of US 做 PheWAS時，能否重現(replication)相同的顯著關聯結果\n\nphenotype-genotype reference map (PGRM), a set of 5,879 genetic associations from 523 GWAS publications that can be used for high-throughput replication experiments.\n\nPGRM 如何定義replicated?\n\nReplication: an association with a p value &lt; 0.05 and OR in the same direction as the original study.\n\nPGRM 另一特別之處在於有族群特異的association，可以個別比對不同族群差異，最終在power &gt; 80% 的 association type 下，不同族群有成功 replicate 的比例分別為: 72.0% (18&#x2F;25) in AFR, 100% (13&#x2F;13) in AMR, 46.6% (7&#x2F;15) in EAS, 74.9% (1,064&#x2F;1,421) in EUR, and 100% (1&#x2F;1) in SAS.\n這裡EAS重複狀況較差，可能和genetic loci boosting, EHR data updation等因素有關，而改變統計結果。\n\nCommentsAll of US 計畫的執行力高，並持續增進收案基數，對於族群基因體學的影響大，且過程中為因應資料量龐大的議題，會額外討論如資料保存、壓縮效率、以及位點QC等，對於之後有興趣做族群基因體分析者，可作為重要參考。這麼大的資料，若能持續的做追蹤並紀錄general population 是否有疾病發生，對長期研究也能有貢獻。當然維持計畫需龐大資金與研究者投入，相信NIH主持的計畫可以相當長壽。\n就族群多樣性的議題來說，USA多族群歷史較長，或許也挺適合觀察mixed-population後變異的特徵是否有保留或改變，甚至新發變異等議題；而本篇文章並沒有特別討論long-read和short-read data訂出來的樣本結果差異，但相信定序技術發展，當long-read使用越頻繁，就能將探討主軸從SNV延續至SV, CNV等大片段類型上。\nReferenceshttps://www.nature.com/articles/s41586-023-06957-xhttps://www.ghd.tw/Home/International_data_standardshttps://cran.r-project.org/web/packages/allofus/vignettes/data.html\n","dateCreated":"2024-05-06T14:38:39+08:00","dateModified":"2024-05-10T12:51:35+08:00","datePublished":"2024-05-06T14:38:39+08:00","description":"(Program Image from NIH website)","headline":"生資系列：All of US research program 介紹","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20240509/Bioinformatics/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20240509/Bioinformatics/","keywords":"Bioinformatics"}</script>
+    <meta name="description" content="introduction to the all of us program">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="Python實用系列： smtplib 模組實現自動寄信">
-<meta property="og:url" content="https://pxchen110.github.io/20240215/Python/index.html">
+<meta property="og:title" content="生資系列：All of US research program 介紹">
+<meta property="og:url" content="https://pxchen110.github.io/20240509/Bioinformatics/index.html">
 <meta property="og:site_name" content="Xuan&#39;s Blog">
-<meta property="og:description" content="introducing python smtplib module to automatically send email">
+<meta property="og:description" content="introduction to the all of us program">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://pxchen110.github.io/20240215/Python/20240215_img1.jpg">
-<meta property="og:image" content="https://pxchen110.github.io/20240215/Python/20240215_img2.png">
-<meta property="og:image" content="https://pxchen110.github.io/20240215/Python/20240215_img3.png">
-<meta property="article:published_time" content="2024-02-15T11:21:40.000Z">
-<meta property="article:modified_time" content="2024-03-11T05:21:19.382Z">
+<meta property="og:image" content="https://pxchen110.github.io/20240509/Bioinformatics/20240509_img1.jpg">
+<meta property="og:image" content="https://pxchen110.github.io/20240509/Bioinformatics/20240509_img2.png">
+<meta property="og:image" content="https://pxchen110.github.io/20240509/Bioinformatics/20240509_img3.jpg">
+<meta property="og:image" content="https://pxchen110.github.io/20240509/Bioinformatics/20240509_img4.jpg">
+<meta property="og:image" content="https://pxchen110.github.io/20240509/Bioinformatics/20240509_img5.png">
+<meta property="og:image" content="https://pxchen110.github.io/20240509/Bioinformatics/20240509_img6.jpg">
+<meta property="og:image" content="https://pxchen110.github.io/20240509/Bioinformatics/20240509_img7.png">
+<meta property="og:image" content="https://pxchen110.github.io/20240509/Bioinformatics/20240509_img8.png">
+<meta property="article:published_time" content="2024-05-06T06:38:39.000Z">
+<meta property="article:modified_time" content="2024-05-10T04:51:35.402Z">
 <meta property="article:author" content="Xuan Chen">
-<meta property="article:tag" content="Python">
+<meta property="article:tag" content="Bioinformatics">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pxchen110.github.io/20240215/Python/20240215_img1.jpg">
+<meta name="twitter:image" content="https://pxchen110.github.io/20240509/Bioinformatics/20240509_img1.jpg">
     
     
         
@@ -271,20 +276,20 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            Python實用系列： smtplib 模組實現自動寄信
+            生資系列：All of US research program 介紹
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2024-02-15T19:21:40+08:00">
+    <time datetime="2024-05-06T14:38:39+08:00">
 	
-		    2024 年 2 月 15 日
+		    2024 年 5 月 6 日
     	
     </time>
     
         <span>分類 </span>
         
-    <a class="category-link" href="/categories/Python/">Python</a>
+    <a class="category-link" href="/categories/database/">database</a>
 
 
     
@@ -296,47 +301,124 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p><img src="/20240215/Python/20240215_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@brett_jordan">Brett Jordan</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
-<p>在信箱收件夾，不乏看到許多<strong>自動寄出</strong>的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信</p>
+            <p><img src="/20240509/Bioinformatics/20240509_img1.jpg" alt="image"><br>(Program Image from <a target="_blank" rel="noopener" href="https://www.nih.gov/">NIH website</a>)</p>
 <span id="more"></span>
+<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A8%88%E7%95%AB%E7%B0%A1%E4%BB%8B"><span class="toc-text">計畫簡介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A8%88%E7%95%AB%E7%89%B9%E9%BB%9E"><span class="toc-text">計畫特點</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%A7%E8%A6%8F%E6%A8%A1%E7%9A%84%E6%A8%A3%E6%9C%AC%E6%94%B6%E6%A1%88"><span class="toc-text">大規模的樣本收案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E5%85%83%E8%B3%87%E6%96%99%E9%A1%9E%E5%9E%8B"><span class="toc-text">多元資料類型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B7%E4%B8%80%E5%AE%9A%E6%BA%96%E7%A2%BA%E5%BA%A6%E7%9A%84%E5%88%86%E6%9E%90%E6%9E%B6%E6%A7%8B"><span class="toc-text">具一定準確度的分析架構</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Workflow-Benchmarking"><span class="toc-text">Workflow Benchmarking</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9B%B2%E7%AB%AF%E5%BC%8F%E5%85%B1%E4%BA%AB%E7%A9%BA%E9%96%93"><span class="toc-text">雲端式共享空間</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%91%E6%9C%9F%E7%A0%94%E7%A9%B6%E6%88%90%E6%9E%9C"><span class="toc-text">近期研究成果</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Variant-discovery-in-joint-callset"><span class="toc-text">Variant discovery in joint callset</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Ancestry-and-relatedness"><span class="toc-text">Ancestry and relatedness</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Genotype-by-phenotype-associations"><span class="toc-text">Genotype-by-phenotype associations</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Comments"><span class="toc-text">Comments</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-text">References</span></a></li></ol>
 
-<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Part1-SMTP%E5%8D%94%E5%AE%9A%E4%BB%8B%E7%B4%B9"><span class="toc-text">Part1: SMTP協定介紹</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Part2-%E6%92%B0%E5%AF%ABpython%E7%A8%8B%E5%BC%8F"><span class="toc-text">Part2: 撰寫python程式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#step0-%E5%BC%95%E5%85%A5%E5%A5%97%E4%BB%B6%E5%92%8C%E9%96%8B%E5%95%9Fgoogle-mail-%E6%AC%8A%E9%99%90"><span class="toc-text">step0: 引入套件和開啟google mail 權限</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step1-%E8%A8%AD%E5%AE%9A%E5%B8%B3%E6%88%B6%E8%B3%87%E8%A8%8A"><span class="toc-text">step1: 設定帳戶資訊</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step2-%E6%92%B0%E5%AF%AB%E9%83%B5%E4%BB%B6%E5%85%A7%E5%AE%B9%E8%88%87%E5%AF%84%E4%BB%B6%E4%BA%BA"><span class="toc-text">step2: 撰寫郵件內容與寄件人</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step3-%E4%BB%A5%E6%93%B4%E5%85%85%E9%9B%BB%E5%AD%90%E9%83%B5%E4%BB%B6%E6%A8%99%E6%BA%96%E4%BE%86%E7%B5%84%E5%90%88-email-%E7%B5%90%E6%A7%8B"><span class="toc-text">step3: 以擴充電子郵件標準來組合 email 結構</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step4-%E8%A8%AD%E5%AE%9Asmtp%E4%BC%BA%E6%9C%8D%E5%99%A8%E4%B8%A6%E5%AF%84%E4%BF%A1"><span class="toc-text">step4: 設定smtp伺服器並寄信</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Part3-%E5%AE%8C%E6%95%B4script-%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA"><span class="toc-text">Part3: 完整script &amp; 成果展示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-text">參考資料</span></a></li></ol>
-
-<h2 id="Part1-SMTP協定介紹"><a href="#Part1-SMTP協定介紹" class="headerlink" title="Part1: SMTP協定介紹"></a>Part1: SMTP協定介紹</h2><p>通訊協定，是協助資訊在不同軟硬體之間傳輸的方式，例如使用相同IP的兩台電腦，可以突破主機限制互相通訊。網際網路中，常用的通訊協定包含TCP&#x2F;IP, HTTPS(TLS&#x2F;SSL加密)，以及本文要使用的SMTP協定。<br>SMTP全名為簡易郵件傳輸通訊協定 (Simple Mail Transfer Protocol)，是透過網路在電腦與伺服器之間<strong>接收與傳送電子郵件</strong>的通訊方式。只要知道服務廠商的smtp, port, 並提供一個寄件帳號，就可以自動\廣發信件給多名收件人。</p>
-<p>常見的廠商與smtp伺服器：</p>
-<ul>
-<li>gmail:  <code>smtp.gmail.com</code></li>
-<li>outlook: <code>smtp-mail.outlook.com</code></li>
-</ul>
-<p>常見的連接埠比較(內容節錄自<a target="_blank" rel="noopener" href="https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/">cloudflare網站</a>) :</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>隨定序技術的發展演進，定序分析已從單一樣本的探討、家族segregation analysis，擴展至大規模族群分析的階段。近年來已有許多國家或計畫組織，積極地針對群體健康，建立具價值的人體生物資料庫: UK Biobank, gnomAD, 或 Taiwan Biobank 等結果林立，並實際應用至臨床研究。今日要介紹的定序計畫，是由美國 National Institutes of Health (NIH) 主持的 <em>All of Us</em> Research Program，本文內容包含計畫簡介，收案狀況與近期成果。</p>
+<h2 id="計畫簡介"><a href="#計畫簡介" class="headerlink" title="計畫簡介"></a>計畫簡介</h2><p><em>All of US</em> 起源於 2015 美國發起之精準醫療計畫 (Precision Medicine Initiative)，針對美國多元族群進行大規模的資料收集與討論</p>
 <blockquote>
-<p>連接埠 25 最常用於 SMTP 伺服器之間的連線。如今，用於終端使用者網路的防火牆通常會封鎖該連接埠，因為垃圾郵件發送者嘗試濫用它來傳送大量垃圾郵件。</p>
-<p>連接埠 465 曾經專供具有安全通訊端層 (SSL) 加密的 SMTP 使用。但是 SSL 已被 Transport Layer Security (TLS) 取代，因此現代電子郵件系統不再使用該連接埠。它只存在於舊版（過時的）系統中。</p>
-<p>連接埠 587 現在是電子郵件提交的預設連接埠。透過此連接埠進行的 SMTP 通訊使用 TLS 加密。</p>
+<p>All of Us is working to improve health care through research. Unlike research studies that focus on one disease or group of people, All of Us is building a <strong>diverse database</strong> that can inform thousands of studies on a variety of health conditions. This creates more opportunities to:</p>
+<ul>
+<li>Know the risk factors for certain diseases</li>
+<li>Figure out which treatments work best <strong>for people of different backgrounds</strong></li>
+<li>Connect people with the right clinical studies for their needs</li>
+<li>Learn how technologies can help us take steps to be healthier</li>
+</ul>
 </blockquote>
-<h2 id="Part2-撰寫python程式"><a href="#Part2-撰寫python程式" class="headerlink" title="Part2: 撰寫python程式"></a>Part2: 撰寫python程式</h2><p>python 提供 smtplib 模組來協助 smtp 封裝信息並傳輸給目標端。由於</p>
-<h3 id="step0-引入套件和開啟google-mail-權限"><a href="#step0-引入套件和開啟google-mail-權限" class="headerlink" title="step0: 引入套件和開啟google mail 權限"></a>step0: 引入套件和開啟google mail 權限</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">import smtplib</span><br></pre></td></tr></table></figure>
-<p>除了基本模組，常搭配擴充電子郵件標準套件，來處理內文部分</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">from email.mime.multipart import MIMEMultipart #email內容載體</span><br><span class="line">from email.mime.text import MIMEText           #製作郵件內文</span><br></pre></td></tr></table></figure>
-
-<p>若要在gmail使用smtplib，需要到 <a target="_blank" rel="noopener" href="https://myaccount.google.com/security">google 帳戶的安全性頁面</a> 完成帳戶密碼設定(下圖紅框標示處)</p>
-<p><img src="/20240215/Python/20240215_img2.png"></p>
-<h3 id="step1-設定帳戶資訊"><a href="#step1-設定帳戶資訊" class="headerlink" title="step1: 設定帳戶資訊"></a>step1: 設定帳戶資訊</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">MAIL_USER = &quot;from_who_user_@gmail...&quot;  #寄件者email帳號</span><br><span class="line">MAIL_PASSWD = &quot;......&quot;                 #寄件者email密碼</span><br><span class="line">FROM_ADDRESS = MAIL_USER               #和寄件者相同</span><br><span class="line"></span><br><span class="line"># 郵件平台的主機 port (這裡使用 gmail smtp 伺服器)</span><br><span class="line">MAIL_SMTP = &quot;smtp.gmail.com&quot;</span><br><span class="line">MAIL_PORT = 587                        #安全加密port &quot;587&quot;</span><br></pre></td></tr></table></figure>
-
-<h3 id="step2-撰寫郵件內容與寄件人"><a href="#step2-撰寫郵件內容與寄件人" class="headerlink" title="step2: 撰寫郵件內容與寄件人"></a>step2: 撰寫郵件內容與寄件人</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">to_address = &quot;to_who_@gmail...&quot;        #收件者email帳號</span><br><span class="line">body_content = &quot;&quot;                      #輸入郵件內文</span><br></pre></td></tr></table></figure>
-
-
-<h3 id="step3-以擴充電子郵件標準來組合-email-結構"><a href="#step3-以擴充電子郵件標準來組合-email-結構" class="headerlink" title="step3: 以擴充電子郵件標準來組合 email 結構"></a>step3: 以擴充電子郵件標準來組合 email 結構</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mail = MIMEMultipart()</span><br><span class="line">mail[&#x27;From&#x27;] = FROM_ADDRESS            #寄件者</span><br><span class="line">mail[&#x27;Subject&#x27;] = &quot;the subject&quot;        #主旨</span><br><span class="line">mail[&#x27;To&#x27;] = to_address                #收件者</span><br><span class="line"></span><br><span class="line">mail.attach(MIMEText(body_content))    #以attach方式貼上內文</span><br></pre></td></tr></table></figure>
-
-
-<h3 id="step4-設定smtp伺服器並寄信"><a href="#step4-設定smtp伺服器並寄信" class="headerlink" title="step4: 設定smtp伺服器並寄信"></a>step4: 設定smtp伺服器並寄信</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">smtpserver = smtplib.SMTP(MAIL_SMTP, MAIL_PORT)</span><br><span class="line"></span><br><span class="line"># 發出「Hello」訊息，以在用戶端和伺服器之間建立SMTP連線</span><br><span class="line">smtpserver.ehlo()   </span><br><span class="line"></span><br><span class="line"># TLS加密：延伸保護 SMTP 階段作業</span><br><span class="line">smtpserver.starttls() </span><br><span class="line"></span><br><span class="line"># 登入寄件人郵件系統</span><br><span class="line">smtpserver.login(MAIL_USER. MAIL_PASSWD) </span><br><span class="line"></span><br><span class="line"># 將step3產生的信件內容轉成string並寫入</span><br><span class="line">smtpserver.sendmail(FROM_ADDRESS, to_address, mail.as_string()) </span><br><span class="line"></span><br><span class="line"># 結束系統連線</span><br><span class="line">server.quit() </span><br></pre></td></tr></table></figure>
-
-<h2 id="Part3-完整script-成果展示"><a href="#Part3-完整script-成果展示" class="headerlink" title="Part3: 完整script &amp; 成果展示"></a>Part3: 完整script &amp; 成果展示</h2><p>附上完整的 python script<br><strong>注意: 由於使用個人主機測試，才敢將信箱帳密直接輸入在command line、由 sys 存取，若在公用主機請注意資安考量。</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python3</span><br><span class="line"></span><br><span class="line">import os</span><br><span class="line">import sys</span><br><span class="line">import smtplib</span><br><span class="line">from email.mime.multipart import MIMEMultipart</span><br><span class="line">from email.mime.text import MIMEText</span><br><span class="line"></span><br><span class="line">mail_user = sys.argv[1]</span><br><span class="line">mail_passwd = sys.argv[2]</span><br><span class="line">from_address = mail_user</span><br><span class="line"></span><br><span class="line">mail_smtp = &quot;smtp.gmail.com&quot;</span><br><span class="line">mail_port = 587</span><br><span class="line"></span><br><span class="line">to_address = sys.argv[3]</span><br><span class="line">body_content = &quot;&quot;&quot;</span><br><span class="line">	This is the auto-send email test </span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">mail = MIMEMultipart()</span><br><span class="line">mail[&#x27;From&#x27;] = mail_user</span><br><span class="line">mail[&#x27;To&#x27;] = to_address</span><br><span class="line">mail[&#x27;Subject&#x27;] = &quot;Test for smtp email-sender&quot;</span><br><span class="line"></span><br><span class="line">mail.attach(MIMEText(body_content))</span><br><span class="line"></span><br><span class="line">server = smtplib.SMTP(mail_smtp, mail_port)</span><br><span class="line">server.ehlo()</span><br><span class="line">server.starttls()</span><br><span class="line">server.login(mail_user, mail_passwd)</span><br><span class="line">server.sendmail(mail_user, to_address, mail.as_string())</span><br><span class="line">server.quit()</span><br></pre></td></tr></table></figure>
-
-<p>到收件者的信箱查看，成功收到如下圖的信件</p>
-<p><img src="/20240215/Python/20240215_img3.png"></p>
-<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><p><a target="_blank" rel="noopener" href="https://aws.amazon.com/tw/what-is/smtp/">https://aws.amazon.com/tw/what-is/smtp/</a><br><a target="_blank" rel="noopener" href="https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/">https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/</a></p>
+<p>從官網的簡介可知<strong>多元</strong>族群與資料類型為計畫核心，也勢必是基因體分析的發展趨勢</p>
+<h2 id="計畫特點"><a href="#計畫特點" class="headerlink" title="計畫特點"></a>計畫特點</h2><h3 id="大規模的樣本收案"><a href="#大規模的樣本收案" class="headerlink" title="大規模的樣本收案"></a>大規模的樣本收案</h3><p>美國幅員廣闊，又因歷史發展族群多元，使收案數量大族群多元。至2024年4月已有近80萬人註冊網站，<strong>近55萬人完成初步收案與調查</strong>，根據官方釋出(來自問卷)的族群統計，非歐洲族群的比例大幅提高。</p>
+<p><img src="/20240509/Bioinformatics/20240509_img2.png" alt="image"></p>
+<p>下表為2024最新研究成果所公布的資料類別與族群樣本數，其實可發現擁有完整WGS資料的比例仍佔少數，並持續提升</p>
+<p><img src="/20240509/Bioinformatics/20240509_img3.jpg" alt="image"></p>
+<h3 id="多元資料類型"><a href="#多元資料類型" class="headerlink" title="多元資料類型"></a>多元資料類型</h3><p>問卷收集資訊包含基本生活習慣，還有因應前幾年COVID-19的追蹤。有些問題很有趣: 像是社交軟體帳號、管制藥品使用史(列出許多毒品名稱，還有正在服用的選項)、社區環境狀況等，和 Taiwan Biobank 相比，多收集許多環境與心理健康的資訊。族群詢問上相當詳細，依地區劃分後再分國家，如Asian下可再勾選Asian Indian, Chinese, Filipino, Japanese, Korean, Vietnamese… 以協助 PCA clustering 或model training 時做特徵依據</p>
+<p>除了問卷調查，All of US 也收集許多來源的個人資料: </p>
+<ul>
+<li>生物檢體(biosamples): blood, saliva, and&#x2F;or urine sample 主要進行定序分析</li>
+<li>電子病例紀錄(electronic health records，EHR): 收集樣本相關疾病與生理測量數值，在前面 Data Broswer 網站也有釋出部分統計結果，資料使用前會經由 Observational Medical Outcomes Partnership (OMOP) 進行術語轉換與數據標準化</li>
+<li>體檢數值(physical measurement): 參與者可至合作醫院進行檢查，量測身高、體重、血壓等</li>
+<li>穿戴式裝置紀錄: 與Fitbit合作，當使用者同意共享紀錄，即可獲得如心跳、運動與睡眠狀態等監測數值</li>
+</ul>
+<p>目前收集狀況穩健，引述自最新發表文章:</p>
+<blockquote>
+<p>99% of participants with WGS data also have survey data and physical measurements, and 84% also have EHR data. </p>
+</blockquote>
+<h3 id="具一定準確度的分析架構"><a href="#具一定準確度的分析架構" class="headerlink" title="具一定準確度的分析架構"></a>具一定準確度的分析架構</h3><p><em>All of US</em> 以多元平台定序(short-read whole genome sequencing, long-read whole genome sequencing, and genome-wide genotyping arrays)，並偵測個體與族群階層的變異，分析流程皆以GIAB truth set與標準品衡量準確度</p>
+<p>以 short-read WGS sequencing data 分析為例:</p>
+<ul>
+<li>PCR-free barcoded Illumina Kapa HyperPrep kit</li>
+<li>sequenced on the <strong>Illumina NovaSeq 6000</strong> instrument</li>
+<li>GRCh38dh as reference</li>
+<li>Illumina DRAGEN v3.4.12 for preprocessing and variant calling，當時使用的command line 有公布在 <a target="_blank" rel="noopener" href="https://developer.illumina.com/dragen/dragen-popgen">illumina 官網</a></li>
+<li>QC measures for each steps</li>
+<li>annotation using using Illumina Nirvana</li>
+</ul>
+<p><img src="/20240509/Bioinformatics/20240509_img4.jpg" alt="image"></p>
+<p>分析流程中的Quality Control:</p>
+<ul>
+<li>single sample QC: (sample removal)<ul>
+<li>fingerprint concordance between the array and WGS data (selected 113 sites)</li>
+<li>sex concordance (seq result vs. self-report)</li>
+<li>cross-individual contamination rate (related to call rate) by counting number of reads at common homozygous alternate SNP</li>
+<li>mean coverage (threshold of ≥30×)</li>
+<li>genome coverage (threshold of ≥90% at 20×)</li>
+<li>coverage of hereditary disease risk genes (threshold of ≥95% at 20×)</li>
+<li>aligned Q30 bases (threshold of ≥8 × 1010)</li>
+</ul>
+</li>
+<li>joint callset QC: (similar to that of gnomAD 3.1, only flagged as failing QC)<ul>
+<li>population outlier through PCA</li>
+<li>variant hard filters ex: GQ, DP, QUAL flags, PASS filter…</li>
+<li>VQSR</li>
+<li>relatedness: kniship calculated by Hail</li>
+</ul>
+</li>
+</ul>
+<h4 id="Workflow-Benchmarking"><a href="#Workflow-Benchmarking" class="headerlink" title="Workflow Benchmarking"></a>Workflow Benchmarking</h4><p>使用 GIABv4.2.1 truth set: HG001(NA12878), HG003, HG004(parents of AJ trio), and HG005(son of Han trio)<br>從下表的比對結果可知，<em>All of US</em> workflow 在 SNV&#x2F;indel 的 Precision 超過 99%，代表偵測到的變異幾乎都為真( QC 做得很好，顯著降低false-positives)</p>
+<p><img src="/20240509/Bioinformatics/20240509_img5.png" alt="image"></p>
+<h3 id="雲端式共享空間"><a href="#雲端式共享空間" class="headerlink" title="雲端式共享空間"></a>雲端式共享空間</h3><p><em>All of US</em> <a target="_blank" rel="noopener" href="https://www.researchallofus.org/">官方網站</a> 依照使用者身分與目的提供不同資源，主要分兩大類:</p>
+<p><img src="/20240509/Bioinformatics/20240509_img6.jpg" alt="41586_2023_6957_Fig1_HTML"></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://databrowser.researchallofus.org/?_gl=1*161o2ef*_ga*MTY5MDQxNDA4MS4xNzE0MTEzMjgy*_ga_7MXT5FNNB6*MTcxNDM3ODE0NS4yLjEuMTcxNDM3ODQ0Ni4wLjAuMA..">Data Broswer</a>: 開源的族群性(aggregate-level data)統計成果</li>
+</ul>
+<p>以 GENOMICS VARIANT 為例，可用基因名稱、rs number 甚至是基因區段搜尋族群偵測到的變異位點，下圖示範以<em>TP53</em>搜尋結果</p>
+<p><img src="/20240509/Bioinformatics/20240509_img7.png" alt="image"></p>
+<p>網站很讚的地方是提供**客製化的篩選(圖中黃色標示處)**，可以用註釋結果如 VEP consequence, ClinVar, 或族群頻率如allele count threshold 等篩出感興趣的位點。此外點選ID還有更詳細的統計，跟gnomAD broswer有得拚! 但目前網站只提供瀏覽功能，還沒找到export 按鈕</p>
+<ul>
+<li>Researcher Workbench: 若學術單位或研究者想使用資料，只要申請平台使用權，購買credit(儲存空間分析費用)，即可自由在雲端workspace下開創 project、上傳資料和使用pipeline。</li>
+</ul>
+<p>雲端分析的另一優點即是節省各自備份或傳輸資料的開銷:</p>
+<blockquote>
+<p>Storing one copy per institution of this data at 556 registered institutions would cost about US$1.16 billion per year. By contrast, storing a central cloud copy costs about US$1.14 million per year</p>
+</blockquote>
+<h2 id="近期研究成果"><a href="#近期研究成果" class="headerlink" title="近期研究成果"></a>近期研究成果</h2><p>2024年2月團隊於 <em>Nature</em> 期刊發表最新研究成果:</p>
+<blockquote>
+<p>The All of Us Research Program Genomics Investigators. Genomic data in the All of Us Research Program. Nature 627, 340–346 (2024).<br><a target="_blank" rel="noopener" href="https://doi.org/10.1038/s41586-023-06957-x">https://doi.org/10.1038/s41586-023-06957-x</a></p>
+</blockquote>
+<p>現階段收案情況與重點成果:</p>
+<ul>
+<li>release of 245,388 clinical-grade genome sequences, and identified more than 1 billion genetic variants</li>
+<li>new genotype-phenotype associations using longitudinal electronic health record</li>
+<li>Summary-level data are publicly available, and individual-level data can be accessed by researchers</li>
+</ul>
+<h3 id="Variant-discovery-in-joint-callset"><a href="#Variant-discovery-in-joint-callset" class="headerlink" title="Variant discovery in joint callset"></a>Variant discovery in joint callset</h3><ul>
+<li>將joint callset結果和dbSNP v153版資料庫位點比對，分別在 non-coding 跟 coding region 找到 272,051,104 和 3,913,722 個新位點</li>
+<li>依照族群 MAF 分類發現 99.98% 的 coding variants 屬於 MAF &lt; 1% 的罕見變異(rare variant)；有趣的是找到 0.01% 變異的屬於在非歐洲族群普遍(MAF &gt; 1%)，但單看歐洲族群屬於罕見的變異位點</li>
+<li>利用illumina Nirvana (DRAGEN implemented annotation tool) 進行註釋，並統計不同族群具有被 Clinvar 判定為 Likely Pathogenic 以上的位點數，利用OR、p-value等數值衡量後，發現歐洲族群發現rare pathogenic variant的比例最高，其他族群可能受限於樣本數大小而降低統計結果的顯著性。</li>
+</ul>
+<p><img src="/20240509/Bioinformatics/20240509_img8.png" alt="image"></p>
+<h3 id="Ancestry-and-relatedness"><a href="#Ancestry-and-relatedness" class="headerlink" title="Ancestry and relatedness"></a>Ancestry and relatedness</h3><p>問卷的族群統計有 51.1% 屬於非歐洲族群，使用基因資訊進行族群分類:</p>
+<p>分類方式參考gnomAD資料庫的做法:</p>
+<blockquote>
+<p>training a random forest (RF) classifier on a subset of samples with provided genetic ancestry labels using the principal components from the PCA as features.</p>
+</blockquote>
+<p>使用 HGDP and 1000 Genomes 計畫樣本作為 training set，並從 gnomAD 資料庫取得變異位點資訊當作PCA input，clustering 後取前 16PC 當作 random forest input，並輸出族群分類結果。</p>
+<p>將模型套用至 All of US 3202 個樣本上，發現問卷回答之族群(self-reported ethnicity) 與基因預測之族群結果一致性達87%</p>
+<h3 id="Genotype-by-phenotype-associations"><a href="#Genotype-by-phenotype-associations" class="headerlink" title="Genotype-by-phenotype associations"></a>Genotype-by-phenotype associations</h3><p>大量的樣本與 variant genotype 很適合做GWAS，以 LDL-C phenotye 為例，從 manhattan plot 看到許多顯著關聯的位點，和過去從TOPMed資料庫偵測之顯著關聯位點做關聯性比較，發現兩計畫的beta (odds ratio) 值高度相關，代表位點對特徵的趨勢一致。但由於統計模型、族群組成的不同，使每個 variant loci 的 effect size 不同。</p>
+<p>此外也參照 <a target="_blank" rel="noopener" href="https://www.cell.com/ajhg/fulltext/S0002-9297(23)00275-6?_returnURL=https://linkinghub.elsevier.com/retrieve/pii/S0002929723002756?showall=true">phenotype-genotype reference map (PGRM)</a> 來驗證 All of US 做 PheWAS時，能否重現(replication)相同的顯著關聯結果</p>
+<blockquote>
+<p>phenotype-genotype reference map (PGRM), a set of 5,879 genetic associations from 523 GWAS publications that can be used for high-throughput replication experiments.</p>
+</blockquote>
+<p>PGRM 如何定義replicated?</p>
+<blockquote>
+<p>Replication: an association with a <strong>p value &lt; 0.05</strong> and <strong>OR in the same direction</strong> as the original study.</p>
+</blockquote>
+<p>PGRM 另一特別之處在於有族群特異的association，可以個別比對不同族群差異，最終在power &gt; 80% 的 association type 下，不同族群有成功 replicate 的比例分別為: 72.0% (18&#x2F;25) in AFR, 100% (13&#x2F;13) in AMR, 46.6% (7&#x2F;15) in EAS, 74.9% (1,064&#x2F;1,421) in EUR, and 100% (1&#x2F;1) in SAS.</p>
+<p>這裡EAS重複狀況較差，可能和genetic loci boosting, EHR data updation等因素有關，而改變統計結果。</p>
+<hr>
+<h2 id="Comments"><a href="#Comments" class="headerlink" title="Comments"></a>Comments</h2><p>All of US 計畫的執行力高，並持續增進收案基數，對於族群基因體學的影響大，且過程中為因應資料量龐大的議題，會額外討論如資料保存、壓縮效率、以及位點QC等，對於之後有興趣做族群基因體分析者，可作為重要參考。這麼大的資料，若能持續的做追蹤並紀錄general population 是否有疾病發生，對長期研究也能有貢獻。當然維持計畫需龐大資金與研究者投入，相信NIH主持的計畫可以相當長壽。</p>
+<p>就族群多樣性的議題來說，USA多族群歷史較長，或許也挺適合觀察mixed-population後變異的特徵是否有保留或改變，甚至新發變異等議題；而本篇文章並沒有特別討論long-read和short-read data訂出來的樣本結果差異，但相信定序技術發展，當long-read使用越頻繁，就能將探討主軸從SNV延續至SV, CNV等大片段類型上。</p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><p><a target="_blank" rel="noopener" href="https://www.nature.com/articles/s41586-023-06957-x">https://www.nature.com/articles/s41586-023-06957-x</a><br><a target="_blank" rel="noopener" href="https://www.ghd.tw/Home/International_data_standards">https://www.ghd.tw/Home/International_data_standards</a><br><a target="_blank" rel="noopener" href="https://cran.r-project.org/web/packages/allofus/vignettes/data.html">https://cran.r-project.org/web/packages/allofus/vignettes/data.html</a></p>
 
             
 
@@ -348,7 +430,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">標籤</span><br/>
                 
-    <a class="tag tag--primary tag--small t-none-link" href="/tags/Python/" rel="tag">Python</a>
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/Bioinformatics/" rel="tag">Bioinformatics</a>
 
             </div>
         
@@ -358,14 +440,11 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240221/Python/"
-                    data-tooltip="Python實用系列： 三種引入外部參數的方法"
-                    aria-label="上一篇: Python實用系列： 三種引入外部參數的方法"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -375,9 +454,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240211/Front-end/"
-                    data-tooltip="HTML+CSS成果展(2)：仿寫拼多多網站"
-                    aria-label="下一篇: HTML+CSS成果展(2)：仿寫拼多多網站"
+                    href="/20240501/Life/"
+                    data-tooltip="新加坡獨旅紀行之二。文化巡禮"
+                    aria-label="下一篇: 新加坡獨旅紀行之二。文化巡禮"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -402,7 +481,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240215/Python/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240509/Bioinformatics/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -415,7 +494,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240215/Python/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240509/Bioinformatics/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -428,7 +507,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240215/Python/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240509/Bioinformatics/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -465,8 +544,8 @@
         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
         var disqus_config = function () {
-          this.page.url = 'https://pxchen110.github.io/20240215/Python/';  // Replace PAGE_URL with your page's canonical URL variable
-          this.page.identifier = '1707996100000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          this.page.url = 'https://pxchen110.github.io/20240509/Bioinformatics/';  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = '1714977519000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
         };
         (function() { // DON'T EDIT BELOW THIS LINE
         var d = document, s = d.createElement('script');
@@ -494,14 +573,11 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240221/Python/"
-                    data-tooltip="Python實用系列： 三種引入外部參數的方法"
-                    aria-label="上一篇: Python實用系列： 三種引入外部參數的方法"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -511,9 +587,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240211/Front-end/"
-                    data-tooltip="HTML+CSS成果展(2)：仿寫拼多多網站"
-                    aria-label="下一篇: HTML+CSS成果展(2)：仿寫拼多多網站"
+                    href="/20240501/Life/"
+                    data-tooltip="新加坡獨旅紀行之二。文化巡禮"
+                    aria-label="下一篇: 新加坡獨旅紀行之二。文化巡禮"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -538,7 +614,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240215/Python/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240509/Bioinformatics/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -551,7 +627,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240215/Python/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240509/Bioinformatics/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -564,7 +640,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240215/Python/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240509/Bioinformatics/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -598,7 +674,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240215/Python/"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240509/Bioinformatics/"
                         aria-label="分享到 Facebook"
                     >
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
@@ -611,7 +687,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240215/Python/"
+                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240509/Bioinformatics/"
                         aria-label="分享到 Twitter"
                     >
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
@@ -624,7 +700,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://plus.google.com/share?url=https://pxchen110.github.io/20240215/Python/"
+                        href="https://plus.google.com/share?url=https://pxchen110.github.io/20240509/Bioinformatics/"
                         aria-label="分享到 Google+"
                     >
                         <i class="fab fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
