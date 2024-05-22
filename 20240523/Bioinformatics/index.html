@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Xuan&#39;s Blog">
-    <title>Python實用系列： 三種引入外部參數的方法 - Xuan&#39;s Blog</title>
+    <title>生資系列： gnomAD v4 database 介紹 - Xuan&#39;s Blog</title>
     <meta name="author" content="Xuan Chen">
     
         <meta name="keywords" content="hexo,javascript,">
@@ -17,21 +17,22 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg"},"articleBody":"Photo by Artturi Jalli on Unsplash\n撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: sys, argparse, 以及 click，文章將介紹模組&#x2F;套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。\n\n\n\n\nsys 模組sys 屬於 python 內建模組，其下的 sys.argv[index] 是最基本的引入方式。\nsys.argv 的運行方式，是把bash command line 中輸入的指令存成一個list，並引入對應index的內容名稱。\nIndex 對照說明假設撰寫名為 test.py 的 script:\n123456import sysinput_var1 = sys.argv[1] print(&quot;sys index 0 : &quot; + sys.argv[0])print(&quot;sys index 1 : &quot; + input_var1)\n\n在 linux bash 執行 python script :\n1python3 test.py apple\n注意: sys 會將 script 名稱視為 sys.argv[0] 也就是index 0 不能使用，而外部參數的 index 會從 1 開始 \n綜合上述觀念，bash 輸出:\n12sys index 0 : test.pysys index 1 : apple\n實例撰寫名為 test.py 的 script:\n123456import sysfruit = sys.argv[1]price = sys.argv[2]print(&quot;The price of &quot; + fruit + &quot; is &quot; + price)\n\nbash 輸入參數 python3 test.py apple 20 得到\n1The price of apple is 20\n\n\nCommentssys 方式多用於測試階段，或是簡單的個人專案上，若需要引入多個參數，或是有協作專案的需求，sys會面臨以下缺點:\n\nindex 引入很看重順序，參數太多增加錯誤機會\n且無法為下一個使用者解釋輸入參數的內容，降低推廣性\n\n接下來要介紹的兩個模組，都是針對不同參數給予特定名稱，並說明參數要求，提高script的實用性。\nargparse 模組argparse 同屬於 python 內建模組，用於命令列剖析\n引入模組引入模組後先創建 ArgumentParser 物件以及設定參數\n12import argparseparser = argparse.ArgumentParser(prog=None, usage=None, description=None, epilog=None)\n\nprog: program 名稱，不指定寫 None，default 會帶入 python script 名稱usage: 告知使用者說應該怎麼使用 program，default 會帶入 script 名稱加上所有參數description: 一段文字說明程式功能epilog: 添加在 --help 訊息後的補充文字\n例子:\n123456## 撰寫 test.pyimport argparseparser = argparse.ArgumentParser(prog = None,usage = None, description = &#x27;this is description&#x27;, epilog = &#x27;this is eliog&#x27;)\n\n12345678910## 在 bash 輸入 python3 test.py --help 會產生以下內容usage: test.py [-h] --anno ANNOthis is descriptionoptions:  -h, --help   show this help message and exitthis is eliog\n\n添加參數名稱12parser.add_argument(&quot;--anno&quot;, required = T, help = &quot;required arguments&quot;)parser.add_argument(&quot;--input&quot;, default =&quot;none&quot;)\n\n-a / --anno 為自定義的參數flag，以將參數引入特殊變數內required 執行script 必須要有的參數，default &#x3D; Falsedefault 當使用者沒給此項參數，則引入預先設定的default值help 針對參數的說明文字，使用 --help 後會顯示\n將參數後的內容引入變數以 args.parameter_flag 的形式引入特定參數下的內容\n12args = parser.parse_args()a = str(args.anno)\n\n實例撰寫名為 test.py 的 script:\n12345678import argparseparser = argparse.ArgumentParser(description = &quot;print input friut type and their price&quot;)parser.add_argument(&#x27;-f&#x27;, &#x27;--fruit&#x27;, required=True, help= &quot;name of fruit&quot;)parser.add_argument(&#x27;-p&#x27;, &#x27;--price&#x27;, default = 20, help = &quot;price of item&quot;)args = parser.parse_args()print(&quot;The price of &quot; + args.fruit + &quot; is &quot; + args.price)\n\nbash 輸入 python3 test.py --help 查看訊息\n12345678usage: test.py [-h] -f FRUIT [-p PRICE]print input friut type and their priceoptions:  -h, --help               show this help message and exit  -f FRUIT, --fruit FRUIT  name of fruit  -p PRICE, --price PRICE  price of item\n\nbash 輸入參數 python3 test.py --fruit apple --price 20 得到\n1The price of apple is 20\n\nCommentsargparse 模組提升參數引入的複雜性與數量，增加在真實世界的使用機會；但複雜的步驟轉換（建立物件 &gt; add_args &gt; parse_args）讓人頭昏眼花，若能有更簡單的參數設定機制，可以減低程式撰寫的難易度\nclick 套件click 官網以 creating beautiful command line interfaces 形容套件的核心功能\n下載並引入套件後，只需利用 @click.command 和 @click_option 即可產生和argparse等價的結果\n實例12345678910import click@click.command@click.option(&#x27;-f&#x27;, &#x27;--fruit&#x27;,&#x27;fruit&#x27;, required=True, help= &quot;name of fruit&quot;)@click.option(&#x27;-p&#x27;, &#x27;--price&#x27;, &#x27;price&#x27;, default = 20, help = &quot;price of item&quot;)def main(fruit, price):    print(&quot;The price of &quot; + fruit + &quot; is &quot; + str(price))if __name__ == &#x27;__main__&#x27;:    main()\nbash 輸入參數 python3 test.py --fruit apple --price 20  得到相同console:\n1The price of apple is 20\n\nComments和 argparse 相比 click 語法更加簡潔，許多參數都相容，推薦新手可以直接使用click建立參數指令，但請注意 python 版本相容性，詳細可參考官網說明。\n參考資料\nhttps://docs.python.org/zh-tw/3/library/sys.html#sys.argvhttps://docs.python.org/zh-tw/3/howto/argparse.htmlhttps://click.palletsprojects.com/en/8.1.x/https://myapollo.com.tw/blog/python-click/\n\n","dateCreated":"2024-02-21T19:54:10+08:00","dateModified":"2024-03-11T13:21:14+08:00","datePublished":"2024-02-21T19:54:10+08:00","description":"Photo by Artturi Jalli on Unsplash\n撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: sys, argparse, 以及 click，文章將介紹模組&#x2F;套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。","headline":"Python實用系列： 三種引入外部參數的方法","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20240221/Python/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20240221/Python/","keywords":"Python"}</script>
-    <meta name="description" content="introducing three methods to introduce outer parameter in python">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg"},"articleBody":"(Image from gnomAD website)\n上一篇文章著重討論 The Genome Aggregation Database (gnomAD) v3 版內容介紹，本文將介紹去年11月更新之gnomAD v4 (以及部分今年4月更新之 v4.1)。\n\n\n\n樣本收集下表整理不同版本間使用的樣本數與參考序列，最大的更新為: v4 增收 416,555 UK Biobank WES data\n\n\n\nversion\nreference\n(type)sample size\n\n\n\ngnomAD v2.1\nGRCh37\n(WES) 125,748 ; (WGS) 15,708\n\n\ngnomAD-SV v2.1\nGRCh37\n(WGS) 10,847\n\n\ngnomAD v3.1\nGRCh38\n(WGS) 76,156\n\n\ngnomAD v4.0\nGRCh38\n(WES) 730,947 ; (WGS) 76,215\n\n\ngnomAD-SV v4.0\nGRCh38\n(WGS) 63,046\n\n\ngnomAD-CNV v4.0\nGRCh38\n(WES) 464,297\n\n\n從官網的統計圖表可清楚了解族群數量分布，由於UK Biobank 樣本以 European 為大宗，合併至 v4 使 European Ancestry比例偏高接近80%另外值得注意的是 EAS 樣本數有大進展，從前幾版的不到萬人增至2萬初，能協助修正 allele frequency 的預估結果\n\nv4 與 v3 差異取消 subset 釋出過去v3樣本來自多種cohort，為提供研究者作為疾病研究的control，gnomAD v3 有釋出多種subsets，如: non-cancer subset 為排除罹患癌症或從相關 cohort study收集來的樣本群(更多介紹可參考前篇文章)。在v4版本僅有釋出non-UKBB subset，且僅提供allele frequency資訊給研究者做累加使用。下面文字截自gnomAD v4 SNV chrY VCF檔的INFO field，可以看到每個population都有拆分另外一組non-UKB的(prefix: non_ukb) 數據:\n1234AC_afr_XY=0;AN_afr_XY=0;nhomalt_afr_XY=0;AC_afr=0;AN_afr=0;nhomalt_afr=0;...AC_eas_XY=0;AN_eas_XY=0;nhomalt_eas_XY=0;...AC_non_ukb_afr_XY=0;AN_non_ukb_afr_XY=0;nhomalt_non_ukb_afr_XY=0;AC_non_ukb_afr=0;AN_non_ukb_afr=0;nhomalt_non_ukb_afr=0;...AC_non_ukb_eas_XY=0;AN_non_ukb_eas_XY=0;nhomalt_non_ukb_eas_XY=0;AC_non_ukb_eas=0;AN_non_ukb_eas=0;nhomalt_non_ukb_eas=0;...\n此外若有使用註解 gnomAD 資料庫的工具如 dbnsfp，則可以明顯看到在資料庫版本更新後，就不會有  gnomAD_exomes_non_cancer 類似欄位產生，只會剩下 gnomAD_exomes_non_ukb 等欄位\n而v4取消製作subset原因包含:\n\n研究特定疾病如cancer、neuro-disease等，這些疾病的盛行率並不會過高到需要透過(乾淨的?) subsets 來做比對與分析，建議直接使用 gnomAD metadata 來協助研究\n新加入的 UK Biobank 或是部分 cohort samples 並沒有完整 phenotype 資料，無法明確的區分樣本的疾病狀態\n\nfiltering allele frequency (FAF)將 WES 和 WGS 的 allele count 合併計算之 allele frequency，稱作 filtering allele frequency\nv4 exome 分析流程(WGS 流程可參照 gnomAD v3版作法)由於 v4 最大進展在於 exome callset 樣本數的提升，因此後續分析流程也有些更新:\n\njoint callset 由原本的 gVCF 格式轉為 VariantDataset (VDS) 格式儲存\n增加 interval QC 以確保目標區段擁有足夠的深度判別變異: 官網提供一組 interval list，左右延伸(padding) 50bp 後計算每個樣本在這些區段的平均深度。最後將 &gt;85% 樣本擁有 &gt;20X 深度的區段定義為 high coverage intervals\n為 sample QC 定義 high qulaity site:為判斷樣本族群來源、親緣關係或定序品質，gnomAD v4從幾個資料集挑選 high quality sites (n &#x3D; 175,043) 協助樣本QC:\n屬於 autosomal, biallelic, single nucleotide variants (SNVs) \n位於 gnomAD v3, CCDG, 以及 UK Biobank dataset 的位點紀錄\n\n\nsample QC: 使用上面這些high quality site進行以下幾個重點QC\nhard filters: 使用新工具從 genotype data 預估 contamination 而非重新拿raw read 分析。其他也用DP, Het&#x2F;Hom ratio 等數值去篩\nPCA clustering for exome capture platform: 由於樣本來源多樣，使用PCA區分出20種定序平台，label上潛在差異\nsex karyotypes\nrelatedness between v4 exomes and genomes, and identified pairs of first and second degree relatives\ngenetic ancestry groups\nQC metrics\n\n\nvariant QC by VQSR (和 v3 一樣拿大型計劃的位點做模型訓練並應用類似的篩選條件)\n\n\nv4 SV和前版 v2.1相比，除了樣本數從一萬初增加至超過六萬、偵測位點數增加，參考序列也從 hg19&#x2F;GRCh37 改成擁有 alternative contigs 的 GRCh38做為參考序列。偵測流程使用相同的 GATK-SV pipeline，並增進變異註解(annotation)的結果。gnomAD-SV v4 從63,046個WGS樣本中找到超過一百萬個 high-quality SVs，SV特徵的趨勢與前版本相同，多為短片段(median size 360bp)的罕見位點(96% SVs AF &lt; 1%)。\ngnomAD-SV v4 的結果已公開至網站，可先行查詢利用；至於技術細節等內容，等研究論文發表後再來更新，根據之前使用v2.1版資料的經驗，可以再拿新的East Asian AF 來做 correlation plot，不過中間需要針對變異座標進行liftover轉換，等有空再來嘗試看看。\nv4 CNVgnomAD v4第一次釋出 CNV callset。也代表未來關於致病位點的研究，可往大片段缺失的偵測目標前進，並擁有 general population 資訊可參考。目前收錄從 464,297 WES data 找到之 rare ( AF &lt;1% ) autosomal coding copy number variants (CNVs)，使用 GATK-gCNV (Babadi et al. Nat Genet, 2023) 流程偵測變異。\n簡單順一下分析流程，主要利用比對至參考序列的BAM&#x2F;CRAM作為input，並計算每個 protein-coding region (target interval) 的 read count (CNV 主要以深度差異來判斷) 接著使用這些數值做 clustering ，將特徵接近的樣本歸類至同一批次(batch)做後續分析。\nCNV流程需要baseline來比較深度差異，通常來自 panel of normal (PoN，在somatic偵測代表tumor相對應的正常樣本) 的結果，而gnomAD 無針對特殊疾病，所以採隨機挑選200樣本作為Pon，之後經由QC篩選，normalization等等，最終以read depth, read count 等特徵判定基因體內的CNV events。\nCNV偵測流程的可信度，透過一組同時具有WES(default input), WGS (IGV validation) 和 microarray 的樣本來驗證，透過和不同開源工具比較，詳細工具的演算法與使用差異，有機會再細看比較。\nCNV 註釋在變異註釋方面，現今工具主要在短片段如SNV&#x2F;indel方面詮釋較佳，如ensembl VEP, AnnotSv等，而CNV宜由於變異跨度大，對於現行臨床ACMG準則來說難以完整判定，且多以基因為單位個別做註釋，整體影響預測尚未完全，而gnomAD作為可能的reference dataset，也針對變異作了以下註釋:\n\n基本的GENCODE 註釋，並以overlap的比例判斷是否給註釋\n長度與exon, interval範圍跨度\n集合與分族群統計的AF: site count (SC), site number (SN), and site frequency (SF)\n\nCNV subsets和 gnomADv4 不同，由於大片段的罕見CNV位點與精神疾病有關連性，gnomAD CNV 有釋出兩組subsets:\n\nDue to the known enrichment of large, rare CNVs that confer substantial relative risk in neuropsychiatric phenotypeneuropsychiatric conditions: bipolar, epilepsy, schizophrenia, psychosis, and general psychiatric conditions\n\n\nnon-neuro (n &#x3D; 418,924): 非精神疾病相關cohort樣本(neuropsychiatric conditions)，以及 biobank 樣本\nnon-neuro-control(n &#x3D; 269,919): 不同cohort內標示為control的樣本,或是biobank樣本\n\nReferenceshttps://gnomad.broadinstitute.org/news/2023-11-gnomad-v4-0/https://gnomad.broadinstitute.org/news/2023-11-v4-structural-variants/https://gnomad.broadinstitute.org/news/2023-11-v4-copy-number-variants/https://gnomad.broadinstitute.org/news/2019-10-gnomad-v3-0/\n","dateCreated":"2024-05-23T06:42:02+08:00","dateModified":"2024-05-23T06:47:23+08:00","datePublished":"2024-05-23T06:42:02+08:00","description":"(Image from gnomAD website)\n上一篇文章著重討論 The Genome Aggregation Database (gnomAD) v3 版內容介紹，本文將介紹去年11月更新之gnomAD v4 (以及部分今年4月更新之 v4.1)。","headline":"生資系列： gnomAD v4 database 介紹","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20240523/Bioinformatics/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20240523/Bioinformatics/","keywords":"Database"}</script>
+    <meta name="description" content="introduction to the gnomAD v3 database">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="Python實用系列： 三種引入外部參數的方法">
-<meta property="og:url" content="https://pxchen110.github.io/20240221/Python/index.html">
+<meta property="og:title" content="生資系列： gnomAD v4 database 介紹">
+<meta property="og:url" content="https://pxchen110.github.io/20240523/Bioinformatics/index.html">
 <meta property="og:site_name" content="Xuan&#39;s Blog">
-<meta property="og:description" content="introducing three methods to introduce outer parameter in python">
+<meta property="og:description" content="introduction to the gnomAD v3 database">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://pxchen110.github.io/20240221/Python/20240221_img1.jpg">
-<meta property="article:published_time" content="2024-02-21T11:54:10.000Z">
-<meta property="article:modified_time" content="2024-03-11T05:21:14.699Z">
+<meta property="og:image" content="https://pxchen110.github.io/20240523/Bioinformatics/20240523_img1.png">
+<meta property="og:image" content="https://pxchen110.github.io/20240523/Bioinformatics/20240523_img2.png">
+<meta property="article:published_time" content="2024-05-22T22:42:02.000Z">
+<meta property="article:modified_time" content="2024-05-22T22:47:23.612Z">
 <meta property="article:author" content="Xuan Chen">
-<meta property="article:tag" content="Python">
+<meta property="article:tag" content="Database">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pxchen110.github.io/20240221/Python/20240221_img1.jpg">
+<meta name="twitter:image" content="https://pxchen110.github.io/20240523/Bioinformatics/20240523_img1.png">
     
     
         
@@ -269,20 +270,20 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            Python實用系列： 三種引入外部參數的方法
+            生資系列： gnomAD v4 database 介紹
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2024-02-21T19:54:10+08:00">
+    <time datetime="2024-05-23T06:42:02+08:00">
 	
-		    2024 年 2 月 21 日
+		    2024 年 5 月 23 日
     	
     </time>
     
         <span>分類 </span>
         
-    <a class="category-link" href="/categories/Python/">Python</a>
+    <a class="category-link" href="/categories/Bioinformatics/">Bioinformatics</a>
 
 
     
@@ -294,71 +295,104 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p><img src="/20240221/Python/20240221_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
-<p>撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: <code>sys</code>, <code>argparse</code>, 以及 <code>click</code>，文章將介紹模組&#x2F;套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。</p>
+            <p><img src="/20240523/Bioinformatics/20240523_img1.png" alt="image"><br>(Image from <a target="_blank" rel="noopener" href="https://gnomad.broadinstitute.org/">gnomAD</a> website)</p>
+<p>上一篇文章著重討論 The Genome Aggregation Database (gnomAD) v3 版內容介紹，本文將介紹去年11月更新之<strong>gnomAD v4</strong> (以及部分今年4月更新之 <strong>v4.1</strong>)。</p>
 <span id="more"></span>
+<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A3%E6%9C%AC%E6%94%B6%E9%9B%86"><span class="toc-text">樣本收集</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#v4-%E8%88%87-v3-%E5%B7%AE%E7%95%B0"><span class="toc-text">v4 與 v3 差異</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%96%E6%B6%88-subset-%E9%87%8B%E5%87%BA"><span class="toc-text">取消 subset 釋出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#filtering-allele-frequency-FAF"><span class="toc-text">filtering allele frequency (FAF)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#v4-exome-%E5%88%86%E6%9E%90%E6%B5%81%E7%A8%8B"><span class="toc-text">v4 exome 分析流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#v4-SV"><span class="toc-text">v4 SV</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#v4-CNV"><span class="toc-text">v4 CNV</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CNV-%E8%A8%BB%E9%87%8B"><span class="toc-text">CNV 註釋</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CNV-subsets"><span class="toc-text">CNV subsets</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-text">References</span></a></li></ol>
 
-<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#sys-%E6%A8%A1%E7%B5%84"><span class="toc-text">sys 模組</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Index-%E5%B0%8D%E7%85%A7%E8%AA%AA%E6%98%8E"><span class="toc-text">Index 對照說明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%A6%E4%BE%8B"><span class="toc-text">實例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Comments"><span class="toc-text">Comments</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#argparse-%E6%A8%A1%E7%B5%84"><span class="toc-text">argparse 模組</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%95%E5%85%A5%E6%A8%A1%E7%B5%84"><span class="toc-text">引入模組</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E5%8F%83%E6%95%B8%E5%90%8D%E7%A8%B1"><span class="toc-text">添加參數名稱</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%87%E5%8F%83%E6%95%B8%E5%BE%8C%E7%9A%84%E5%85%A7%E5%AE%B9%E5%BC%95%E5%85%A5%E8%AE%8A%E6%95%B8"><span class="toc-text">將參數後的內容引入變數</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%A6%E4%BE%8B-1"><span class="toc-text">實例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Comments-1"><span class="toc-text">Comments</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#click-%E5%A5%97%E4%BB%B6"><span class="toc-text">click 套件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%A6%E4%BE%8B-2"><span class="toc-text">實例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Comments-2"><span class="toc-text">Comments</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-text">參考資料</span></a></li></ol>
-
-<h2 id="sys-模組"><a href="#sys-模組" class="headerlink" title="sys 模組"></a>sys 模組</h2><p><code>sys</code> 屬於 python 內建模組，其下的 <code>sys.argv[index]</code> 是最基本的引入方式。</p>
-<p><code>sys.argv</code> 的運行方式，是把bash command line 中輸入的指令存成一個list，並引入對應index的內容名稱。</p>
-<h3 id="Index-對照說明"><a href="#Index-對照說明" class="headerlink" title="Index 對照說明"></a>Index 對照說明</h3><p>假設撰寫名為 <code>test.py</code> 的 script:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">import sys</span><br><span class="line"></span><br><span class="line">input_var1 = sys.argv[1] </span><br><span class="line"></span><br><span class="line">print(&quot;sys index 0 : &quot; + sys.argv[0])</span><br><span class="line">print(&quot;sys index 1 : &quot; + input_var1)</span><br></pre></td></tr></table></figure>
-
-<p>在 linux bash 執行 python script :</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 test.py apple</span><br></pre></td></tr></table></figure>
-<p><strong>注意: <code>sys</code> 會將 script 名稱視為 <code>sys.argv[0]</code> 也就是index 0 不能使用</strong>，而外部參數的 index 會從 <strong>1</strong> 開始 </p>
-<p>綜合上述觀念，bash 輸出:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sys index 0 : test.py</span><br><span class="line">sys index 1 : apple</span><br></pre></td></tr></table></figure>
-<h3 id="實例"><a href="#實例" class="headerlink" title="實例"></a>實例</h3><p>撰寫名為 <code>test.py</code> 的 script:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">import sys</span><br><span class="line"></span><br><span class="line">fruit = sys.argv[1]</span><br><span class="line">price = sys.argv[2]</span><br><span class="line"></span><br><span class="line">print(&quot;The price of &quot; + fruit + &quot; is &quot; + price)</span><br></pre></td></tr></table></figure>
-
-<p>bash 輸入參數 <code>python3 test.py apple 20</code> 得到</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The price of apple is 20</span><br></pre></td></tr></table></figure>
-
-
-<h3 id="Comments"><a href="#Comments" class="headerlink" title="Comments"></a>Comments</h3><p>sys 方式多用於測試階段，或是簡單的個人專案上，若需要<strong>引入多個參數，或是有協作專案的需求</strong>，sys會面臨以下缺點:</p>
+<h2 id="樣本收集"><a href="#樣本收集" class="headerlink" title="樣本收集"></a>樣本收集</h2><p>下表整理不同版本間使用的樣本數與參考序列，最大的更新為: <strong>v4 增收 416,555 UK Biobank WES data</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">version</th>
+<th align="left">reference</th>
+<th align="left">(type)sample size</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">gnomAD v2.1</td>
+<td align="left">GRCh37</td>
+<td align="left">(WES) 125,748 ; (WGS) 15,708</td>
+</tr>
+<tr>
+<td align="left">gnomAD-SV v2.1</td>
+<td align="left">GRCh37</td>
+<td align="left">(WGS) 10,847</td>
+</tr>
+<tr>
+<td align="left">gnomAD v3.1</td>
+<td align="left">GRCh38</td>
+<td align="left">(WGS) 76,156</td>
+</tr>
+<tr>
+<td align="left">gnomAD v4.0</td>
+<td align="left">GRCh38</td>
+<td align="left">(WES) 730,947 ; (WGS) 76,215</td>
+</tr>
+<tr>
+<td align="left">gnomAD-SV v4.0</td>
+<td align="left">GRCh38</td>
+<td align="left">(WGS) 63,046</td>
+</tr>
+<tr>
+<td align="left">gnomAD-CNV v4.0</td>
+<td align="left">GRCh38</td>
+<td align="left">(WES) 464,297</td>
+</tr>
+</tbody></table>
+<p>從官網的統計圖表可清楚了解族群數量分布，由於UK Biobank 樣本以 European 為大宗，合併至 v4 使 European Ancestry比例偏高接近80%<br>另外值得注意的是 EAS 樣本數有大進展，從前幾版的不到萬人增至2萬初，能協助修正 allele frequency 的預估結果</p>
+<p><img src="/20240523/Bioinformatics/20240523_img2.png" alt="image"></p>
+<h2 id="v4-與-v3-差異"><a href="#v4-與-v3-差異" class="headerlink" title="v4 與 v3 差異"></a>v4 與 v3 差異</h2><h3 id="取消-subset-釋出"><a href="#取消-subset-釋出" class="headerlink" title="取消 subset 釋出"></a>取消 subset 釋出</h3><p>過去v3樣本來自多種cohort，為提供研究者作為疾病研究的control，gnomAD v3 有釋出多種subsets，如: non-cancer subset 為排除罹患癌症或從相關 cohort study收集來的樣本群(更多介紹可參考前篇文章)。<br><strong>在v4版本僅有釋出non-UKBB subset</strong>，且僅提供allele frequency資訊給研究者做累加使用。下面文字截自gnomAD v4 SNV chrY VCF檔的INFO field，可以看到<strong>每個population都有拆分另外一組non-UKB的(prefix: non_ukb) 數據:</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">AC_afr_XY=0;AN_afr_XY=0;nhomalt_afr_XY=0;AC_afr=0;AN_afr=0;nhomalt_afr=0;...</span><br><span class="line">AC_eas_XY=0;AN_eas_XY=0;nhomalt_eas_XY=0;...</span><br><span class="line">AC_non_ukb_afr_XY=0;AN_non_ukb_afr_XY=0;nhomalt_non_ukb_afr_XY=0;AC_non_ukb_afr=0;AN_non_ukb_afr=0;nhomalt_non_ukb_afr=0;...</span><br><span class="line">AC_non_ukb_eas_XY=0;AN_non_ukb_eas_XY=0;nhomalt_non_ukb_eas_XY=0;AC_non_ukb_eas=0;AN_non_ukb_eas=0;nhomalt_non_ukb_eas=0;...</span><br></pre></td></tr></table></figure>
+<p>此外若有使用註解 gnomAD 資料庫的工具如 dbnsfp，則可以明顯看到在資料庫版本更新後，就不會有  <code>gnomAD_exomes_non_cancer</code> 類似欄位產生，只會剩下 <code>gnomAD_exomes_non_ukb</code> 等欄位</p>
+<p>而v4取消製作subset原因包含:</p>
 <ul>
-<li>index 引入很看重順序，參數太多增加錯誤機會</li>
-<li>且無法為下一個使用者<strong>解釋輸入參數的內容</strong>，降低推廣性</li>
+<li>研究特定疾病如cancer、neuro-disease等，這些疾病的盛行率並不會過高到需要透過(乾淨的?) subsets 來做比對與分析，建議直接使用 gnomAD metadata 來協助研究</li>
+<li>新加入的 UK Biobank 或是部分 cohort samples 並沒有完整 phenotype 資料，無法明確的區分樣本的疾病狀態</li>
 </ul>
-<p>接下來要介紹的兩個模組，都是針對不同參數給予特定名稱，並說明參數要求，提高script的實用性。</p>
-<h2 id="argparse-模組"><a href="#argparse-模組" class="headerlink" title="argparse 模組"></a>argparse 模組</h2><p><code>argparse</code> 同屬於 python 內建模組，用於命令列剖析</p>
-<h3 id="引入模組"><a href="#引入模組" class="headerlink" title="引入模組"></a>引入模組</h3><p>引入模組後先創建 <code>ArgumentParser</code> 物件以及設定參數</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import argparse</span><br><span class="line">parser = argparse.ArgumentParser(prog=None, usage=None, description=None, epilog=None)</span><br></pre></td></tr></table></figure>
-
-<p><code>prog</code>: program 名稱，不指定寫 None，default 會帶入 python script 名稱<br><code>usage</code>: 告知使用者說應該怎麼使用 program，default 會帶入 script 名稱加上所有參數<br><code>description</code>: 一段文字說明程式功能<br><code>epilog</code>: 添加在 <code>--help</code> 訊息後的補充文字</p>
-<p>例子:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">## 撰寫 test.py</span><br><span class="line">import argparse</span><br><span class="line"></span><br><span class="line">parser = argparse.ArgumentParser(prog = None,</span><br><span class="line">usage = None, description = &#x27;this is description&#x27;, </span><br><span class="line">epilog = &#x27;this is eliog&#x27;)</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">## 在 bash 輸入 python3 test.py --help 會產生以下內容</span><br><span class="line"></span><br><span class="line">usage: test.py [-h] --anno ANNO</span><br><span class="line"></span><br><span class="line">this is description</span><br><span class="line"></span><br><span class="line">options:</span><br><span class="line">  -h, --help   show this help message and exit</span><br><span class="line"></span><br><span class="line">this is eliog</span><br></pre></td></tr></table></figure>
-
-<h3 id="添加參數名稱"><a href="#添加參數名稱" class="headerlink" title="添加參數名稱"></a>添加參數名稱</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">parser.add_argument(&quot;--anno&quot;, required = T, help = &quot;required arguments&quot;)</span><br><span class="line">parser.add_argument(&quot;--input&quot;, default =&quot;none&quot;)</span><br></pre></td></tr></table></figure>
-
-<p><code>-a / --anno</code> 為自定義的參數flag，以將參數引入特殊變數內<br><code>required</code> 執行script 必須要有的參數，default &#x3D; False<br><code>default</code> 當使用者沒給此項參數，則引入預先設定的default值<br><code>help</code> 針對參數的說明文字，使用 <code>--help</code> 後會顯示</p>
-<h3 id="將參數後的內容引入變數"><a href="#將參數後的內容引入變數" class="headerlink" title="將參數後的內容引入變數"></a>將參數後的內容引入變數</h3><p>以 <code>args.parameter_flag</code> 的形式引入特定參數下的內容</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">args = parser.parse_args()</span><br><span class="line">a = str(args.anno)</span><br></pre></td></tr></table></figure>
-
-<h3 id="實例-1"><a href="#實例-1" class="headerlink" title="實例"></a>實例</h3><p>撰寫名為 <code>test.py</code> 的 script:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">import argparse</span><br><span class="line"></span><br><span class="line">parser = argparse.ArgumentParser(description = &quot;print input friut type and their price&quot;)</span><br><span class="line">parser.add_argument(&#x27;-f&#x27;, &#x27;--fruit&#x27;, required=True, help= &quot;name of fruit&quot;)</span><br><span class="line">parser.add_argument(&#x27;-p&#x27;, &#x27;--price&#x27;, default = 20, help = &quot;price of item&quot;)</span><br><span class="line"></span><br><span class="line">args = parser.parse_args()</span><br><span class="line">print(&quot;The price of &quot; + args.fruit + &quot; is &quot; + args.price)</span><br></pre></td></tr></table></figure>
-
-<p>bash 輸入 <code>python3 test.py --help</code> 查看訊息</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">usage: test.py [-h] -f FRUIT [-p PRICE]</span><br><span class="line"></span><br><span class="line">print input friut type and their price</span><br><span class="line"></span><br><span class="line">options:</span><br><span class="line">  -h, --help               show this help message and exit</span><br><span class="line">  -f FRUIT, --fruit FRUIT  name of fruit</span><br><span class="line">  -p PRICE, --price PRICE  price of item</span><br></pre></td></tr></table></figure>
-
-<p>bash 輸入參數 <code>python3 test.py --fruit apple --price 20</code> 得到</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The price of apple is 20</span><br></pre></td></tr></table></figure>
-
-<h3 id="Comments-1"><a href="#Comments-1" class="headerlink" title="Comments"></a>Comments</h3><p><code>argparse</code> 模組提升參數引入的複雜性與數量，增加在真實世界的使用機會；<strong>但複雜的步驟</strong>轉換（建立物件 &gt; add_args &gt; parse_args）讓人頭昏眼花，若能有更簡單的參數設定機制，可以減低程式撰寫的難易度</p>
-<h2 id="click-套件"><a href="#click-套件" class="headerlink" title="click 套件"></a>click 套件</h2><p>click 官網以 <strong>creating beautiful command line interfaces</strong> 形容套件的核心功能</p>
-<p>下載並引入套件後，只需利用 <code>@click.command</code> 和 <code>@click_option</code> 即可產生和<code>argparse</code>等價的結果</p>
-<h3 id="實例-2"><a href="#實例-2" class="headerlink" title="實例"></a>實例</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import click</span><br><span class="line"></span><br><span class="line">@click.command</span><br><span class="line">@click.option(&#x27;-f&#x27;, &#x27;--fruit&#x27;,&#x27;fruit&#x27;, required=True, help= &quot;name of fruit&quot;)</span><br><span class="line">@click.option(&#x27;-p&#x27;, &#x27;--price&#x27;, &#x27;price&#x27;, default = 20, help = &quot;price of item&quot;)</span><br><span class="line">def main(fruit, price):</span><br><span class="line">    print(&quot;The price of &quot; + fruit + &quot; is &quot; + str(price))</span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
-<p>bash 輸入參數 <code>python3 test.py --fruit apple --price 20</code>  得到相同console:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The price of apple is 20</span><br></pre></td></tr></table></figure>
-
-<h3 id="Comments-2"><a href="#Comments-2" class="headerlink" title="Comments"></a>Comments</h3><p>和 <code>argparse</code> 相比 <code>click</code> 語法更加簡潔，許多參數都相容，推薦新手可以直接使用click建立參數指令，但請注意 python 版本相容性，詳細可參考官網說明。</p>
-<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><blockquote>
-<p><a target="_blank" rel="noopener" href="https://docs.python.org/zh-tw/3/library/sys.html#sys.argv">https://docs.python.org/zh-tw/3/library/sys.html#sys.argv</a><br><a target="_blank" rel="noopener" href="https://docs.python.org/zh-tw/3/howto/argparse.html">https://docs.python.org/zh-tw/3/howto/argparse.html</a><br><a target="_blank" rel="noopener" href="https://click.palletsprojects.com/en/8.1.x/">https://click.palletsprojects.com/en/8.1.x/</a><br><a target="_blank" rel="noopener" href="https://myapollo.com.tw/blog/python-click/">https://myapollo.com.tw/blog/python-click/</a></p>
+<h3 id="filtering-allele-frequency-FAF"><a href="#filtering-allele-frequency-FAF" class="headerlink" title="filtering allele frequency (FAF)"></a>filtering allele frequency (FAF)</h3><p>將 WES 和 WGS 的 allele count 合併計算之 allele frequency，稱作 filtering allele frequency</p>
+<h2 id="v4-exome-分析流程"><a href="#v4-exome-分析流程" class="headerlink" title="v4 exome 分析流程"></a>v4 exome 分析流程</h2><p>(WGS 流程可參照 gnomAD v3版作法)<br>由於 v4 最大進展在於 exome callset 樣本數的提升，因此後續分析流程也有些更新:</p>
+<ul>
+<li>joint callset 由原本的 gVCF 格式轉為 VariantDataset (VDS) 格式儲存</li>
+<li>增加 <strong>interval QC</strong> 以確保目標區段擁有足夠的<strong>深度</strong>判別變異: 官網提供一組 <a target="_blank" rel="noopener" href="https://gnomad.broadinstitute.org/help/what-are-your-calling-intervals-what-intervals-are-used-for-the-genomes-coding-only-files">interval list</a>，左右延伸(padding) 50bp 後計算每個樣本在這些區段的平均深度。最後將 &gt;85% 樣本擁有 &gt;20X 深度的區段定義為 high coverage intervals</li>
+<li>為 sample QC 定義 <strong>high qulaity site</strong>:為判斷樣本族群來源、親緣關係或定序品質，gnomAD v4從幾個資料集挑選 high quality sites (n &#x3D; 175,043) 協助樣本QC:<ul>
+<li>屬於 autosomal, biallelic, single nucleotide variants (SNVs) </li>
+<li>位於 gnomAD v3, CCDG, 以及 UK Biobank dataset 的位點紀錄</li>
+</ul>
+</li>
+<li>sample QC: 使用上面這些high quality site進行以下幾個重點QC<ul>
+<li>hard filters: 使用新工具從 genotype data 預估 contamination 而非重新拿raw read 分析。其他也用DP, Het&#x2F;Hom ratio 等數值去篩</li>
+<li>PCA clustering for exome capture platform: 由於樣本來源多樣，使用PCA區分出20種定序平台，label上潛在差異</li>
+<li>sex karyotypes</li>
+<li>relatedness between v4 exomes and genomes, and identified pairs of first and second degree relatives</li>
+<li>genetic ancestry groups</li>
+<li>QC metrics</li>
+</ul>
+</li>
+<li>variant QC by VQSR (和 v3 一樣拿大型計劃的位點做模型訓練並應用類似的篩選條件)</li>
+</ul>
+<hr>
+<h2 id="v4-SV"><a href="#v4-SV" class="headerlink" title="v4 SV"></a>v4 SV</h2><p>和前版 v2.1相比，除了<strong>樣本數</strong>從一萬初<strong>增加至超過六萬</strong>、偵測位點數增加，參考序列也從 hg19&#x2F;GRCh37 改成擁有 alternative contigs 的 <strong>GRCh38做為參考序列</strong>。<br>偵測流程使用相同的 GATK-SV pipeline，並增進變異註解(annotation)的結果。gnomAD-SV v4 從63,046個WGS樣本中找到超過一百萬個 high-quality SVs，SV特徵的趨勢與前版本相同，多為短片段(median size 360bp)的罕見位點(96% SVs AF &lt; 1%)。</p>
+<p>gnomAD-SV v4 的結果已公開至網站，可先行查詢利用；至於技術細節等內容，等研究論文發表後再來更新，根據之前使用v2.1版資料的經驗，可以再拿新的East Asian AF 來做 correlation plot，不過中間需要針對變異座標進行liftover轉換，等有空再來嘗試看看。</p>
+<h2 id="v4-CNV"><a href="#v4-CNV" class="headerlink" title="v4 CNV"></a>v4 CNV</h2><p><strong>gnomAD v4第一次釋出 CNV callset</strong>。也代表未來關於致病位點的研究，可往大片段缺失的偵測目標前進，並擁有 general population 資訊可參考。目前收錄從 464,297 WES data 找到之 rare ( AF &lt;1% ) autosomal coding copy number variants (CNVs)，使用 GATK-gCNV (Babadi et al. Nat Genet, 2023) 流程偵測變異。</p>
+<p>簡單順一下分析流程，主要利用比對至參考序列的BAM&#x2F;CRAM作為input，並計算每個 protein-coding region (target interval) 的 read count (CNV 主要以深度差異來判斷) 接著使用這些數值做 clustering ，將特徵接近的樣本歸類至同一批次(batch)做後續分析。</p>
+<p>CNV流程需要baseline來比較深度差異，通常來自 panel of normal (PoN，在somatic偵測代表tumor相對應的正常樣本) 的結果，而gnomAD 無針對特殊疾病，所以採隨機挑選200樣本作為Pon，之後經由QC篩選，normalization等等，最終以read depth, read count 等特徵判定基因體內的CNV events。</p>
+<p>CNV偵測流程的可信度，透過一組同時具有WES(default input), WGS (IGV validation) 和 microarray 的樣本來驗證，透過和不同開源工具比較，詳細工具的演算法與使用差異，有機會再細看比較。</p>
+<h3 id="CNV-註釋"><a href="#CNV-註釋" class="headerlink" title="CNV 註釋"></a>CNV 註釋</h3><p>在變異註釋方面，現今工具主要在短片段如SNV&#x2F;indel方面詮釋較佳，如ensembl VEP, AnnotSv等，而CNV宜由於變異跨度大，對於現行臨床ACMG準則來說難以完整判定，且多以基因為單位個別做註釋，整體影響預測尚未完全，而gnomAD作為可能的reference dataset，也針對變異作了以下註釋:</p>
+<ul>
+<li>基本的GENCODE 註釋，並以overlap的比例判斷是否給註釋</li>
+<li>長度與exon, interval範圍跨度</li>
+<li>集合與分族群統計的AF: site count (SC), site number (SN), and site frequency (SF)</li>
+</ul>
+<h3 id="CNV-subsets"><a href="#CNV-subsets" class="headerlink" title="CNV subsets"></a>CNV subsets</h3><p>和 gnomADv4 不同，由於大片段的罕見CNV位點與精神疾病有關連性，<strong>gnomAD CNV 有釋出兩組subsets</strong>:</p>
+<blockquote>
+<p>Due to the known enrichment of large, rare CNVs that confer substantial relative risk in neuropsychiatric phenotype<br>neuropsychiatric conditions: bipolar, epilepsy, schizophrenia, psychosis, and general psychiatric conditions</p>
 </blockquote>
+<ul>
+<li>non-neuro (n &#x3D; 418,924): 非精神疾病相關cohort樣本(neuropsychiatric conditions)，以及 biobank 樣本</li>
+<li>non-neuro-control(n &#x3D; 269,919): 不同cohort內標示為control的樣本,或是biobank樣本</li>
+</ul>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><p><a target="_blank" rel="noopener" href="https://gnomad.broadinstitute.org/news/2023-11-gnomad-v4-0/">https://gnomad.broadinstitute.org/news/2023-11-gnomad-v4-0/</a><br><a target="_blank" rel="noopener" href="https://gnomad.broadinstitute.org/news/2023-11-v4-structural-variants/">https://gnomad.broadinstitute.org/news/2023-11-v4-structural-variants/</a><br><a target="_blank" rel="noopener" href="https://gnomad.broadinstitute.org/news/2023-11-v4-copy-number-variants/">https://gnomad.broadinstitute.org/news/2023-11-v4-copy-number-variants/</a><br><a target="_blank" rel="noopener" href="https://gnomad.broadinstitute.org/news/2019-10-gnomad-v3-0/">https://gnomad.broadinstitute.org/news/2019-10-gnomad-v3-0/</a></p>
 
             
 
@@ -370,7 +404,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">標籤</span><br/>
                 
-    <a class="tag tag--primary tag--small t-none-link" href="/tags/Python/" rel="tag">Python</a>
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/Database/" rel="tag">Database</a>
 
             </div>
         
@@ -380,14 +414,11 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240222/Python/"
-                    data-tooltip="Python實用系列： subprocess模組管理子進程"
-                    aria-label="上一篇: Python實用系列： subprocess模組管理子進程"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -397,9 +428,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240215/Python/"
-                    data-tooltip="Python實用系列： smtplib 模組實現自動寄信"
-                    aria-label="下一篇: Python實用系列： smtplib 模組實現自動寄信"
+                    href="/20240516/Bioinformatics/"
+                    data-tooltip="生資系列： gnomAD v3 database 介紹"
+                    aria-label="下一篇: 生資系列： gnomAD v3 database 介紹"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -424,7 +455,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240221/Python/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240523/Bioinformatics/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -437,7 +468,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240221/Python/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240523/Bioinformatics/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -450,7 +481,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240221/Python/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240523/Bioinformatics/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -487,8 +518,8 @@
         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
         var disqus_config = function () {
-          this.page.url = 'https://pxchen110.github.io/20240221/Python/';  // Replace PAGE_URL with your page's canonical URL variable
-          this.page.identifier = '1708516450000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          this.page.url = 'https://pxchen110.github.io/20240523/Bioinformatics/';  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = '1716417722000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
         };
         (function() { // DON'T EDIT BELOW THIS LINE
         var d = document, s = d.createElement('script');
@@ -516,14 +547,11 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240222/Python/"
-                    data-tooltip="Python實用系列： subprocess模組管理子進程"
-                    aria-label="上一篇: Python實用系列： subprocess模組管理子進程"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -533,9 +561,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240215/Python/"
-                    data-tooltip="Python實用系列： smtplib 模組實現自動寄信"
-                    aria-label="下一篇: Python實用系列： smtplib 模組實現自動寄信"
+                    href="/20240516/Bioinformatics/"
+                    data-tooltip="生資系列： gnomAD v3 database 介紹"
+                    aria-label="下一篇: 生資系列： gnomAD v3 database 介紹"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -560,7 +588,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240221/Python/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240523/Bioinformatics/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -573,7 +601,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240221/Python/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240523/Bioinformatics/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -586,7 +614,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240221/Python/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240523/Bioinformatics/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -620,7 +648,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240221/Python/"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240523/Bioinformatics/"
                         aria-label="分享到 Facebook"
                     >
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
@@ -633,7 +661,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240221/Python/"
+                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240523/Bioinformatics/"
                         aria-label="分享到 Twitter"
                     >
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
@@ -646,7 +674,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://plus.google.com/share?url=https://pxchen110.github.io/20240221/Python/"
+                        href="https://plus.google.com/share?url=https://pxchen110.github.io/20240523/Bioinformatics/"
                         aria-label="分享到 Google+"
                     >
                         <i class="fab fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
