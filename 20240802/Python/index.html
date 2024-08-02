@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Xuan&#39;s Blog">
-    <title>使用 diff, vimdiff, excel inquire 比較檔案 - Xuan&#39;s Blog</title>
+    <title>Python實用系列： itables 製作互動式表格 - Xuan&#39;s Blog</title>
     <meta name="author" content="Xuan Chen">
     
         <meta name="keywords" content="hexo,javascript,">
@@ -17,26 +17,26 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg"},"articleBody":"介紹幾個比較檔案內容差異的方法\n\n\n\ndiffmanual page\n適合想知道檔案有無差異，不細看內部文字的工作\n1diff FILE1 FILE2\n若只想知道檔案是否一樣，可以加:\n\n-q, --brief 會在檔案不同時輸出 Files FILE1 and FILE2 differ\n-s, --report-identical-files 在檔案相同時輸出 Files FILE1 and FILE2 are identical\n\n預設的 stdout 會輸出兩檔案不同的地方與相互對應的行數(順序跟cmd中檔按順序相同)，如下面範例:\n12345678910# diff FILE1 FILE26c6  ## diff row number in FILE1 and FILE2&lt; Date: 2024 March---&gt; Date: 2024 Jun65c67&lt;     with gzip.open(out_name, &#x27;wt&#x27;, encoding = &#x27;utf-8&#x27; ) as fh:---&gt;     with open(out_name, &#x27;w&#x27;, ) as fh:\n\n但這樣一行一行的輸出內容太難看，可以用 -y, --side-by-side 來將比較結果輸出成兩個column的排列方式\n還有一個 sdiff 作用等同於 diff -y\nvimdiff (vim -d)適合想詳細比較程式碼版本間差異的工作\n1vimdiff FILE1 FILE2\nvimdiff (相當於 vim -d) 會先以 vim 開啟兩份目標檔案後，再一行行對照檔案間的差異，若有內文不同、刪減、空行等差異情況會以顏色標示呈現\n\n可以使用 [c 和 ]c 跳轉至前後不同處，此外也可直接進入 insert 模式來修改文檔\nExcel 增益集 Inquire 功能Microsoft 官方的說明網頁\n適合檔案較小，格式固定，且喜愛做手工的你進入excel後，點選左下角的選項會跳出以下畫面:\n點選黃色標示的增益集後，依序選擇:管理 -&gt; COM 增益集 -&gt; 點選 Inquire -&gt; 點選右下角確定儲存\n\n接著同時開啟目標檔案，這時會發現工具欄多了一個Inquire的選項點選比較檔案會跳出選擇比較檔名的視窗\n輸出可分兩大部分檢視:上部分為目標兩檔案的表格，詳細列給使用者，並以顏色標示不同處顏色根據不同的資料類別區分，如圖中的綠色指的是 ‘entered value’　數值不同\n\n若不同之處較多，參考長條圖的統計數量比較有意義。\n","dateCreated":"2024-07-19T05:41:18+08:00","dateModified":"2024-07-19T05:48:48+08:00","datePublished":"2024-07-19T05:41:18+08:00","description":"介紹幾個比較檔案內容差異的方法","headline":"使用 diff, vimdiff, excel inquire 比較檔案","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20240704/Linux/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20240704/Linux/","keywords":"Linux, Excel"}</script>
-    <meta name="description" content="introduce unix, excel method to compare differences between two files">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg"},"articleBody":"html文件想要嵌入表格，但又不想要簡單的Markdown Table ? 可以考慮包含篩選，排序功能的python itables 套件\niTables is a wrapper for the Javascript DataTables libraryitables 以 javascript DataTable 函數為基礎，可在python執行並做進階延伸的應用，本文將介紹常用的函數與參數。\n\n\n\n安裝與引入套件12pip install itablesconda install itables -c conda-forge\n\n在 VSCode 使用 itables 要安裝 JUPYTER extension在測試 python itables 套件，發現VSCode無法在終端機顯示\n首先在官網確認 itables 可以在 VSCode 環境使用，但需要安裝 Jupyter 相關套件協助\n\nThe tables are interactive in interactive books powered by Jupyter Book, see e.g. the ITables documentation.In VS Code, itables works both for Jupyter Notebooks and Python scripts.\n\n若 VSCode 之前沒裝過，可以直接建立一份 .ipynb 的檔案並寫幾行code測試，按下執行(run)按鈕，系統會詢問你是否要自動安裝 jupyter extensions。完成後可點選左側延伸模組檢查相關套件的安裝情況:\n\n在終端機block 也多出一個 Jupyter 的選項\n\n現在可以block執行\n最終成功跑出想要的可以排序篩選的互動式表格:\n\n啟動互動式 notebook 環境1234from itables import init_notebook_mode## Activate the interactive mode in notebook-like environmentinit_notebook_mode(all_interactive=True)\n\n可以使用範例表格作為輸入，檢查是否有為互動模式\n12345from itables.sample_dfs import get_countriesdf = get_countries(html=False)df\n\n另外一個範例\n12345# pip install world_bank_data --upgradeimport world_bank_data as wbdf = wb.get_countries(html=False)df\n\n添加渲染與參數使用 show() 協助渲染表格呈現的內容，大部分參數介紹都可參考 DataTable 的手冊\n123from itables import showshow(df, ....)\n\n常用的參數包含:\n\nlengthMenu = [2,10,25] 以列表調整左上角的 entries per page 每頁顯示的資料筆數\ncaption = &quot;string&quot; 標題預設位置在表格底部caption-side:bottom，可透過style=&#39;caption-side:top&#39; 調整至表格上方\nlayout=&#123;&#125;調整表格四個角落的內容，預設顯示:1234&quot;topStart&quot;: &#x27;pageLength&#x27;,&quot;topEnd&quot;: &#x27;search&#x27;,&quot;bottomStart&quot;: &#x27;info&#x27;,&quot;bottomEnd&quot;: &#x27;paging&#x27;\n\nsearch=&#123;&#125; 調整搜尋匹配內容 &quot;regex&quot;: True, &quot;caseInsensitive&quot;: True, search: &quot;default search str&quot;\npaging=False 會顯示表格全部的內容，會讓 lengthMenu 設定失效；若想要限制畫面呈現數量，可搭配 scrollCollapse=True, scrollY=&quot;200px&quot; 設定卷軸滾動\ncolumn_filters = &quot;footer&quot; 允許針對個別欄位篩選，且將 search bar 顯示在表格下方\n\n表格外觀參數\nclasses=&quot;compact&quot; 設定表格擁擠，classes=&quot;cell-border&quot; 添加格線\nstyle= 添加CSS相關樣式\n\n使用pandas Styler object:\n1s = df.style\n\ns.background_gradient(axis=None, cmap=&quot;YlOrRd&quot;) 依數字大小給予不同顏色梯度(colormap)s.format(&quot;&#123;:.3&#125;&quot;) 調整位數(.3代表顯示三個數字剩下四捨五入)\n輸出表格1show(df, buttons=[&quot;copyHtml5&quot;, &quot;csvHtml5&quot;, &quot;excelHtml5&quot;])\n表格會出現以下三個按鈕，分別代表複製表格內容、下載為CSV檔和下載為XLSX檔\n\n可使用 pandas \n嵌入外部網頁目前支援嵌入 HTML 和 Shiny\nReferenceshttps://code.visualstudio.com/docs/datascience/jupyter-notebookshttps://datatables.net/https://hackmd.io/@DokiDokiPB/Hy05n_Mzs\n","dateCreated":"2024-08-02T16:48:29+08:00","dateModified":"2024-08-02T17:16:48+08:00","datePublished":"2024-08-02T16:48:29+08:00","description":"html文件想要嵌入表格，但又不想要簡單的Markdown Table ? 可以考慮包含篩選，排序功能的python itables 套件\niTables is a wrapper for the Javascript DataTables libraryitables 以 javascript DataTable 函數為基礎，可在python執行並做進階延伸的應用，本文將介紹常用的函數與參數。","headline":"Python實用系列： itables 製作互動式表格","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20240802/Python/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20240802/Python/","keywords":"Python"}</script>
+    <meta name="description" content="introducing python itables module to generate interactive tables">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="使用 diff, vimdiff, excel inquire 比較檔案">
-<meta property="og:url" content="https://pxchen110.github.io/20240704/Linux/index.html">
+<meta property="og:title" content="Python實用系列： itables 製作互動式表格">
+<meta property="og:url" content="https://pxchen110.github.io/20240802/Python/index.html">
 <meta property="og:site_name" content="Xuan&#39;s Blog">
-<meta property="og:description" content="introduce unix, excel method to compare differences between two files">
+<meta property="og:description" content="introducing python itables module to generate interactive tables">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://pxchen110.github.io/20240704/Linux/20240719_img1.png">
-<meta property="og:image" content="https://pxchen110.github.io/20240704/Linux/20240719_img2.png">
-<meta property="og:image" content="https://pxchen110.github.io/20240704/Linux/20240719_img3.png">
-<meta property="og:image" content="https://pxchen110.github.io/20240704/Linux/20240719_img4.png">
-<meta property="og:image" content="https://pxchen110.github.io/20240704/Linux/20240719_img5.png">
-<meta property="article:published_time" content="2024-07-18T21:41:18.000Z">
-<meta property="article:modified_time" content="2024-07-18T21:48:48.644Z">
+<meta property="og:image" content="https://pxchen110.github.io/20240802/Python/20240802_img1.png">
+<meta property="og:image" content="https://pxchen110.github.io/20240802/Python/20240802_img2.png">
+<meta property="og:image" content="https://pxchen110.github.io/20240802/Python/20240802_img3.png">
+<meta property="og:image" content="https://pxchen110.github.io/20240802/Python/20240802_img4.png">
+<meta property="og:image" content="https://pxchen110.github.io/20240802/Python/20240802_img5.png">
+<meta property="og:image" content="https://pxchen110.github.io/20240802/Python/20240802_img6.png">
+<meta property="article:published_time" content="2024-08-02T08:48:29.000Z">
+<meta property="article:modified_time" content="2024-08-02T09:16:48.672Z">
 <meta property="article:author" content="Xuan Chen">
-<meta property="article:tag" content="Linux">
-<meta property="article:tag" content="Excel">
+<meta property="article:tag" content="Python">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pxchen110.github.io/20240704/Linux/20240719_img1.png">
+<meta name="twitter:image" content="https://pxchen110.github.io/20240802/Python/20240802_img1.png">
     
     
         
@@ -274,20 +274,20 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            使用 diff, vimdiff, excel inquire 比較檔案
+            Python實用系列： itables 製作互動式表格
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2024-07-19T05:41:18+08:00">
+    <time datetime="2024-08-02T16:48:29+08:00">
 	
-		    2024 年 7 月 19 日
+		    2024 年 8 月 2 日
     	
     </time>
     
         <span>分類 </span>
         
-    <a class="category-link" href="/categories/Linux/">Linux</a>
+    <a class="category-link" href="/categories/Python/">Python</a>
 
 
     
@@ -299,36 +299,60 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>介紹幾個比較檔案內容差異的方法</p>
+            <p>html文件想要嵌入表格，但又不想要簡單的Markdown Table ? 可以考慮包含篩選，排序功能的python <code>itables</code> 套件</p>
+<p>iTables is a wrapper for the <strong>Javascript DataTables</strong> library<br>itables 以 javascript <a target="_blank" rel="noopener" href="https://datatables.net/">DataTable</a> 函數為基礎，可在python執行並做進階延伸的應用，本文將介紹常用的函數與參數。</p>
 <span id="more"></span>
-<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#diff"><span class="toc-text">diff</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vimdiff-vim-d"><span class="toc-text">vimdiff (vim -d)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Excel-%E5%A2%9E%E7%9B%8A%E9%9B%86-Inquire-%E5%8A%9F%E8%83%BD"><span class="toc-text">Excel 增益集 Inquire 功能</span></a></li></ol>
+<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%9D%E8%88%87%E5%BC%95%E5%85%A5%E5%A5%97%E4%BB%B6"><span class="toc-text">安裝與引入套件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8-VSCode-%E4%BD%BF%E7%94%A8-itables-%E8%A6%81%E5%AE%89%E8%A3%9D-JUPYTER-extension"><span class="toc-text">在 VSCode 使用 itables 要安裝 JUPYTER extension</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%95%9F%E5%8B%95%E4%BA%92%E5%8B%95%E5%BC%8F-notebook-%E7%92%B0%E5%A2%83"><span class="toc-text">啟動互動式 notebook 環境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E6%B8%B2%E6%9F%93%E8%88%87%E5%8F%83%E6%95%B8"><span class="toc-text">添加渲染與參數</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A1%A8%E6%A0%BC%E5%A4%96%E8%A7%80%E5%8F%83%E6%95%B8"><span class="toc-text">表格外觀參數</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BC%B8%E5%87%BA%E8%A1%A8%E6%A0%BC"><span class="toc-text">輸出表格</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B5%8C%E5%85%A5%E5%A4%96%E9%83%A8%E7%B6%B2%E9%A0%81"><span class="toc-text">嵌入外部網頁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#References"><span class="toc-text">References</span></a></li></ol></li></ol>
 
-<h2 id="diff"><a href="#diff" class="headerlink" title="diff"></a>diff</h2><p><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man1/diff.1.html">manual page</a></p>
-<p>適合<strong>想知道檔案有無差異，不細看內部文字的工作</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff FILE1 FILE2</span><br></pre></td></tr></table></figure>
-<p>若只想知道檔案是否一樣，可以加:</p>
+<h2 id="安裝與引入套件"><a href="#安裝與引入套件" class="headerlink" title="安裝與引入套件"></a>安裝與引入套件</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip install itables</span><br><span class="line">conda install itables -c conda-forge</span><br></pre></td></tr></table></figure>
+
+<h2 id="在-VSCode-使用-itables-要安裝-JUPYTER-extension"><a href="#在-VSCode-使用-itables-要安裝-JUPYTER-extension" class="headerlink" title="在 VSCode 使用 itables 要安裝 JUPYTER extension"></a>在 VSCode 使用 itables 要安裝 JUPYTER extension</h2><p>在測試 python <code>itables</code> 套件，發現VSCode無法在終端機顯示</p>
+<p>首先在<a target="_blank" rel="noopener" href="https://mwouts.github.io/itables/supported_editors.html">官網</a>確認 <code>itables</code> 可以在 VSCode 環境使用，但需要安裝 Jupyter 相關套件協助</p>
+<blockquote>
+<p>The tables are interactive in interactive books <strong>powered by Jupyter Book</strong>, see e.g. the ITables documentation.<br>In VS Code, itables <strong>works both for Jupyter Notebooks and Python</strong> scripts.</p>
+</blockquote>
+<p>若 VSCode 之前沒裝過，<strong>可以直接建立一份 <code>.ipynb</code> 的檔案</strong>並寫幾行code測試，按下執行(run)按鈕，系統會詢問你是否要自動安裝 jupyter extensions。<br>完成後可點選左側<strong>延伸模組</strong>檢查相關套件的安裝情況:</p>
+<p><img src="/20240802/Python/20240802_img1.png" alt="image"></p>
+<p>在終端機block 也多出一個 <strong>Jupyter</strong> 的選項</p>
+<p><img src="/20240802/Python/20240802_img2.png" alt="image"></p>
+<p>現在可以block執行</p>
+<p>最終成功跑出想要的可以排序篩選的互動式表格:</p>
+<p><img src="/20240802/Python/20240802_img3.png" alt="image"></p>
+<h2 id="啟動互動式-notebook-環境"><a href="#啟動互動式-notebook-環境" class="headerlink" title="啟動互動式 notebook 環境"></a>啟動互動式 notebook 環境</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">from itables import init_notebook_mode</span><br><span class="line"></span><br><span class="line">## Activate the interactive mode in notebook-like environment</span><br><span class="line">init_notebook_mode(all_interactive=True)</span><br></pre></td></tr></table></figure>
+
+<p>可以使用範例表格作為輸入，檢查是否有為互動模式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">from itables.sample_dfs import get_countries</span><br><span class="line"></span><br><span class="line">df = get_countries(html=False)</span><br><span class="line"></span><br><span class="line">df</span><br></pre></td></tr></table></figure>
+
+<p>另外一個範例</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># pip install world_bank_data --upgrade</span><br><span class="line">import world_bank_data as wb</span><br><span class="line"></span><br><span class="line">df = wb.get_countries(html=False)</span><br><span class="line">df</span><br></pre></td></tr></table></figure>
+
+<h2 id="添加渲染與參數"><a href="#添加渲染與參數" class="headerlink" title="添加渲染與參數"></a>添加渲染與參數</h2><p>使用 <code>show()</code> 協助渲染表格呈現的內容，大部分參數介紹都可參考 DataTable 的手冊</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">from itables import show</span><br><span class="line"></span><br><span class="line">show(df, ....)</span><br></pre></td></tr></table></figure>
+
+<p>常用的參數包含:</p>
 <ul>
-<li><code>-q, --brief</code> 會在檔案不同時輸出 <strong>Files FILE1 and FILE2 differ</strong></li>
-<li><code>-s, --report-identical-files</code> 在檔案相同時輸出 <strong>Files FILE1 and FILE2 are identical</strong></li>
+<li><code>lengthMenu = [2,10,25]</code> 以列表調整左上角的 <strong>entries per page</strong> 每頁顯示的資料筆數</li>
+<li><code>caption = &quot;string&quot;</code> 標題預設位置在表格底部<code>caption-side:bottom</code>，可透過<code>style=&#39;caption-side:top&#39;</code> 調整至表格上方</li>
+<li><code>layout=&#123;&#125;</code>調整表格四個角落的內容，預設顯示:<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&quot;topStart&quot;: &#x27;pageLength&#x27;,</span><br><span class="line">&quot;topEnd&quot;: &#x27;search&#x27;,</span><br><span class="line">&quot;bottomStart&quot;: &#x27;info&#x27;,</span><br><span class="line">&quot;bottomEnd&quot;: &#x27;paging&#x27;</span><br></pre></td></tr></table></figure>
+<img src="/20240802/Python/20240802_img4.png" alt="image"></li>
+<li><code>search=&#123;&#125;</code> 調整搜尋匹配內容 <code>&quot;regex&quot;: True, &quot;caseInsensitive&quot;: True, search: &quot;default search str&quot;</code></li>
+<li><code>paging=False</code> 會顯示表格全部的內容，會讓 <code>lengthMenu</code> 設定失效；若想要限制畫面呈現數量，可搭配 <code>scrollCollapse=True, scrollY=&quot;200px&quot;</code> 設定卷軸滾動</li>
+<li><code>column_filters = &quot;footer&quot;</code> 允許針對個別欄位篩選，且將 search bar 顯示在表格下方<br><img src="/20240802/Python/20240802_img5.png" alt="image"></li>
 </ul>
-<p>預設的 stdout 會輸出兩檔案不同的地方與相互對應的行數(順序跟cmd中檔按順序相同)，如下面範例:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># diff FILE1 FILE2</span><br><span class="line"></span><br><span class="line">6c6  ## diff row number in FILE1 and FILE2</span><br><span class="line">&lt; Date: 2024 March</span><br><span class="line">---</span><br><span class="line">&gt; Date: 2024 Jun</span><br><span class="line">65c67</span><br><span class="line">&lt;     with gzip.open(out_name, &#x27;wt&#x27;, encoding = &#x27;utf-8&#x27; ) as fh:</span><br><span class="line">---</span><br><span class="line">&gt;     with open(out_name, &#x27;w&#x27;, ) as fh:</span><br></pre></td></tr></table></figure>
+<h3 id="表格外觀參數"><a href="#表格外觀參數" class="headerlink" title="表格外觀參數"></a>表格外觀參數</h3><ul>
+<li><code>classes=&quot;compact&quot;</code> 設定表格擁擠，<code>classes=&quot;cell-border&quot;</code> 添加格線</li>
+<li><code>style=</code> 添加CSS相關樣式</li>
+</ul>
+<p>使用<code>pandas Styler</code> object:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s = df.style</span><br></pre></td></tr></table></figure>
 
-<p>但這樣一行一行的輸出內容太難看，可以用 <code>-y, --side-by-side</code> 來將比較結果輸出成兩個column的排列方式</p>
-<p>還有一個 <code>sdiff</code> 作用等同於 <code>diff -y</code></p>
-<h2 id="vimdiff-vim-d"><a href="#vimdiff-vim-d" class="headerlink" title="vimdiff (vim -d)"></a>vimdiff (vim -d)</h2><p>適合<strong>想詳細比較程式碼版本間差異的工作</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vimdiff FILE1 FILE2</span><br></pre></td></tr></table></figure>
-<p><code>vimdiff</code> (相當於 <code>vim -d</code>) 會先以 vim 開啟兩份目標檔案後，再一行行對照檔案間的差異，若有內文不同、刪減、空行等差異情況會以顏色標示呈現</p>
-<p><img src="/20240704/Linux/20240719_img1.png" alt="image"></p>
-<p>可以使用 <code>[c</code> 和 <code>]c</code> 跳轉至前後不同處，此外也可直接進入 insert 模式來修改文檔</p>
-<h2 id="Excel-增益集-Inquire-功能"><a href="#Excel-增益集-Inquire-功能" class="headerlink" title="Excel 增益集 Inquire 功能"></a>Excel 增益集 Inquire 功能</h2><p><a target="_blank" rel="noopener" href="https://support.microsoft.com/zh-tw/office/%E9%96%8B%E5%95%9F-inquire-%E5%A2%9E%E7%9B%8A%E9%9B%86-6bc668e2-f3c6-4729-8ce1-75ea20aa9d90">Microsoft 官方的說明網頁</a></p>
-<p>適合<strong>檔案較小，格式固定，且<del>喜愛做手工</del>的你</strong><br>進入excel後，點選左下角的<strong>選項</strong>會跳出以下畫面:</p>
-<p><img src="/20240704/Linux/20240719_img2.png" alt="image"><br>點選黃色標示的<strong>增益集</strong>後，依序選擇:<br>管理 -&gt; COM 增益集 -&gt; 點選 <strong>Inquire</strong> -&gt; 點選右下角<strong>確定</strong>儲存</p>
-<p><img src="/20240704/Linux/20240719_img3.png" alt="image"></p>
-<p>接著同時開啟目標檔案，這時會發現工具欄多了一個<strong>Inquire</strong>的選項<br>點選<strong>比較檔案</strong>會跳出選擇比較檔名的視窗<br><img src="/20240704/Linux/20240719_img4.png" alt="image"></p>
-<p>輸出可分兩大部分檢視:<br>上部分為目標兩檔案的表格，詳細列給使用者，並以顏色標示不同處<br>顏色根據不同的資料類別區分，如圖中的綠色指的是 ‘entered value’　數值不同</p>
-<p><img src="/20240704/Linux/20240719_img5.png" alt="image"></p>
-<p>若不同之處較多，參考長條圖的統計數量比較有意義。</p>
+<p><code>s.background_gradient(axis=None, cmap=&quot;YlOrRd&quot;)</code> 依數字大小給予不同顏色梯度(colormap)<br><code>s.format(&quot;&#123;:.3&#125;&quot;)</code> 調整位數(.3代表顯示三個數字剩下四捨五入)</p>
+<h3 id="輸出表格"><a href="#輸出表格" class="headerlink" title="輸出表格"></a>輸出表格</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show(df, buttons=[&quot;copyHtml5&quot;, &quot;csvHtml5&quot;, &quot;excelHtml5&quot;])</span><br></pre></td></tr></table></figure>
+<p>表格會出現以下三個按鈕，分別代表複製表格內容、下載為CSV檔和下載為XLSX檔</p>
+<p><img src="/20240802/Python/20240802_img6.png" alt="image"></p>
+<p>可使用 <code>pandas</code> </p>
+<h2 id="嵌入外部網頁"><a href="#嵌入外部網頁" class="headerlink" title="嵌入外部網頁"></a>嵌入外部網頁</h2><p>目前支援嵌入 <strong>HTML</strong> 和 <strong>Shiny</strong></p>
+<h3 id="References"><a href="#References" class="headerlink" title="References"></a>References</h3><p><a target="_blank" rel="noopener" href="https://code.visualstudio.com/docs/datascience/jupyter-notebooks">https://code.visualstudio.com/docs/datascience/jupyter-notebooks</a><br><a target="_blank" rel="noopener" href="https://datatables.net/">https://datatables.net/</a><br><a target="_blank" rel="noopener" href="https://hackmd.io/@DokiDokiPB/Hy05n_Mzs">https://hackmd.io/@DokiDokiPB/Hy05n_Mzs</a></p>
 
             
 
@@ -340,7 +364,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">標籤</span><br/>
                 
-    <a class="tag tag--primary tag--small t-none-link" href="/tags/Excel/" rel="tag">Excel</a> <a class="tag tag--primary tag--small t-none-link" href="/tags/Linux/" rel="tag">Linux</a>
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/Python/" rel="tag">Python</a>
 
             </div>
         
@@ -350,14 +374,11 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240724/Python/"
-                    data-tooltip="Python 實用系列：利用 openpxyl 操作 excel"
-                    aria-label="上一篇: Python 實用系列：利用 openpxyl 操作 excel"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -367,9 +388,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240704/Docker/"
-                    data-tooltip="Recent docker / singularity notes"
-                    aria-label="下一篇: Recent docker / singularity notes"
+                    href="/20240724/Python/"
+                    data-tooltip="Python 實用系列：利用 openpxyl 操作 excel"
+                    aria-label="下一篇: Python 實用系列：利用 openpxyl 操作 excel"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -394,7 +415,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240704/Linux/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240802/Python/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -407,7 +428,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240704/Linux/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240802/Python/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -420,7 +441,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240704/Linux/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240802/Python/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -457,8 +478,8 @@
         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
         var disqus_config = function () {
-          this.page.url = 'https://pxchen110.github.io/20240704/Linux/';  // Replace PAGE_URL with your page's canonical URL variable
-          this.page.identifier = '1721338878000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          this.page.url = 'https://pxchen110.github.io/20240802/Python/';  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = '1722588509000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
         };
         (function() { // DON'T EDIT BELOW THIS LINE
         var d = document, s = d.createElement('script');
@@ -486,14 +507,11 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240724/Python/"
-                    data-tooltip="Python 實用系列：利用 openpxyl 操作 excel"
-                    aria-label="上一篇: Python 實用系列：利用 openpxyl 操作 excel"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -503,9 +521,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240704/Docker/"
-                    data-tooltip="Recent docker / singularity notes"
-                    aria-label="下一篇: Recent docker / singularity notes"
+                    href="/20240724/Python/"
+                    data-tooltip="Python 實用系列：利用 openpxyl 操作 excel"
+                    aria-label="下一篇: Python 實用系列：利用 openpxyl 操作 excel"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -530,7 +548,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240704/Linux/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240802/Python/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -543,7 +561,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240704/Linux/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240802/Python/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -556,7 +574,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240704/Linux/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240802/Python/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -590,7 +608,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240704/Linux/"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240802/Python/"
                         aria-label="分享到 Facebook"
                     >
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
@@ -603,7 +621,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240704/Linux/"
+                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240802/Python/"
                         aria-label="分享到 Twitter"
                     >
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
@@ -616,7 +634,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://plus.google.com/share?url=https://pxchen110.github.io/20240704/Linux/"
+                        href="https://plus.google.com/share?url=https://pxchen110.github.io/20240802/Python/"
                         aria-label="分享到 Google+"
                     >
                         <i class="fab fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
