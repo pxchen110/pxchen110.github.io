@@ -281,6 +281,13 @@
 
   
   <url>
+    <loc>https://pxchen110.github.io/tags/Github/</loc>
+    <lastmod>2024-08-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://pxchen110.github.io/tags/HTML/</loc>
     <lastmod>2024-08-02</lastmod>
     <changefreq>weekly</changefreq>
@@ -302,7 +309,7 @@
   </url>
   
   <url>
-    <loc>https://pxchen110.github.io/tags/Github/</loc>
+    <loc>https://pxchen110.github.io/tags/Movie/</loc>
     <lastmod>2024-08-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -317,13 +324,6 @@
   
   <url>
     <loc>https://pxchen110.github.io/tags/Taiwan/</loc>
-    <lastmod>2024-08-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://pxchen110.github.io/tags/Movie/</loc>
     <lastmod>2024-08-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -351,13 +351,6 @@
   </url>
   
   <url>
-    <loc>https://pxchen110.github.io/tags/Macau/</loc>
-    <lastmod>2024-08-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://pxchen110.github.io/tags/Docker/</loc>
     <lastmod>2024-08-02</lastmod>
     <changefreq>weekly</changefreq>
@@ -378,7 +371,21 @@
     <priority>0.2</priority>
   </url>
   
+  <url>
+    <loc>https://pxchen110.github.io/tags/Macau/</loc>
+    <lastmod>2024-08-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
 
+  
+  <url>
+    <loc>https://pxchen110.github.io/categories/Github/</loc>
+    <lastmod>2024-08-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
   
   <url>
     <loc>https://pxchen110.github.io/categories/Front-end/</loc>
@@ -389,13 +396,6 @@
   
   <url>
     <loc>https://pxchen110.github.io/categories/Python/</loc>
-    <lastmod>2024-08-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://pxchen110.github.io/categories/Github/</loc>
     <lastmod>2024-08-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
