@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Xuan&#39;s Blog">
-    <title>使用 diff, vimdiff, excel inquire 比較檔案 - Xuan&#39;s Blog</title>
+    <title>香港旅行隨筆 (2) - Xuan&#39;s Blog</title>
     <meta name="author" content="Xuan Chen">
     
         <meta name="keywords" content="hexo,javascript,">
@@ -17,26 +17,28 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg"},"articleBody":"介紹幾個比較檔案內容差異的方法\n\n\n\ndiffmanual page\n適合想知道檔案有無差異，不細看內部文字的工作\n1diff FILE1 FILE2\n若只想知道檔案是否一樣，可以加:\n\n-q, --brief 會在檔案不同時輸出 Files FILE1 and FILE2 differ\n-s, --report-identical-files 在檔案相同時輸出 Files FILE1 and FILE2 are identical\n\n預設的 stdout 會輸出兩檔案不同的地方與相互對應的行數(順序跟cmd中檔按順序相同)，如下面範例:\n12345678910# diff FILE1 FILE26c6  ## diff row number in FILE1 and FILE2&lt; Date: 2024 March---&gt; Date: 2024 Jun65c67&lt;     with gzip.open(out_name, &#x27;wt&#x27;, encoding = &#x27;utf-8&#x27; ) as fh:---&gt;     with open(out_name, &#x27;w&#x27;, ) as fh:\n\n但這樣一行一行的輸出內容太難看，可以用 -y, --side-by-side 來將比較結果輸出成兩個column的排列方式\n還有一個 sdiff 作用等同於 diff -y\nvimdiff (vim -d)適合想詳細比較程式碼版本間差異的工作\n1vimdiff FILE1 FILE2\nvimdiff (相當於 vim -d) 會先以 vim 開啟兩份目標檔案後，再一行行對照檔案間的差異，若有內文不同、刪減、空行等差異情況會以顏色標示呈現\n\n可以使用 [c 和 ]c 跳轉至前後不同處，此外也可直接進入 insert 模式來修改文檔\nExcel 增益集 Inquire 功能Microsoft 官方的說明網頁\n適合檔案較小，格式固定，且喜愛做手工的你進入excel後，點選左下角的選項會跳出以下畫面:\n點選黃色標示的增益集後，依序選擇:管理 -&gt; COM 增益集 -&gt; 點選 Inquire -&gt; 點選右下角確定儲存\n\n接著同時開啟目標檔案，這時會發現工具欄多了一個Inquire的選項點選比較檔案會跳出選擇比較檔名的視窗\n輸出可分兩大部分檢視:上部分為目標兩檔案的表格，詳細列給使用者，並以顏色標示不同處顏色根據不同的資料類別區分，如圖中的綠色指的是 ‘entered value’　數值不同\n\n若不同之處較多，參考長條圖的統計數量比較有意義。\n","dateCreated":"2024-07-19T05:41:18+08:00","dateModified":"2024-07-19T05:48:48+08:00","datePublished":"2024-07-19T05:41:18+08:00","description":"介紹幾個比較檔案內容差異的方法","headline":"使用 diff, vimdiff, excel inquire 比較檔案","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20240704/Linux/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20240704/Linux/","keywords":"Linux, Excel"}</script>
-    <meta name="description" content="introduce unix, excel method to compare differences between two files">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg"},"articleBody":"吹著海風思考著未來會過著什麼樣的生活？那些過去許下的願望好像沉入深海不見蹤影“已到達大人年歲，那偉大預言無根據” – 預言書。關智斌\n\n\n落雨天慵懶準備去飲茶，店內有限的空間容納許多食客，若以全能住宅xx王的方式來形容，店家巧妙利用隔板做出隔間以增加顧客收容能力(誤) 服務員不冷不熱的收拾餐具與劃單，拿回明細檢查發現打錯，來回兩次帳目仍然不對，便直接去櫃檯同他確認才正確；點心不論樣貌與味道都有中上水平，特別是滷至入味的鳳爪，那鹹甜的外皮令人忘情吸吮；經典蝦餃和流沙包趁熱食比在台灣吃過的味道都好。吃飽飯外頭雨暫歇，趕緊返回地鐵站搭車，兩旁竹子搭建的拉皮工地，總有搖搖欲墜的錯覺，若是風球登入就不好說了。到尖沙咀展開伴手禮採購，位於美麗大廈的珍妮小熊剛開店外頭已熱鬧如早市，為了不辜負排隊的辛苦，總想著要不再多買幾盒；結帳時老闆娘展示多盒餅乾倒扣進購物袋的打包神技，揹著超重的鐵盒、成為名副其實的爆買觀光客。\n下午抵達維港k11，商場內裝金碧輝煌，各個角落都有藝術作品可欣賞，從抽現象現代到潮流角色都有；特別喜歡懸掛於商場天幕的塩田千春的作品，當年特別去北美館參觀，運用線條纏繞出船舶意象，搭配大綑紅線交錯編織成的一張大網，特別壯觀感動。維港附近草皮正放映著奧運比賽，前幾日香港劍擊奪冠而掀起奧運熱潮，據說半夜商場都有大屏幕轉播讓民眾前去觀賽。\n\n終於見到傳說中的維港景色，天色尚早先欣賞建築輪廓，也期待象徵繁榮的商業高樓，在華燈初上時會是何種風貌？沿港邊漫步至天星渡輪入口，才知上下層收費不同，為廣闊的視野選擇坐上層，啟航時海面波瀾略顯，身體稍微暈船但不能阻止想拍照記錄的意志，10分鐘內可抵達中環碼頭。原想到中環散步，但突然下起陣雨使我們選擇原地返回尖沙咀，回程輪流欣賞港島和九龍兩側的風景；天際100屏幕放當今時刻，不知在港島海景第一排OT的上班族能否見到？ \n\n整點欣賞一場燈光秀，相比光影熱烈的主場，我更喜歡研究靠近灣仔那側的住宅區，想著他們會如何度過周末日常，以及每棟屋邨下承載著多少人的生活瑣碎？但或許是與偶像同處一片天空的興奮，以觀光客角度出發總帶有過於樂觀美好的濾鏡，也呼應了旅行的本質是”從自己活膩的地方，去到別人活膩的地方”。再花個三五分散步至kenny來過的1881 heritage，跟影片裡繽紛的聖誕節氣不同，平常日即是一處古蹟特區，頂樓的高塔曾是偵測時間的至高點，如今早已退居在高樓密林中。\n\n隔天又回佐敦站吃澳洲牛奶公司，外頭有些排隊人龍，服務生會依照剩餘座位出來詢問有無剛好人數的顧客並帶入就坐，這極致的並桌陣法完全體現不浪費空間的港式哲學；為了融入茶餐廳文化，入座馬上唔該點餐，像是拼反應速度一般，一分鐘內便完成上菜，滿噹噹的套餐包含炒蛋吐司，火腿通粉跟飲料，擺滿面積不大的餐桌：炒蛋加入奶油口感滑嫩，通粉不常見於台式早餐行列，那雞高湯底的味道令人難忘，整體是會讓人想再來的水平；一邊用餐一邊觀察環境，佇守崗位的服務員鷹眼般的控場，誰放下筷子就前去收拾，誰東西佔到他人空間便出手相喬(位子)，最後看準顧客伸手拿錢，迅速遞上寫著價格的單據送客，跟台灣的服務風格差異頗大。\n\n解鎖港島線往堅尼地城（Kennedy Town）方向前進，這些英譯中的特色命名，已被紀念品店做成一塊塊磁鐵兜售，在澳門也見過類似D嘢。出站又是新的風貌，左彎是以海岸為終點的道路，右拐可見沿山坡興建的屋邨群，前方的當地街市正熱鬧開張，多為老人家前去採買。終於看見海平面，跟日本鎌倉晴朗飽和的藍白色不同，這裏是帶有些微顆粒感的莫藍迪色調，島嶼和跨海大橋映入眼簾，不時有渡輪劃破海面往遠方駛去。\n\n從接近終點的位置跳上叮叮車橫逛港島，上環海味街飄來濃郁的海鮮腥香，大片魷魚乾貨至小瑤柱陳列於台前供人選購，到銅鑼灣車子改變方向往跑馬地總站前進，偌大的馬場七月中開始因天氣因素暫停馬匹出賽，沒能體驗賽馬有點可惜，便改繞去不遠處的祥興咖啡室，這裡是追男仔裡張學友點陰陽奶水，陰陽飽的場景，如今內裝更新成為舒適的咖啡廳。搭車下山途中外頭突然落驟雨，再次驗證港島比九龍更會下雨。晚上獨自踏上見偶像之旅，轉乘東涌綫與機場快綫終於抵達亞博，開場前去應援場館欣賞粉絲們的作品，也收穫好多應援小物；演唱會兩個小時彷彿夢一般，親眼觀賞表演比起觀看影片收穫更多的震撼，待在同溫層裡特別投入為她的應援，結束後心情仍然亢奮直到一點才睡。\n拖著積累的疲倦收拾行李準備返家，終於見到屬於夏日的豔陽天，搭乘觀塘綫往調景嶺方向拜訪景點:彩虹邨和照片裡年輕氣盛的鮮豔牆面不同，已隨歲月斑駁褪色(或是濾鏡?)，後來查新聞得知這區準備重建，這次初見可能是最後一面；黃大仙被眾多屋邨圍繞，頗能感受此寶地的靈氣，在”一命二運三風水”信念下相信不會被輕易拆遷，內部除了既定路線還有個小花園可參觀，但正午時分建議去旁邊商場吹冷氣行街。回程路上做最後掙扎般的記錄九龍半島的街景，想著還有些小巷沒鑽到，幾棟唐樓沒看到，就讓遺憾將成為下次出發的動力。起飛前透過窗戶捕捉暴雨過後的兩道彩虹，天色漸晚，從雲層間隙欣賞香港夜色、直到只剩機艙內的反光。\n\n","dateCreated":"2024-08-22T20:32:47+08:00","dateModified":"2024-08-22T20:42:00+08:00","datePublished":"2024-08-22T20:32:47+08:00","description":"吹著海風思考著未來會過著什麼樣的生活？那些過去許下的願望好像沉入深海不見蹤影“已到達大人年歲，那偉大預言無根據” – 預言書。關智斌","headline":"香港旅行隨筆 (2)","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20240822/Life/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20240822/Life/","keywords":"Travel, Hong Kong"}</script>
+    <meta name="description" content="diary for Hong Kong trip in July 2024">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="使用 diff, vimdiff, excel inquire 比較檔案">
-<meta property="og:url" content="https://pxchen110.github.io/20240704/Linux/index.html">
+<meta property="og:title" content="香港旅行隨筆 (2)">
+<meta property="og:url" content="https://pxchen110.github.io/20240822/Life/index.html">
 <meta property="og:site_name" content="Xuan&#39;s Blog">
-<meta property="og:description" content="introduce unix, excel method to compare differences between two files">
+<meta property="og:description" content="diary for Hong Kong trip in July 2024">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://pxchen110.github.io/20240704/Linux/20240719_img1.png">
-<meta property="og:image" content="https://pxchen110.github.io/20240704/Linux/20240719_img2.png">
-<meta property="og:image" content="https://pxchen110.github.io/20240704/Linux/20240719_img3.png">
-<meta property="og:image" content="https://pxchen110.github.io/20240704/Linux/20240719_img4.png">
-<meta property="og:image" content="https://pxchen110.github.io/20240704/Linux/20240719_img5.png">
-<meta property="article:published_time" content="2024-07-18T21:41:18.000Z">
-<meta property="article:modified_time" content="2024-07-18T21:48:48.644Z">
+<meta property="og:image" content="https://pxchen110.github.io/20240822/Life/20240822_img1.jpg">
+<meta property="og:image" content="https://pxchen110.github.io/20240822/Life/20240822_img2.jpg">
+<meta property="og:image" content="https://pxchen110.github.io/20240822/Life/20240822_img3.jpg">
+<meta property="og:image" content="https://pxchen110.github.io/20240822/Life/20240822_img4.jpg">
+<meta property="og:image" content="https://pxchen110.github.io/20240822/Life/20240822_img5.jpg">
+<meta property="og:image" content="https://pxchen110.github.io/20240822/Life/20240822_img6.jpg">
+<meta property="og:image" content="https://pxchen110.github.io/20240822/Life/20240822_img7.jpg">
+<meta property="article:published_time" content="2024-08-22T12:32:47.000Z">
+<meta property="article:modified_time" content="2024-08-22T12:42:00.964Z">
 <meta property="article:author" content="Xuan Chen">
-<meta property="article:tag" content="Linux">
-<meta property="article:tag" content="Excel">
+<meta property="article:tag" content="Travel">
+<meta property="article:tag" content="Hong Kong">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pxchen110.github.io/20240704/Linux/20240719_img1.png">
+<meta name="twitter:image" content="https://pxchen110.github.io/20240822/Life/20240822_img1.jpg">
     
     
         
@@ -274,20 +276,20 @@
         <div class="post-header main-content-wrap text-left">
     
         <h1 class="post-title">
-            使用 diff, vimdiff, excel inquire 比較檔案
+            香港旅行隨筆 (2)
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2024-07-19T05:41:18+08:00">
+    <time datetime="2024-08-22T20:32:47+08:00">
 	
-		    2024 年 7 月 19 日
+		    2024 年 8 月 22 日
     	
     </time>
     
         <span>分類 </span>
         
-    <a class="category-link" href="/categories/Linux/">Linux</a>
+    <a class="category-link" href="/categories/Life/">Life</a>
 
 
     
@@ -299,36 +301,23 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <p>介紹幾個比較檔案內容差異的方法</p>
+            <p><img src="/20240822/Life/20240822_img1.jpg" alt="257838"><br>吹著海風思考著未來會過著什麼樣的生活？<br>那些過去許下的願望好像沉入深海不見蹤影<br>“已到達大人年歲，那偉大預言無根據” – 預言書。關智斌</p>
 <span id="more"></span>
-<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#diff"><span class="toc-text">diff</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#vimdiff-vim-d"><span class="toc-text">vimdiff (vim -d)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Excel-%E5%A2%9E%E7%9B%8A%E9%9B%86-Inquire-%E5%8A%9F%E8%83%BD"><span class="toc-text">Excel 增益集 Inquire 功能</span></a></li></ol>
 
-<h2 id="diff"><a href="#diff" class="headerlink" title="diff"></a>diff</h2><p><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man1/diff.1.html">manual page</a></p>
-<p>適合<strong>想知道檔案有無差異，不細看內部文字的工作</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff FILE1 FILE2</span><br></pre></td></tr></table></figure>
-<p>若只想知道檔案是否一樣，可以加:</p>
-<ul>
-<li><code>-q, --brief</code> 會在檔案不同時輸出 <strong>Files FILE1 and FILE2 differ</strong></li>
-<li><code>-s, --report-identical-files</code> 在檔案相同時輸出 <strong>Files FILE1 and FILE2 are identical</strong></li>
-</ul>
-<p>預設的 stdout 會輸出兩檔案不同的地方與相互對應的行數(順序跟cmd中檔按順序相同)，如下面範例:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># diff FILE1 FILE2</span><br><span class="line"></span><br><span class="line">6c6  ## diff row number in FILE1 and FILE2</span><br><span class="line">&lt; Date: 2024 March</span><br><span class="line">---</span><br><span class="line">&gt; Date: 2024 Jun</span><br><span class="line">65c67</span><br><span class="line">&lt;     with gzip.open(out_name, &#x27;wt&#x27;, encoding = &#x27;utf-8&#x27; ) as fh:</span><br><span class="line">---</span><br><span class="line">&gt;     with open(out_name, &#x27;w&#x27;, ) as fh:</span><br></pre></td></tr></table></figure>
-
-<p>但這樣一行一行的輸出內容太難看，可以用 <code>-y, --side-by-side</code> 來將比較結果輸出成兩個column的排列方式</p>
-<p>還有一個 <code>sdiff</code> 作用等同於 <code>diff -y</code></p>
-<h2 id="vimdiff-vim-d"><a href="#vimdiff-vim-d" class="headerlink" title="vimdiff (vim -d)"></a>vimdiff (vim -d)</h2><p>適合<strong>想詳細比較程式碼版本間差異的工作</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vimdiff FILE1 FILE2</span><br></pre></td></tr></table></figure>
-<p><code>vimdiff</code> (相當於 <code>vim -d</code>) 會先以 vim 開啟兩份目標檔案後，再一行行對照檔案間的差異，若有內文不同、刪減、空行等差異情況會以顏色標示呈現</p>
-<p><img src="/20240704/Linux/20240719_img1.png" alt="image"></p>
-<p>可以使用 <code>[c</code> 和 <code>]c</code> 跳轉至前後不同處，此外也可直接進入 insert 模式來修改文檔</p>
-<h2 id="Excel-增益集-Inquire-功能"><a href="#Excel-增益集-Inquire-功能" class="headerlink" title="Excel 增益集 Inquire 功能"></a>Excel 增益集 Inquire 功能</h2><p><a target="_blank" rel="noopener" href="https://support.microsoft.com/zh-tw/office/%E9%96%8B%E5%95%9F-inquire-%E5%A2%9E%E7%9B%8A%E9%9B%86-6bc668e2-f3c6-4729-8ce1-75ea20aa9d90">Microsoft 官方的說明網頁</a></p>
-<p>適合<strong>檔案較小，格式固定，且<del>喜愛做手工</del>的你</strong><br>進入excel後，點選左下角的<strong>選項</strong>會跳出以下畫面:</p>
-<p><img src="/20240704/Linux/20240719_img2.png" alt="image"><br>點選黃色標示的<strong>增益集</strong>後，依序選擇:<br>管理 -&gt; COM 增益集 -&gt; 點選 <strong>Inquire</strong> -&gt; 點選右下角<strong>確定</strong>儲存</p>
-<p><img src="/20240704/Linux/20240719_img3.png" alt="image"></p>
-<p>接著同時開啟目標檔案，這時會發現工具欄多了一個<strong>Inquire</strong>的選項<br>點選<strong>比較檔案</strong>會跳出選擇比較檔名的視窗<br><img src="/20240704/Linux/20240719_img4.png" alt="image"></p>
-<p>輸出可分兩大部分檢視:<br>上部分為目標兩檔案的表格，詳細列給使用者，並以顏色標示不同處<br>顏色根據不同的資料類別區分，如圖中的綠色指的是 ‘entered value’　數值不同</p>
-<p><img src="/20240704/Linux/20240719_img5.png" alt="image"></p>
-<p>若不同之處較多，參考長條圖的統計數量比較有意義。</p>
+<p>落雨天慵懶準備去飲茶，店內有限的空間容納許多食客，若以全能住宅xx王的方式來形容，店家巧妙利用隔板做出隔間以增加顧客收容能力(誤) 服務員不冷不熱的收拾餐具與劃單，拿回明細檢查發現打錯，來回兩次帳目仍然不對，便直接去櫃檯同他確認才正確；點心不論樣貌與味道都有中上水平，特別是滷至入味的鳳爪，那鹹甜的外皮令人忘情吸吮；經典蝦餃和流沙包趁熱食比在台灣吃過的味道都好。吃飽飯外頭雨暫歇，趕緊返回地鐵站搭車，兩旁竹子搭建的拉皮工地，總有搖搖欲墜的錯覺，若是風球登入就不好說了。到尖沙咀展開伴手禮採購，位於美麗大廈的珍妮小熊剛開店外頭已熱鬧如早市，為了不辜負排隊的辛苦，總想著要不再多買幾盒；結帳時老闆娘展示多盒餅乾倒扣進購物袋的打包神技，揹著超重的鐵盒、成為名副其實的爆買觀光客。</p>
+<p>下午抵達維港k11，商場內裝金碧輝煌，各個角落都有藝術作品可欣賞，從抽現象現代到潮流角色都有；特別喜歡懸掛於商場天幕的塩田千春的作品，當年特別去北美館參觀，運用線條纏繞出船舶意象，搭配大綑紅線交錯編織成的一張大網，特別壯觀感動。維港附近草皮正放映著奧運比賽，前幾日香港劍擊奪冠而掀起奧運熱潮，據說半夜商場都有大屏幕轉播讓民眾前去觀賽。</p>
+<p><img src="/20240822/Life/20240822_img2.jpg" alt="257835"></p>
+<p>終於見到傳說中的維港景色，天色尚早先欣賞建築輪廓，也期待象徵繁榮的商業高樓，在華燈初上時會是何種風貌？沿港邊漫步至天星渡輪入口，才知上下層收費不同，為廣闊的視野選擇坐上層，啟航時海面波瀾略顯，身體稍微暈船但不能阻止想拍照記錄的意志，10分鐘內可抵達中環碼頭。原想到中環散步，但突然下起陣雨使我們選擇原地返回尖沙咀，回程輪流欣賞港島和九龍兩側的風景；天際100屏幕放當今時刻，不知在港島海景第一排OT的上班族能否見到？ </p>
+<p><img src="/20240822/Life/20240822_img3.jpg" alt="257833_0"></p>
+<p>整點欣賞一場燈光秀，相比光影熱烈的主場，我更喜歡研究靠近灣仔那側的住宅區，想著他們會如何度過周末日常，以及每棟屋邨下承載著多少人的生活瑣碎？但或許是與偶像同處一片天空的興奮，以觀光客角度出發總帶有過於樂觀美好的濾鏡，也呼應了旅行的本質是”從自己活膩的地方，去到別人活膩的地方”。再花個三五分散步至kenny來過的1881 heritage，跟影片裡繽紛的聖誕節氣不同，平常日即是一處古蹟特區，頂樓的高塔曾是偵測時間的至高點，如今早已退居在高樓密林中。</p>
+<p><img src="/20240822/Life/20240822_img4.jpg" alt="257832"></p>
+<p>隔天又回佐敦站吃澳洲牛奶公司，外頭有些排隊人龍，服務生會依照剩餘座位出來詢問有無剛好人數的顧客並帶入就坐，這極致的並桌陣法完全體現不浪費空間的港式哲學；為了融入茶餐廳文化，入座馬上唔該點餐，像是拼反應速度一般，一分鐘內便完成上菜，滿噹噹的套餐包含炒蛋吐司，火腿通粉跟飲料，擺滿面積不大的餐桌：炒蛋加入奶油口感滑嫩，通粉不常見於台式早餐行列，那雞高湯底的味道令人難忘，整體是會讓人想再來的水平；一邊用餐一邊觀察環境，佇守崗位的服務員鷹眼般的控場，誰放下筷子就前去收拾，誰東西佔到他人空間便出手相喬(位子)，最後看準顧客伸手拿錢，迅速遞上寫著價格的單據送客，跟台灣的服務風格差異頗大。</p>
+<p><img src="/20240822/Life/20240822_img5.jpg" alt="257836_0"></p>
+<p>解鎖港島線往堅尼地城（Kennedy Town）方向前進，這些英譯中的特色命名，已被紀念品店做成一塊塊磁鐵兜售，在澳門也見過類似D嘢。出站又是新的風貌，左彎是以海岸為終點的道路，右拐可見沿山坡興建的屋邨群，前方的當地街市正熱鬧開張，多為老人家前去採買。終於看見海平面，跟日本鎌倉晴朗飽和的藍白色不同，這裏是帶有些微顆粒感的莫藍迪色調，島嶼和跨海大橋映入眼簾，不時有渡輪劃破海面往遠方駛去。</p>
+<p><img src="/20240822/Life/20240822_img6.jpg" alt="257834_0"></p>
+<p>從接近終點的位置跳上叮叮車橫逛港島，上環海味街飄來濃郁的海鮮腥香，大片魷魚乾貨至小瑤柱陳列於台前供人選購，到銅鑼灣車子改變方向往跑馬地總站前進，偌大的馬場七月中開始因天氣因素暫停馬匹出賽，沒能體驗賽馬有點可惜，便改繞去不遠處的祥興咖啡室，這裡是追男仔裡張學友點陰陽奶水，陰陽飽的場景，如今內裝更新成為舒適的咖啡廳。搭車下山途中外頭突然落驟雨，再次驗證港島比九龍更會下雨。晚上獨自踏上見偶像之旅，轉乘東涌綫與機場快綫終於抵達亞博，開場前去應援場館欣賞粉絲們的作品，也收穫好多應援小物；演唱會兩個小時彷彿夢一般，親眼觀賞表演比起觀看影片收穫更多的震撼，待在同溫層裡特別投入為她的應援，結束後心情仍然亢奮直到一點才睡。</p>
+<p>拖著積累的疲倦收拾行李準備返家，終於見到屬於夏日的豔陽天，搭乘觀塘綫往調景嶺方向拜訪景點:彩虹邨和照片裡年輕氣盛的鮮豔牆面不同，已隨歲月斑駁褪色(或是濾鏡?)，後來查新聞得知這區準備重建，這次初見可能是最後一面；黃大仙被眾多屋邨圍繞，頗能感受此寶地的靈氣，在”一命二運三風水”信念下相信不會被輕易拆遷，內部除了既定路線還有個小花園可參觀，但正午時分建議去旁邊商場吹冷氣行街。回程路上做最後掙扎般的記錄九龍半島的街景，想著還有些小巷沒鑽到，幾棟唐樓沒看到，就讓遺憾將成為下次出發的動力。起飛前透過窗戶捕捉暴雨過後的兩道彩虹，天色漸晚，從雲層間隙欣賞香港夜色、直到只剩機艙內的反光。</p>
+<p><img src="/20240822/Life/20240822_img7.jpg" alt="257830_0"></p>
 
             
 
@@ -340,7 +329,7 @@
             <div class="post-footer-tags">
                 <span class="text-color-light text-small">標籤</span><br/>
                 
-    <a class="tag tag--primary tag--small t-none-link" href="/tags/Excel/" rel="tag">Excel</a> <a class="tag tag--primary tag--small t-none-link" href="/tags/Linux/" rel="tag">Linux</a>
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/Hong-Kong/" rel="tag">Hong Kong</a> <a class="tag tag--primary tag--small t-none-link" href="/tags/Travel/" rel="tag">Travel</a>
 
             </div>
         
@@ -350,14 +339,11 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240724/Python/"
-                    data-tooltip="Python 實用系列：利用 openpxyl 操作 excel"
-                    aria-label="上一篇: Python 實用系列：利用 openpxyl 操作 excel"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -367,9 +353,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240704/Docker/"
-                    data-tooltip="Recent docker / singularity notes"
-                    aria-label="下一篇: Recent docker / singularity notes"
+                    href="/20240815/Life/"
+                    data-tooltip="香港旅行隨筆（1)"
+                    aria-label="下一篇: 香港旅行隨筆（1)"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -394,7 +380,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240704/Linux/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240822/Life/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -407,7 +393,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240704/Linux/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240822/Life/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -420,7 +406,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240704/Linux/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240822/Life/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -433,7 +419,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目錄">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="post.back_to_top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -457,8 +443,8 @@
         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
         var disqus_config = function () {
-          this.page.url = 'https://pxchen110.github.io/20240704/Linux/';  // Replace PAGE_URL with your page's canonical URL variable
-          this.page.identifier = '1721338878000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          this.page.url = 'https://pxchen110.github.io/20240822/Life/';  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = '1724329967000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
         };
         (function() { // DON'T EDIT BELOW THIS LINE
         var d = document, s = d.createElement('script');
@@ -486,14 +472,11 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240724/Python/"
-                    data-tooltip="Python 實用系列：利用 openpxyl 操作 excel"
-                    aria-label="上一篇: Python 實用系列：利用 openpxyl 操作 excel"
-                >
-                    
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -503,9 +486,9 @@
                     
                 <a
                     class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240704/Docker/"
-                    data-tooltip="Recent docker / singularity notes"
-                    aria-label="下一篇: Recent docker / singularity notes"
+                    href="/20240815/Life/"
+                    data-tooltip="香港旅行隨筆（1)"
+                    aria-label="下一篇: 香港旅行隨筆（1)"
                 >
                     
                         <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
@@ -530,7 +513,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240704/Linux/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240822/Life/"
                     title="分享到 Facebook"
                     aria-label="分享到 Facebook"
                 >
@@ -543,7 +526,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240704/Linux/"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240822/Life/"
                     title="分享到 Twitter"
                     aria-label="分享到 Twitter"
                 >
@@ -556,7 +539,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240704/Linux/"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240822/Life/"
                     title="分享到 Google+"
                     aria-label="分享到 Google+"
                 >
@@ -569,7 +552,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目錄">
+                <a class="post-action-btn btn btn--default" href="#" aria-label="post.back_to_top">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -590,7 +573,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240704/Linux/"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240822/Life/"
                         aria-label="分享到 Facebook"
                     >
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
@@ -603,7 +586,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240704/Linux/"
+                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240822/Life/"
                         aria-label="分享到 Twitter"
                     >
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
@@ -616,7 +599,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://plus.google.com/share?url=https://pxchen110.github.io/20240704/Linux/"
+                        href="https://plus.google.com/share?url=https://pxchen110.github.io/20240822/Life/"
                         aria-label="分享到 Google+"
                     >
                         <i class="fab fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
