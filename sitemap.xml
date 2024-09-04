@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://pxchen110.github.io/20240905/Python/</loc>
+    
+    <lastmod>2024-09-04</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://pxchen110.github.io/20240829/Bioinformatics/</loc>
     
     <lastmod>2024-08-29</lastmod>
@@ -310,7 +319,7 @@
 
   <url>
     <loc>https://pxchen110.github.io/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -318,105 +327,105 @@
   
   <url>
     <loc>https://pxchen110.github.io/tags/Github/</loc>
-    <lastmod>2024-08-29</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://pxchen110.github.io/tags/Python/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/tags/HTML/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/tags/CSS/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://pxchen110.github.io/tags/Movie/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <loc>https://pxchen110.github.io/tags/Python/</loc>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/tags/Travel/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/tags/Taiwan/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/tags/Japan/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://pxchen110.github.io/tags/Movie/</loc>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/tags/Singapore/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/tags/Database/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/tags/Macau/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/tags/Docker/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/tags/Linux/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/tags/Excel/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/tags/Hong-Kong/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
@@ -425,49 +434,49 @@
   
   <url>
     <loc>https://pxchen110.github.io/categories/Github/</loc>
-    <lastmod>2024-08-29</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://pxchen110.github.io/categories/Python/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/categories/Front-end/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://pxchen110.github.io/categories/Python/</loc>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/categories/Life/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/categories/Bioinformatics/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/categories/Docker/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://pxchen110.github.io/categories/Linux/</loc>
-    <lastmod>2024-08-29</lastmod>
+    <lastmod>2024-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
