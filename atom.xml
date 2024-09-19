@@ -6,7 +6,7 @@
   <link href="https://pxchen110.github.io/atom.xml" rel="self"/>
   
   <link href="https://pxchen110.github.io/"/>
-  <updated>2024-09-04T21:27:34.942Z</updated>
+  <updated>2024-09-19T11:45:36.179Z</updated>
   <id>https://pxchen110.github.io/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Python flask 小專案：下載公開資料庫的基因列表網頁</title>
+    <link href="https://pxchen110.github.io/20240919/Python/"/>
+    <id>https://pxchen110.github.io/20240919/Python/</id>
+    <published>2024-09-19T11:37:57.000Z</published>
+    <updated>2024-09-19T11:45:36.179Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/20240919/Python/20240919_img1.png"></p><p>source code 已放在我的 Github downloadDB repository: <a href="https://github.com/pxchen110/downloadDB?tab=readme-ov-file">https://github.com/pxchen110/downloadDB?tab=readme-ov-file</a></p><span id="more"></span><!-- toc --><h2 id="專案動機"><a href="#專案動機" class="headerlink" title="專案動機"></a>專案動機</h2><p>基因途徑(gene pathway)在生物研究扮演重要角色，如分子生物機制(molecular mechanism)、基因表現量(gene-set enrichment)的探討；研究者常參考 Kyoto Encyclopedia of Genes and Genomes (KEGG), Harmonizome 等資料庫，並具有抓取特定途徑之基因列表的需求。</p><p>但在資料取用上，對於沒有程式使用經驗(R, python)的使用者而言，常面臨以下幾個困難點:</p><ul><li>資料庫僅提供 REST api 取用資料 (<a href="https://www.kegg.jp/kegg/rest/">KEGG</a> 和 <a href="https://maayanlab.cloud/Harmonizome/documentation#api">Harmonizme</a>)。api 處理需要串聯 <code>requests</code> 等程式套件與網頁互動以存取資料</li><li>即使網站提供api資料取用，也僅提供json格式輸出(<a href="https://maayanlab.cloud/Harmonizome/api/1.0/gene_set/krasdriven/GeneRIF+Biological+Term+Annotations">範例參考</a>)，一般文書處理程式(Microsoft Excel, Notepad++)無法直觀開啟和取用資訊</li></ul><p>為提供更直觀方便的基因途徑探索，本專案以python為基礎處理api資訊，並以flask套件撰寫動態網頁，提供友善的html介面操作: 使用者僅需選擇資料庫來源、輸入pathway ID、貼上api網址、或上傳含有多個網址的文檔，網頁會直接回傳機因列表，並提供一鍵友善下載功能，檔案將以TXT, CSV等方便開啟的格式儲存，若提供多個列表，將會以zip壓縮檔下載給使用者。</p><h2 id="示範操作"><a href="#示範操作" class="headerlink" title="示範操作"></a>示範操作</h2><ul><li><p>將專案 git clone 回本機，並確保本機已滿足環境需求(environment requirements)： <code>python</code> 和 <code>conda</code></p></li><li><p>進入 downloadDB 資料夾並建立 conda 環境：<code>conda create -f environment.yml</code></p></li><li><p>執行專案前請開啟環境 <code>conda activate flaskenv</code></p></li><li><p>利用 python 開啟 flask 網頁 <code>python3 app.py</code><br>開啟 <code>http://127.0.0.1:5000</code> 連結後會看到以下網頁:<br><img src="/20240919/Python/20240919_img1.png" alt="image"></p></li><li><p>根據需求選擇其中一個Block輸入資料: <strong>!注意一次僅接受一種輸入形式!</strong>:</p><ul><li>查詢一個基因途徑(single query): 選擇資料庫種類 (<code>KEGG</code> 或 <code>Harmonizome</code>) 並依照範例輸入 pathway ID, api URL、點選 <code>Submit</code> 送出</li><li>查詢多個基因途徑(multiple query):準備一份紀錄api URL 的 TXT 檔，選擇資料庫種類 (<code>KEGG</code> 或 <code>Harmonizome</code>)並上傳檔案、點選 <code>Submit</code> 送出</li></ul></li><li><p>若目標api或基因途徑存在，將會返回以下網頁內容:<br><img src="/20240919/Python/20240919_img2.png" alt="image"></p></li><li><p>點選 <strong>Download TXT</strong> 或 <strong>Download CSV</strong> 下載不同格式的基因列表；若提供多個基因途徑，點選<strong>Download ZIP</strong> 下載zip壓縮檔，解壓縮後每個基因列表產生一份TXT檔</p></li></ul><h2 id="未來改善"><a href="#未來改善" class="headerlink" title="未來改善"></a>未來改善</h2><ul><li>由於目前python程式寫法為: 取得資料後<strong>會將基因列表儲存成txt和csv檔</strong>(專案路徑下名為<code>query_output</code>和<code>query_input</code>的資料夾)，並以檔名作為變數傳遞至下個函數；若使用者點選 download 按鈕並將檔案下載至本機，此時電腦會有兩份相同的檔案，<strong>希望能增加自動清除檔案功能</strong></li><li>如何跳轉回最初頁面</li><li>嘗試連結後端資料庫儲存的函數功能</li></ul>]]></content>
+    
+    
+    <summary type="html">introducing my python side project about download gene pathway list via html interface and db api</summary>
+    
+    
+    
+    <category term="Python" scheme="https://pxchen110.github.io/categories/Python/"/>
+    
+    
+    <category term="Python" scheme="https://pxchen110.github.io/tags/Python/"/>
+    
+  </entry>
   
   <entry>
     <title>Python 系列：建立簡單的伺服器</title>
@@ -420,29 +441,6 @@
     <updated>2024-04-30T22:23:50.414Z</updated>
     
     <content type="html"><![CDATA[<p><img src="/20240411/Life/20240411_img1.jpg"></p><p>特別感謝國中朋友Amigo的共遊.___.</p><span id="more"></span><p>(時間拉回到第一個周日)，和在日友人Amigo(以下又稱朋朋)見面，早上先獨自一人去世田谷區探險，第一次知道三茶是東京女子圖鑑，房仲說剛上京工作可以考慮的租屋處。三軒茶屋站內可見成群的家庭或學生，小巷內還有剛從居酒屋出來的人群，騎單車滿載的阿伯，充滿生活氣息。早餐吃了 blue bottle coffee 和(二度朝聖的)truffle bakery，松露麵包超級好吃，也幫朋朋代買幾個。</p><p>搭乘東急世田谷線的福貓列車，貓咪外觀的車廂相當可愛，路面電車的風情之一就是能一瞥兩旁住宅區的風景，讓人想起挪威森林書中描寫電車駛過住宅街區的段落(雖然路線不同XD)，也偷偷想像屋內的人過著怎樣的生活?</p><p><img src="/20240411/Life/20240411_img2.jpg"></p><p>抵達豪德寺，滿滿的觀光客為了可愛招財貓而來，神社外擺放過於密集的祈福貓，很適合拍照，也有人秉持著威利在哪裡的玩心，將貓咪放在刁鑽的角度，像是屋簷內側?等奇特位置，享受了片刻的尋寶樂趣。沿著住宅區散步回車站，轉搭小田急線前往下北沢，才發現今天有神社祭典，真是幸運。</p><p>和Amigo會合並吃午餐後，一路跟隨神轎的隊伍前往神社，還記得當天晴空萬里（九月仍然有32度的熾熱），由於人潮眾多不方便撐傘，就頂著大太陽玩樂，也近距離參觀神轎的精美作工，那固定木樁的粗繩比我手臂還粗，尺寸驚人，消耗體力後的鬆餅下午茶格外美味，一路上閒晃聊天，彷彿回到沒有太多顧慮和世俗壓力的學生時代，享受著純粹的開心。</p><p><img src="/20240411/Life/20240411_img3.jpg"><br>總共有8家神社參與的樣子，神轎的樣貌與裝飾都有所不同，很棒的體驗。</p><p>星期二和在日朋朋Amigo約在新宿JR南口匯合，原本想飯店在新宿車站附近，可以慢悠悠地晃過去集合，但由於本人連北車地下道都會迷路，如果貿然進入新宿地下迷宮，一定會被吞進異世界，於是多花一點時間，從飯店走平面到集合點。由於兩人都是早到派，發車前半小時已經抵達月台，發現都穿了當季流行的公装褲並帶上我推小娃娃，默契++。事前預訂好富士回游車票，好處是一定有位子，但富士山的能見度就要看運氣，由於颱風接近，富士預報的狀況不太理想，希望到當地能見到完整的景色。</p><p>從下吉田站開始旅程，前往淺間神社與忠靈塔欣賞風景，我們覺得年輕人就多爬樓梯快速通關，誰知爬到半路體力太差，幾次停頓才終於抵達最上層，富士山一開始被大片雲遮住，和其他遊客在那等了一會，突然一瞬間山頂的雲霧散去，大家非常有默契的起身拍照</p><p>下山後我們改走小路探險，途經當地人的菜園，看到可愛的小茄子與漂亮的都府車牌，備感新奇，找到一間養馬的神社，一旁裝飾到一半的道具與宣傳單顯示下周要舉辦祭典，聽說還有騎馬射箭的儀式，感覺很有趣，從神社正門出來就是下吉田懷舊商店街。</p><p><img src="/20240411/Life/20240411_img5.jpg"></p><p>那裏帶有可愛的昭和風色調，淺灰色、天空藍與白色和富士山十分相襯，街上擺著請勿停留馬路中間拍照的招牌，甚至是中文寫得，看來IG打卡點的宣傳力量大，這時富士山又被蓋住無法欣賞，於是我們試圖從商店街宣傳單推薦的餐廳尋找午餐地點，但那張宣傳單有點雷，部分已歇業或公休，最終找到一家叫M2的喫茶店，門口牌子顯示準備中，往店裡窺探也相當昏暗，正當我們準備放棄時，突然有一個當地人很自然的走進去，我們趁這時見到染著大紅頭髮的的老闆，成功入座點餐。</p><p>午餐的漢堡排定食在飢餓的加成下相當美味，手工捏製的粗絞肉漢堡排配上味噌醬汁與生菜，搭配香軟的日本米與鹹度適中的味增湯，令人滿足感謝招待；店內氣氛放鬆，許多熟客進來不用多說便坐在老位子看書，或聽廣播享受飲料；結帳時阿嬤還跑去廚房拿巧克力給我們，就像孫女一樣被神秘款待。飯後散步至大月站搭車前往河口湖。</p><p>到河口湖天氣非常晴朗但富士山還沒出來，走去天上山公園纜車的路上差點熱昏，纜車上升途中可以眺望整個河口湖的美景，觀景平台的故事設定和鬼灯那隻兔子獄官一樣，可以看到那隻被塗味增的壞心狸貓XD</p><p><img src="/20240411/Life/20240411_img6.jpg"><br>從河口湖上升至山頂的纜車，天気はとても良い</p><p>我們爬上神秘小山，抵達武田信玄戰場，甚至沿著超級難走的路(只能找樹根與石頭縫隙落腳) 爬上煙罕至的小神社，運動量直接達標XD下山後直接跑去買富士山限定可樂與刨冰消暑。</p><p>回到車站附近，幸運地在lawson前看到露出全貌的富士山，配上佐以當季水果-桃子和麝香葡萄-的富士山布丁，有得看又有得吃，離開跟朋友去買信玄餅伴手禮，轉頭剛好看到富士山跟和河口湖車站兩者共構的美景，真的不虛此行。</p><p><img src="/20240411/Life/20240411_img4.jpg"><br>旅行の最後に、窓から富士山を見えた！</p><p>星期三是鎌倉江之島旅行，由於颱風生成並朝東京前進，內心有點忐忑江之島的天氣。新宿購買小田急鎌倉一日券後，先抵達藤沢站再換乘江之島電鐵。</p><p>將之導電鐵的車廂十分復古可愛，大概十來分鐘抵達通往江之島的陸橋入口，當天橋上的風雨頗大，彷彿是為了我先做颱風天扛行李換飯店的演習，我們兩人死命抓著傘防止開花，一邊艱難前進XD登島後眼看雨勢頗大，果斷購買江之島電扶梯門票以節省體力，電梯一共分三層，每層都會抵達江之島三大社(邊津宮、中津宮、奧津宮)的其中一間，電扶梯只提供往上運輸，下來只有樓梯可選擇。</p><p>這次來江之島的目的便是打卡 <a href="https://www.youtube.com/watch?v=vD42ZRdVvpg">she’s letter</a> mv的拍攝場景，感謝 Amigo 答應與我巡禮一圈，包含奧津宮，元祖招牌商店街，也吃了女夫饅頭跟富士見亭。巡禮過程天氣也從烏雲密布到出大太陽啦!(ps.支線任務還有參觀植物園，吃章魚仙貝，以及江之島燈塔徘徊)</p><p><img src="/20240411/Life/20240411_img7.jpg"><br>兩人約會共同參拜的神社奧津宮，有趣的知識：這裡跟台灣人說情侶不要一起去呂洞賓廟有異曲同工之妙，江之島也有戀人分手聖地的傳說……</p><p>原本想跟主角一樣坐在外面，在養樂多排陽傘下吃刨冰，但外面風挺大就先作罷，我們點了當地特產江之島丼，一開始兩人都以為是烤香菇片的親子丼，一查網路才發現是海螺切片XD</p><p><img src="/20240411/Life/20240411_img8.jpg"></p><p>吃飽飯沿著原路返回並往鎌倉前進，抵達鎌倉後途經商店街先去八幡宮參拜，才回商店街買小鴿子餅跟鎌倉半月做伴手禮，之後一起去打卡中島健人來過的可麗餅，點了檸檬糖口味，感覺要加個生奶油會比較好吃，回程前在車站購入吻仔魚的可樂餅和炸牛肉餅分食，結果選到若冷房的車廂，被悶烤將近一個多小時，きつい😭能夠和很久沒見的人在他鄉相約，不管做啥都備感珍貴。</p>]]></content>
-    
-    
-    <summary type="html">diary for Japan alone trip in last year</summary>
-    
-    
-    
-    <category term="Life" scheme="https://pxchen110.github.io/categories/Life/"/>
-    
-    
-    <category term="Travel" scheme="https://pxchen110.github.io/tags/Travel/"/>
-    
-    <category term="Japan" scheme="https://pxchen110.github.io/tags/Japan/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>東京獨旅紀行之二。繁華都市</title>
-    <link href="https://pxchen110.github.io/20240328/Life/"/>
-    <id>https://pxchen110.github.io/20240328/Life/</id>
-    <published>2024-03-28T04:10:45.000Z</published>
-    <updated>2024-03-28T04:20:21.210Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/20240328/Life/20240328_img1.jpg"></p><p>「東京這個地方，聚集著從各個地方而來的人們。從前在鄉下時，從漫畫和電視劇里看見的東京，雖然燈火繁華，但人總是很冷漠。上京後我才明白了，那並不是冷漠，而是因為身為外來者的大家都心情緊張。外來者進入東京這個城市，一個個都表現出不要被吃掉的緊張狀態，終於成了一個集合體。」</p><span id="more"></span><p>為了節省通勤時間，從淺草搬至新宿車站、靠近新大久保的飯店，一出地鐵站感受到魚龍混雜的繁華格調，忍不住讚嘆”這就是東京呀!” 跟著一坨外國人操作自助 check in 機辦理入住，晚上特別打扮一下，前往時髦的新宿歌舞伎百貨區，Lumine est 湧入下班逛街的女子，女生看不出剛下班的疲累，反而都精心打扮並充滿幹勁的挑選衣服飾品，購買力驚人。我只簡單逛了GU和藥妝店，買一杯限定的奶油地瓜風味星冰樂就回飯店休息。</p><p><img src="/20240328/Life/20240328_img2.jpg"></p><p>第一個周末分別和兩位朋友見面，星期六在碰面前先去中目黑的星巴克甄選工坊，這家星巴克櫻花季相當熱門，可以坐在窗邊欣賞目黑川沿途盛開的櫻花。內部空間非常寬敞，販賣おしゃれ的限定飲品跟麵包，選了一杯奶油冰淇淋佐抹茶氣泡水，抹茶與氣泡感調和的相當完美，搭配現場烘烤的菠菜烘蛋可頌度過愉快上午。</p><p><img src="/20240328/Life/20240328_img3.jpg"></p><p>前往澀谷跟朋友一家吃飯，忠犬小巴的紀念碑成為碰面點，甚至需要排隊合影，諾大的交叉路口走了兩遍仍然迴避人潮苦手，中餐選擇在親子友好的樂雅樂用餐，和日劇裡家庭餐廳的印象一致，飲料自助吧、白領人員洽公打電腦，好吃的歐姆蛋炸物洋食套餐，朋友的兩位女兒很有趣，當我們吃飽到夾娃娃店後，直接開啟另一個人格變得很瘋。</p><p><img src="/20240328/Life/20240328_img4.jpg"></p><p>晚上去朝聖挽肉と米，網路宣傳效力大，店裡感覺都是台灣人來用餐XD，整體來說，我覺得什麼都不沾的原味，以及搭配白蘿蔔泥與柚子醋的味道比較好吃。生雞蛋拌飯有點接受苦手，絞肉的筋有點大塊，咬到最後微厭世XD酒足飯飽後，穿越周末狂歡的洶湧人潮，搭乘副都心線離開澀谷。</p><p><img src="/20240328/Life/20240328_img5.jpg"><br>(雞蛋…溜下去…了)</p><p>東京第二周的開局即是陰雨朦朧，新聞播報地鐵延遲的新聞，已經能想像地鐵內的月曜日鬱悶與擁擠，決定先到附近sukiya吃早餐，窩在角落吃著普通的日式定食。觀察店內顧客都是男性，某些人的疲態，透漏著直接喝到早上跑來吃牛丼的訊息。</p><p><img src="/20240328/Life/20240328_img6.jpg"></p><p>惠比壽花園廣場打卡sky lounge，在天氣還沒太差的狀況下，街道房屋和東京鐵塔變得好小好密集，像是東京女子圖鑑的悸動，為理想從四面八方上京的人們，在這裡過著不同卻又平凡的生活。</p><p><img src="/20240328/Life/20240328_img7.jpg"></p><p>下樓後雨勢稍大，在 starbucks tevanna 店品嘗季節限定的栗子焙茶星冰樂，同時想著這些地方是第一次，也可能是人生中最後一次來的感傷。生活總是直線前進，僅能偶爾回頭看看風景，如果能把現在開始過得更好，遺憾應該會減少吧。</p><p><img src="/20240328/Life/20240328_img8.jpg"></p><p>眼看雨是變小了，動身前往神樂坂參拜兩間神社，但天氣不作美，在xx坂健身行程途中甚至下起大雨，褲子一路淋濕，肚子也很餓，發現看起來馬上就能吃到東西的明代富士そば，（肚子已達極限的我）沒注意要先投錢才能操作點餐機，甚至一度懷疑機器壞掉了XD 那碗簡單的熱天婦羅蕎麥麵，成為相當美味的回憶</p>]]></content>
     
     
     <summary type="html">diary for Japan alone trip in last year</summary>

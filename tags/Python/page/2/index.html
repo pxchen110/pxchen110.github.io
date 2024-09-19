@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Xuan&#39;s Blog">
-    <title>Recent docker / singularity notes - Xuan&#39;s Blog</title>
+    <title>標籤: Python - Xuan&#39;s Blog</title>
     <meta name="author" content="Xuan Chen">
     
         <meta name="keywords" content="hexo,javascript,">
@@ -17,21 +17,16 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg"},"articleBody":"記錄最近跑 docker &#x2F; singularity 的指令\n\n\n引入本機資料在container內使用外部檔案，設定 --volume 或 -v 並指定在container可以access的路徑名稱，例如:\n123## my input file: /path/to/input/input.txtdocker run -v /path/to/input:/data my_container:latest -input /data/input.txt\n\nsingularity 也有相似指令 --bind\n1singularity exec --bind /path/to/input:/data,/path/to/other:/index my_sing.sif -input /data/input.txt -output /index \n\n修改寫入權限有時遇到 docker 輸出檔案的權限為 root ，若以後要修改刪除等操作會不方便，使用 --user $(id -u):$(id -g) 來將輸出的owner, group 權限給下指令的使用者，例如:\n1docker run -it -rm -v /path/to/input:/data --user $(id -u):$(id -g) my_container:latest -input /data/input.txt -output /data/output.txt\n若owner為使用者，之後還可通過linux chgrp 修改 group 權限\ncontainer執行完一併刪除加上 --rm\n用 Dockerfile 建立 docker 並使用前陣子使用某docker遇到bug無法執行成功，因此稍微修改他的dockerfile -&gt; push至dockerhub -&gt; pull 回來使用註1: 以下有匿名處理 docker name 請參考code就好XD註2: 需要註冊 https://hub.docker.com/ 才能push註3: my references\n首先登入dockerhub 建立新專案\n回到linux建立docker\n123456789101112131415## cd to dockerfile directory and build dockerdocker build -t local/origin_docker_fixed:latest .## need user login docker login## rename docker tag (origin TAG is &lt;none&gt;)## the image name may be the same as the repository we createddocker tag 53a8d0dbxxxx pxchen/origin_docker_fixed## check docker image ls## push to the existing repositorydocker push pxchen112/msisensor-pro-fixed\n\n回到 dockerhub，點進去看push的image 以及Dockerfile layer\n","dateCreated":"2024-07-04T01:56:12+08:00","dateModified":"2024-07-04T01:59:56+08:00","datePublished":"2024-07-04T01:56:12+08:00","description":"記錄最近跑 docker &#x2F; singularity 的指令","headline":"Recent docker / singularity notes","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20240704/Docker/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20240704/Docker/","keywords":"Docker"}</script>
-    <meta name="description" content="some commands about docker singularity">
-<meta property="og:type" content="blog">
-<meta property="og:title" content="Recent docker &#x2F; singularity notes">
-<meta property="og:url" content="https://pxchen110.github.io/20240704/Docker/index.html">
+    <script type="application/ld+json">{}</script>
+    <meta property="og:type" content="blog">
+<meta property="og:title" content="Xuan&#39;s Blog">
+<meta property="og:url" content="https://pxchen110.github.io/tags/Python/page/2/index.html">
 <meta property="og:site_name" content="Xuan&#39;s Blog">
-<meta property="og:description" content="some commands about docker singularity">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://pxchen110.github.io/20240704/Docker/20240704_img1.png">
-<meta property="article:published_time" content="2024-07-03T17:56:12.000Z">
-<meta property="article:modified_time" content="2024-07-03T17:59:56.087Z">
 <meta property="article:author" content="Xuan Chen">
-<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="hexo">
+<meta property="article:tag" content="javascript">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pxchen110.github.io/20240704/Docker/20240704_img1.png">
     
     
         
@@ -52,8 +47,6 @@
     
 
     
-        
-    
 </head>
 
     <body>
@@ -61,7 +54,7 @@
             <!-- Define author's picture -->
 
 
-<header id="header" data-behavior="4">
+<header id="header" data-behavior="1">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
         <a
@@ -94,7 +87,7 @@
         
     
 
-<nav id="sidebar" data-behavior="4">
+<nav id="sidebar" data-behavior="1">
     <div class="sidebar-container">
         
             <div class="sidebar-profile">
@@ -258,202 +251,85 @@
 </nav>
 
             
-            <div id="main" data-behavior="4"
+            <div id="main" data-behavior="1"
                  class="
                         hasCoverMetaIn
                         ">
                 
-<article class="post">
+    <section class="postShorten-group main-content-wrap">
     
     
-        <div class="post-header main-content-wrap text-left">
-    
-        <h1 class="post-title">
-            Recent docker / singularity notes
-        </h1>
-    
-    
-        <div class="post-meta">
-    <time datetime="2024-07-04T01:56:12+08:00">
+    <article class="postShorten postShorten--thumbnailimg-right">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
+                            href="/20240215/Python/"
+                            aria-label=": Python實用系列： smtplib 模組實現自動寄信"
+                        >
+                            Python實用系列： smtplib 模組實現自動寄信
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2024-02-15T19:21:40+08:00">
 	
-		    2024 年 7 月 4 日
+		    2024 年 2 月 15 日
     	
     </time>
     
         <span>分類 </span>
         
-    <a class="category-link" href="/categories/Docker/">Docker</a>
+    <a class="category-link" href="/categories/Python/">Python</a>
 
 
     
 </div>
-
-    
-</div>
-
-    
-    <div class="post-content markdown">
-        <div class="main-content-wrap">
-            <p>記錄最近跑 docker &#x2F; singularity 的指令</p>
-<span id="more"></span>
-
-<h2 id="引入本機資料"><a href="#引入本機資料" class="headerlink" title="引入本機資料"></a>引入本機資料</h2><p>在container內使用外部檔案，設定 <code>--volume</code> 或 <code>-v</code> 並指定在container可以access的路徑名稱，例如:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">## my input file: /path/to/input/input.txt</span><br><span class="line"></span><br><span class="line">docker run -v /path/to/input:/data my_container:latest -input /data/input.txt</span><br></pre></td></tr></table></figure>
-
-<p>singularity 也有相似指令 <code>--bind</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">singularity exec --bind /path/to/input:/data,/path/to/other:/index my_sing.sif -input /data/input.txt -output /index </span><br></pre></td></tr></table></figure>
-
-<h2 id="修改寫入權限"><a href="#修改寫入權限" class="headerlink" title="修改寫入權限"></a>修改寫入權限</h2><p>有時遇到 docker 輸出檔案的權限為 <strong>root</strong> ，若以後要修改刪除等操作會不方便，使用 <code>--user $(id -u):$(id -g)</code> 來將輸出的owner, group 權限給下指令的使用者，例如:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -it -rm -v /path/to/input:/data --user $(id -u):$(id -g) my_container:latest -input /data/input.txt -output /data/output.txt</span><br></pre></td></tr></table></figure>
-<p>若owner為使用者，之後還可通過linux <code>chgrp</code> 修改 group 權限</p>
-<h2 id="container執行完一併刪除"><a href="#container執行完一併刪除" class="headerlink" title="container執行完一併刪除"></a>container執行完一併刪除</h2><p>加上 <code>--rm</code></p>
-<h2 id="用-Dockerfile-建立-docker-並使用"><a href="#用-Dockerfile-建立-docker-並使用" class="headerlink" title="用 Dockerfile 建立 docker 並使用"></a>用 Dockerfile 建立 docker 並使用</h2><p>前陣子使用某docker遇到bug無法執行成功，因此稍微修改他的dockerfile -&gt; push至dockerhub -&gt; pull 回來使用<br>註1: 以下有匿名處理 docker name 請參考code就好XD<br>註2: 需要註冊 <a target="_blank" rel="noopener" href="https://hub.docker.com/">https://hub.docker.com/</a> 才能push<br>註3: <a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10192824">my references</a></p>
-<p>首先登入dockerhub 建立新專案</p>
-<p>回到linux建立docker</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">## cd to dockerfile directory and build docker</span><br><span class="line">docker build -t local/origin_docker_fixed:latest .</span><br><span class="line"></span><br><span class="line">## need user login </span><br><span class="line">docker login</span><br><span class="line"></span><br><span class="line">## rename docker tag (origin TAG is &lt;none&gt;)</span><br><span class="line">## the image name may be the same as the repository we created</span><br><span class="line">docker tag 53a8d0dbxxxx pxchen/origin_docker_fixed</span><br><span class="line"></span><br><span class="line">## check </span><br><span class="line">docker image ls</span><br><span class="line"></span><br><span class="line">## push to the existing repository</span><br><span class="line">docker push pxchen112/msisensor-pro-fixed</span><br></pre></td></tr></table></figure>
-
-<p>回到 dockerhub，點進去看push的image 以及Dockerfile layer<br><img src="/20240704/Docker/20240704_img1.png" alt="image"></p>
-
-            
-
-
-        </div>
-    </div>
-    <div id="post-footer" class="post-footer main-content-wrap">
-        
-            <div class="post-footer-tags">
-                <span class="text-color-light text-small">標籤</span><br/>
-                
-    <a class="tag tag--primary tag--small t-none-link" href="/tags/Docker/" rel="tag">Docker</a>
 
             </div>
+            
+                <div class="postShorten-excerpt">
+                    <p><img src="/20240215/Python/20240215_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@brett_jordan">Brett Jordan</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+<p>在信箱收件夾，不乏看到許多<strong>自動寄出</strong>的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信</p>
+                    
+                        <a
+                            href="/20240215/Python/"
+                            class="postShorten-excerpt_link link"
+                            aria-label=": Python實用系列： smtplib 模組實現自動寄信"
+                        >
+                            繼續閱讀
+                        </a>
+                        
+                    
+                </div>
+            
+        </div>
         
+    </article>
+    
+    <div class="pagination-bar">
+    <ul class="pagination">
         
-            <div class="post-actions-wrap">
-    <nav>
-        <ul class="post-actions post-action-nav">
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240704/Linux/"
-                    data-tooltip="使用 diff, vimdiff, excel inquire 比較檔案"
-                    aria-label="上一篇: 使用 diff, vimdiff, excel inquire 比較檔案"
-                >
-                    
-                        <i class="fa fa-angle-left" aria-hidden="true"></i>
-                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
-                    </a>
-            </li>
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240620/Life/"
-                    data-tooltip="隨老派少女的大稻埕巡禮"
-                    aria-label="下一篇: 隨老派少女的大稻埕巡禮"
-                >
-                    
-                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
-                        <i class="fa fa-angle-right" aria-hidden="true"></i>
-                    </a>
-            </li>
-        </ul>
-    </nav>
-    <ul class="post-actions post-action-share">
-        <li class="post-action hide-lg hide-md hide-sm">
+          <li class="pagination-prev">
             <a
-                class="post-action-btn btn btn--default btn-open-shareoptions"
-                href="#btn-open-shareoptions"
-                aria-label="post.share"
+                class="btn btn--default btn--small"
+                href="/tags/Python/"
+                aria-label="上一頁"
             >
-                <i class="fa fa-share-alt" aria-hidden="true"></i>
+              <i class="fa fa-angle-left text-base icon-mr"></i>
+              <span>上一頁</span>
             </a>
-        </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240704/Docker/"
-                    title="分享到 Facebook"
-                    aria-label="分享到 Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240704/Docker/"
-                    title="分享到 Twitter"
-                    aria-label="分享到 Twitter"
-                >
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240704/Docker/"
-                    title="分享到 Google+"
-                    aria-label="分享到 Google+"
-                >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
+          </li>
         
         
-            
-        
-        <li class="post-action">
-            
-                <a class="post-action-btn btn btn--default" href="#" aria-label="post.back_to_top">
-            
-                <i class="fa fa-list" aria-hidden="true"></i>
-            </a>
-        </li>
+        <li class="pagination-number">第 2 頁 共 2 頁</li>
     </ul>
 </div>
 
-
-        
-        
-            
-        
-    </div>
-</article>
-
-
-
-    <div id="disqus_thread"></div>
-    <script>
-        /**
-        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
-        var disqus_config = function () {
-          this.page.url = 'https://pxchen110.github.io/20240704/Docker/';  // Replace PAGE_URL with your page's canonical URL variable
-          this.page.identifier = '1720029372000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-        };
-        (function() { // DON'T EDIT BELOW THIS LINE
-        var d = document, s = d.createElement('script');
-        s.src = 'https://pxchen110-blog.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
-        })();
-    </script>
-    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-  
-
+</section>
 
 
                 <footer id="footer" class="main-content-wrap">
@@ -463,154 +339,6 @@
 </footer>
 
             </div>
-            
-                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
-                    <div class="post-actions-wrap">
-    <nav>
-        <ul class="post-actions post-action-nav">
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240704/Linux/"
-                    data-tooltip="使用 diff, vimdiff, excel inquire 比較檔案"
-                    aria-label="上一篇: 使用 diff, vimdiff, excel inquire 比較檔案"
-                >
-                    
-                        <i class="fa fa-angle-left" aria-hidden="true"></i>
-                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
-                    </a>
-            </li>
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/20240620/Life/"
-                    data-tooltip="隨老派少女的大稻埕巡禮"
-                    aria-label="下一篇: 隨老派少女的大稻埕巡禮"
-                >
-                    
-                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
-                        <i class="fa fa-angle-right" aria-hidden="true"></i>
-                    </a>
-            </li>
-        </ul>
-    </nav>
-    <ul class="post-actions post-action-share">
-        <li class="post-action hide-lg hide-md hide-sm">
-            <a
-                class="post-action-btn btn btn--default btn-open-shareoptions"
-                href="#btn-open-shareoptions"
-                aria-label="post.share"
-            >
-                <i class="fa fa-share-alt" aria-hidden="true"></i>
-            </a>
-        </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240704/Docker/"
-                    title="分享到 Facebook"
-                    aria-label="分享到 Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240704/Docker/"
-                    title="分享到 Twitter"
-                    aria-label="分享到 Twitter"
-                >
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20240704/Docker/"
-                    title="分享到 Google+"
-                    aria-label="分享到 Google+"
-                >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-        
-            
-        
-        <li class="post-action">
-            
-                <a class="post-action-btn btn btn--default" href="#" aria-label="post.back_to_top">
-            
-                <i class="fa fa-list" aria-hidden="true"></i>
-            </a>
-        </li>
-    </ul>
-</div>
-
-
-                </div>
-                
-    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-        <i id="btn-close-shareoptions" class="fa fa-times"></i>
-        <ul class="share-options">
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20240704/Docker/"
-                        aria-label="分享到 Facebook"
-                    >
-                        <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
-                    </a>
-                </li>
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20240704/Docker/"
-                        aria-label="分享到 Twitter"
-                    >
-                        <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
-                    </a>
-                </li>
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://plus.google.com/share?url=https://pxchen110.github.io/20240704/Docker/"
-                        aria-label="分享到 Google+"
-                    >
-                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
-                    </a>
-                </li>
-            
-        </ul>
-    </div>
-
-
             
         </div>
         
@@ -941,8 +669,6 @@
 
 <!--SCRIPTS END-->
 
-
-    
 
 
 
