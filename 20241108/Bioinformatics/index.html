@@ -1,0 +1,1015 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Xuan&#39;s Blog">
+    <title>生資系列： 基因註解轉換套件 biomaRt, bitr, mygene - Xuan&#39;s Blog</title>
+    <meta name="author" content="Xuan Chen">
+    
+        <meta name="keywords" content="hexo,javascript,">
+    
+    
+    
+        
+            <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+        
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg"},"articleBody":"生物研究時常需要基因資訊，但分析工具與資料庫之間的註解未必能直接相通，如某些網站僅提供RefSeq ID, 有些只提供Ensembl ID等，雖然都是描述同一基因、但需要做進一步轉換才能串連資訊；另一常見狀況則是在GO enrichment analysis時，需要利用entrezid(gene id)來進行KEGG, GO enrichment分析。今天要介紹三種覺得好用的註解轉換套件:biomaRt, bitr, mygene，文章在R語言環境進行操作，若想使用python可以查詢是否支援並用 conda 安裝。\n\n\n\nbiomaRTbiomaRT 套件主要協助取得 Ensembl 網站的資訊。\nInstallationbioconductor website\n1234if (!require(&quot;BiocManager&quot;, quietly = TRUE))    install.packages(&quot;BiocManager&quot;)BiocManager::install(&quot;biomaRt&quot;)\nSelect desired BioMart database and dataset以 useEnsembl() 來指定連線到哪個 biomaRT 資料庫與資料集\n12library(biomaRt)ensembl &lt;- useEnsembl(biomart = &quot;genes&quot;, dataset = &quot;hsapiens_gene_ensembl&quot;, version = 113)\n\n函式有兩個必要參數 biomart 和 dataset(層級 biomart &gt; dataset)，首先用 listEnsembl() 或 listMarts() 查詢 biomart選項，雖名稱不同但內容相等(如: genes 等價於 ENSEMBL_MART_ENSEMBL)\n12345678910111213&gt; listEnsembl()        biomart                version1         genes      Ensembl Genes 1132 mouse_strains      Mouse strains 1133          snps  Ensembl Variation 1134    regulation Ensembl Regulation 113&gt; listMarts()                biomart                version1 ENSEMBL_MART_ENSEMBL      Ensembl Genes 1132   ENSEMBL_MART_MOUSE      Mouse strains 1133     ENSEMBL_MART_SNP  Ensembl Variation 1134 ENSEMBL_MART_FUNCGEN Ensembl Regulation 113\n\n以 useMart() 指定biomart資料庫 + listDatasets() 查詢可用的資料集，可搭配字串篩選:\n12mart &lt;- useMart(&quot;ENSEMBL_MART_ENSEMBL&quot;)ds &lt;- as.data.frame(listDatasets(mart=mart))\n123456## find rows in dataset which contains &#x27;human&#x27; stringds %&gt;% filter(grepl(&quot;human&quot;,tolower(description))) ## output:                dataset              description    version1 hsapiens_gene_ensembl Human genes (GRCh38.p14) GRCh38.p14\n\n最後如果有指定ensembl版本需求，可用 listEnsemblArchives() 函數，並用 useEnsembl(version = xxx) 指定版本 (default: latest release)\n12345             name     date                                 url version current_release1  Ensembl GRCh37 Feb 2014          https://grch37.ensembl.org  GRCh37                2     Ensembl 113 Oct 2024 https://oct2024.archive.ensembl.org     113               *3     Ensembl 112 May 2024 https://may2024.archive.ensembl.org     112                4     Ensembl 111 Jan 2024 https://jan2024.archive.ensembl.org     111                \n\nRun biomaRT query指定ensembl參考資料後，接著以 getBM()連線至 ensembl server 並針對query返回dataframe:\n123getBM(attributes, filters = &quot;&quot;, values = &quot;&quot;, mart, curl = NULL, checkFilters = TRUE, verbose = FALSE, uniqueRows = TRUE, bmHeader = FALSE,quote = &quot;\\&quot;&quot;, useCache = TRUE)\n參數包含:\n\natribute 輸出ensembl的欄位，可用 listAttributes($&#123;useEnsembl()_varname&#125;) 查看選項\nfilters 輸入內容的資訊類型，如輸入 ENSGxxx 則 filters = &quot;ensembl_gene_id&quot; 可用 listFilters($&#123;useEnsembl()_varname&#125;) 查看選項\nvalues 輸入內容 input query list\nmart 指定 useEnsembl() 物件\n\nCheck caches若先前有跑過相同資料庫，透過 biomartCacheInfo() 查詢是否有 cache file\n1234biomaRt cache- Location: C:\\xxxx/biomaRt/Cache- No. of files: 12- Total size: 983.1 Kb\n\nExample R code123456789101112131415161718192021222324library(biomaRt)## check mart dbslistMarts() mart &lt;- useMart(&quot;ENSEMBL_MART_ENSEMBL&quot;) ## check mart datasets and find rows where column &#x27;description&#x27; contains humands &lt;- as.data.frame(listDatasets(mart=mart))ds %&gt;% filter(grepl(&quot;human&quot;,tolower(description))) # build this object which specify older version 103ensembl &lt;- useEnsembl(biomart = &#x27;ensembl&#x27;, dataset = &#x27;ggallus_gene_ensembl&#x27;, version = 103)## run biomart convertdata &lt;- read.table(&#x27;query_gene.txt&#x27;, header = T)inputs &lt;- as.vector(data$ensembl_gene_id)# send it to the Ensembl BioMart servergenes &lt;- getBM(attributes=c(&quot;external_gene_name&quot;,&quot;ensembl_gene_id&quot;,&quot;entrezgene_id&quot;),               filters = &quot;ensembl_gene_id&quot;,               values = inputs,                mart = ensembl)\n\nbitrbitr() 為 clusterprofiler套件內的函式，利用 AnnotationDbi::select 來篩選特定物種的 OrgDB 內的資訊，最後輸出dataframe**所有的.db結尾的library其實就是使用AnnotationDbi來的物件\nInstallationbioconductor website\n1234if (!require(&quot;BiocManager&quot;, quietly = TRUE))    install.packages(&quot;BiocManager&quot;)BiocManager::install(&quot;clusterProfiler&quot;)\n\nRun bitr() function1bitr(geneID, fromType, toType, OrgDb, drop = TRUE)\n\ngeneID 為 input query list\nfromType 和 toType 須為 idType(orgDB) 返回的類別(key): 1fromType&#x27; should be one of ACCNUM, ALIAS, ENSEMBL, ENSEMBLPROT, ENSEMBLTRANS, ENTREZID, ENZYME, EVIDENCE, EVIDENCEALL, GENENAME, GENETYPE, GO, GOALL, IPI, MAP, OMIM, ONTOLOGY, ONTOLOGYALL, PATH, PFAM, PMID, PROSITE, REFSEQ, SYMBOL, UCSCKG, UNIPROT.\nOrgDb 為指定物種的註解包，需要先安裝才能使用，物種匹配的orgDB 可以參考這個網站\n\nExample R code1234567891011121314library(clusterProfiler)library(org.Hs.eg.db)query_gene &lt;- c(&#x27;TP53&#x27;,&#x27;BRAF&#x27;,&#x27;PIK3CA&#x27;,&#x27;KRAS&#x27;)gene_out &lt;- bitr(query_gene, fromType=&quot;SYMBOL&quot;, toType=c(&quot;GENENAME&quot;, &quot;ENTREZID&quot;,&quot;ENSEMBL&quot;), OrgDb=org.Hs.eg.db)gene_out &lt;- as.data.frame(gene_out)&gt; print(gene_out)  SYMBOL                                                               GENENAME ENTREZID    ENSEMBL1   TP53                                                      tumor protein p53     7157   ENSG000001415102   BRAF                          B-Raf proto-oncogene, serine/threonine kinase      673   ENSG000001577643 PIK3CA phosphatidylinositol-4,5-bisphosphate 3-kinase catalytic subunit alpha     5290   ENSG000001218794   KRAS                                            KRAS proto-oncogene, GTPase     3845   ENSG00000133703\n\n轉換完成會顯示有多少比例轉換失敗\n12345650% of input gene IDs are fail to map...&gt; print(gene_out)    SYMBOL                    GENENAME ENTREZID1   TP53           tumor protein p53     71574   KRAS KRAS proto-oncogene, GTPase     3845\n\n\nmygenemygene.info 以API形式獲取公開資料庫的基因資訊，官方文件多以 python code 做示範使用，R 套件函式屬於 API qurey 的 wrapper \n\nqueryMany is a wrapper for POST query of “&#x2F;query” service\n\ninstallationbioconductor website\n1234if (!require(&quot;BiocManager&quot;, quietly = TRUE))    install.packages(&quot;BiocManager&quot;)BiocManager::install(&quot;mygene&quot;)\n\nRun mygene query主要使用 queryMany 函式\n1queryMany(qterms, scopes=NULL, ..., return.as=c(&quot;DataFrame&quot;, &quot;records&quot;, &quot;text&quot;), mygene)\n\nqterm 為 input query list\nscopes 提供 query list 類型，可用 field請參考官方文件，如: query 給 ENSGxx 則 scopes = ensembl.gene\n其他常用參數\nspecies 給予物種資訊如 taxid;\nfields 指定輸出內容，可填類型跟 scopes field 相同\nreturn.as 指定輸出類型: 目前支援”DataFrame” (default), “records” (list), “text” (JSON) 三種\n\n\n\nExample R code12345678910111213library(mygene)geneList &lt;- c(&#x27;TP53&#x27;,&#x27;BRAF&#x27;,&#x27;PIK3CA&#x27;,&#x27;KRAS&#x27;)query_output &lt;- queryMany(geneList, scopes = &#x27;symbol&#x27;, species = 9606, fields = &#x27;ensembl.gene,name,entrezgene&#x27;)&gt; print(query_output)DataFrame with 4 rows and 6 columns        query         _id   X_score  entrezgene                   name    ensembl.gene  &lt;character&gt; &lt;character&gt; &lt;numeric&gt; &lt;character&gt;            &lt;character&gt;     &lt;character&gt;1        TP53        7157   18.0079        7157      tumor protein p53 ENSG000001415102        BRAF         673   17.6012         673 B-Raf proto-oncogene.. ENSG000001577643      PIK3CA        5290   17.8778        5290 phosphatidylinositol.. ENSG000001218794        KRAS        3845   17.6623        3845 KRAS proto-oncogene,.. ENSG00000133703\n\n\nCommentsbitr() 和 mygene queryMany() 相當方便，常見或具有orgDB的物種基本上沒有太大問題，但有時會遇到以下情況導致轉換失敗:\n\ngene name alias 或 synonyms 無法直接聯繫到正確的HGNC資訊，這時可先用 AnnotationDbi::select(org.$&#123;spec&#125;.eg.db, keys = alias_list, columns = c(&#39;SYMBOL&#39;), keytype = &quot;ALIAS&quot;) 轉換基因名稱，或是找尋好用套件來轉換…  12345678910  alias_list &lt;- c(&#x27;MEK&#x27;,&#x27;PI3K&#x27;,&#x27;TP53&#x27;)  &gt; AnnotationDbi::select(org.Hs.eg.db, keys = alias_list, columns = c(&#x27;SYMBOL&#x27;), keytype = &quot;ALIAS&quot;)  &gt; &#x27;select()&#x27; returned 1:many mapping between keys and columnsALIAS SYMBOL1   MEK MAP2K72  PI3K PIK3CA3  PI3K PIK3CB4  PI3K PIK3CD5  PI3K PIK3CG6  TP53   TP53\n若資料庫以舊版 ensembl 註解，有些transcript ID 可能已經被移除，導致HGNC轉換失敗，這時 biomaRT useEnsembl() 指定資料集版本的功能相當方便，能多少救一些轉換，但也要注意這樣的轉換是否有意義，畢竟最新版沒有收錄……\n\nReferences\nhttps://bioconductor.org/packages/release/bioc/vignettes/biomaRt/inst/doc/accessing_ensembl.htmlhttps://mygene.info/https://github.com/gege-circle/home/issues/702\n\n","dateCreated":"2024-11-08T05:19:22+08:00","dateModified":"2024-11-08T05:36:30+08:00","datePublished":"2024-11-08T05:19:22+08:00","description":"生物研究時常需要基因資訊，但分析工具與資料庫之間的註解未必能直接相通，如某些網站僅提供RefSeq ID, 有些只提供Ensembl ID等，雖然都是描述同一基因、但需要做進一步轉換才能串連資訊；另一常見狀況則是在GO enrichment analysis時，需要利用entrezid(gene id)來進行KEGG, GO enrichment分析。今天要介紹三種覺得好用的註解轉換套件:biomaRt, bitr, mygene，文章在R語言環境進行操作，若想使用python可以查詢是否支援並用 conda 安裝。","headline":"生資系列： 基因註解轉換套件 biomaRt, bitr, mygene","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20241108/Bioinformatics/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20241108/Bioinformatics/","keywords":"R"}</script>
+    <meta name="description" content="introduction to three gene annotation conversion packages">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="生資系列： 基因註解轉換套件 biomaRt, bitr, mygene">
+<meta property="og:url" content="https://pxchen110.github.io/20241108/Bioinformatics/index.html">
+<meta property="og:site_name" content="Xuan&#39;s Blog">
+<meta property="og:description" content="introduction to three gene annotation conversion packages">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2024-11-07T21:19:22.000Z">
+<meta property="article:modified_time" content="2024-11-07T21:36:30.653Z">
+<meta property="article:author" content="Xuan Chen">
+<meta property="article:tag" content="R">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://pxchen110.github.io/assets/images/author_img.jpg"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-ha3ss00rb8xqkgfmce4t7w1czuxcagphmehm2ubet8kdlucc0x40seivfi9b.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            Xuan&#39;s Blog
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-icon open-algolia-search"
+                href="#search"
+                aria-label="打開鏈接: /#search"
+            >
+        
+        
+            <i class="fa fa-search fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="閱讀有關作者的更多信息"
+                >
+                    <img class="sidebar-profile-picture" src="/assets/images/author_img.jpg" alt="作者的圖片"/>
+                </a>
+                <h4 class="sidebar-profile-name">Xuan Chen</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>長大以後就是小瑄～分享生物資訊、程式語言和讀後感的地方</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="首頁"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">首頁</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="分類"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">分類</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="標籤"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">標籤</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="所有文章"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">所有文章</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="搜尋"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">搜尋</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="關於"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">關於</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="http://stackoverflow.com/users"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Stack Overflow"
+                        >
+                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Stack Overflow</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="Atom"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Atom</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            生資系列： 基因註解轉換套件 biomaRt, bitr, mygene
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2024-11-08T05:19:22+08:00">
+	
+		    2024 年 11 月 8 日
+    	
+    </time>
+    
+        <span>分類 </span>
+        
+    <a class="category-link" href="/categories/Bioinformatics/">Bioinformatics</a>
+
+
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>生物研究時常需要基因資訊，但分析工具與資料庫之間的註解未必能直接相通，如某些網站僅提供RefSeq ID, 有些只提供Ensembl ID等，雖然都是描述同一基因、但需要做進一步轉換才能串連資訊；另一常見狀況則是在GO enrichment analysis時，需要利用entrezid(gene id)來進行KEGG, GO enrichment分析。今天要介紹三種覺得好用的註解轉換套件:biomaRt, bitr, mygene，文章在R語言環境進行操作，若想使用python可以查詢是否支援並用 conda 安裝。</p>
+<span id="more"></span>
+<h1 id="table-of-contents">目錄</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#biomaRT"><span class="toc-text">biomaRT</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Installation"><span class="toc-text">Installation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Select-desired-BioMart-database-and-dataset"><span class="toc-text">Select desired BioMart database and dataset</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run-biomaRT-query"><span class="toc-text">Run biomaRT query</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Check-caches"><span class="toc-text">Check caches</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Example-R-code"><span class="toc-text">Example R code</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bitr"><span class="toc-text">bitr</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Installation-1"><span class="toc-text">Installation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run-bitr-function"><span class="toc-text">Run bitr() function</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Example-R-code-1"><span class="toc-text">Example R code</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#mygene"><span class="toc-text">mygene</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#installation"><span class="toc-text">installation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run-mygene-query"><span class="toc-text">Run mygene query</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Example-R-code-2"><span class="toc-text">Example R code</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Comments"><span class="toc-text">Comments</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#References"><span class="toc-text">References</span></a></li></ol>
+
+<h2 id="biomaRT"><a href="#biomaRT" class="headerlink" title="biomaRT"></a>biomaRT</h2><p><code>biomaRT</code> 套件主要協助取得 <a target="_blank" rel="noopener" href="http://www.ensembl.org/">Ensembl</a> 網站的資訊。</p>
+<h3 id="Installation"><a href="#Installation" class="headerlink" title="Installation"></a>Installation</h3><p><a target="_blank" rel="noopener" href="https://bioconductor.org/packages/release/bioc/html/biomaRt.html">bioconductor website</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if (!require(&quot;BiocManager&quot;, quietly = TRUE))</span><br><span class="line">    install.packages(&quot;BiocManager&quot;)</span><br><span class="line"></span><br><span class="line">BiocManager::install(&quot;biomaRt&quot;)</span><br></pre></td></tr></table></figure>
+<h3 id="Select-desired-BioMart-database-and-dataset"><a href="#Select-desired-BioMart-database-and-dataset" class="headerlink" title="Select desired BioMart database and dataset"></a>Select desired BioMart database and dataset</h3><p>以 <code>useEnsembl()</code> 來指定連線到哪個 biomaRT 資料庫與資料集</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">library(biomaRt)</span><br><span class="line">ensembl &lt;- useEnsembl(biomart = &quot;genes&quot;, dataset = &quot;hsapiens_gene_ensembl&quot;, version = 113)</span><br></pre></td></tr></table></figure>
+
+<p>函式有兩個必要參數 <code>biomart</code> 和 <code>dataset</code>(層級 biomart &gt; dataset)，首先用 <code>listEnsembl()</code> 或 <code>listMarts()</code> 查詢 <code>biomart</code>選項，雖名稱不同但內容相等(如: <code>genes</code> 等價於 <code>ENSEMBL_MART_ENSEMBL</code>)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&gt; listEnsembl()</span><br><span class="line">        biomart                version</span><br><span class="line">1         genes      Ensembl Genes 113</span><br><span class="line">2 mouse_strains      Mouse strains 113</span><br><span class="line">3          snps  Ensembl Variation 113</span><br><span class="line">4    regulation Ensembl Regulation 113</span><br><span class="line"></span><br><span class="line">&gt; listMarts() </span><br><span class="line">               biomart                version</span><br><span class="line">1 ENSEMBL_MART_ENSEMBL      Ensembl Genes 113</span><br><span class="line">2   ENSEMBL_MART_MOUSE      Mouse strains 113</span><br><span class="line">3     ENSEMBL_MART_SNP  Ensembl Variation 113</span><br><span class="line">4 ENSEMBL_MART_FUNCGEN Ensembl Regulation 113</span><br></pre></td></tr></table></figure>
+
+<p>以 <code>useMart()</code> 指定biomart資料庫 + <code>listDatasets()</code> 查詢可用的資料集，可搭配字串篩選:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mart &lt;- useMart(&quot;ENSEMBL_MART_ENSEMBL&quot;)</span><br><span class="line">ds &lt;- as.data.frame(listDatasets(mart=mart))</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">## find rows in dataset which contains &#x27;human&#x27; string</span><br><span class="line">ds %&gt;% filter(grepl(&quot;human&quot;,tolower(description))) </span><br><span class="line"></span><br><span class="line">## output:</span><br><span class="line">                dataset              description    version</span><br><span class="line">1 hsapiens_gene_ensembl Human genes (GRCh38.p14) GRCh38.p14</span><br></pre></td></tr></table></figure>
+
+<p>最後如果有指定ensembl版本需求，可用 <code>listEnsemblArchives()</code> 函數，並用 <code>useEnsembl(version = xxx)</code> 指定版本 (default: latest release)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">             name     date                                 url version current_release</span><br><span class="line">1  Ensembl GRCh37 Feb 2014          https://grch37.ensembl.org  GRCh37                </span><br><span class="line">2     Ensembl 113 Oct 2024 https://oct2024.archive.ensembl.org     113               *</span><br><span class="line">3     Ensembl 112 May 2024 https://may2024.archive.ensembl.org     112                </span><br><span class="line">4     Ensembl 111 Jan 2024 https://jan2024.archive.ensembl.org     111                </span><br></pre></td></tr></table></figure>
+
+<h3 id="Run-biomaRT-query"><a href="#Run-biomaRT-query" class="headerlink" title="Run biomaRT query"></a>Run biomaRT query</h3><p>指定ensembl參考資料後，接著以 <code>getBM()</code>連線至 ensembl server 並針對query返回dataframe:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">getBM(attributes, filters = &quot;&quot;, values = &quot;&quot;, mart, curl = NULL, </span><br><span class="line">checkFilters = TRUE, verbose = FALSE, uniqueRows = TRUE, bmHeader = FALSE,</span><br><span class="line">quote = &quot;\&quot;&quot;, useCache = TRUE)</span><br></pre></td></tr></table></figure>
+<p>參數包含:</p>
+<ul>
+<li><code>atribute</code> 輸出ensembl的欄位，可用 <code>listAttributes($&#123;useEnsembl()_varname&#125;)</code> 查看選項</li>
+<li><code>filters</code> 輸入內容的資訊類型，如輸入 <code>ENSGxxx</code> 則 <code>filters = &quot;ensembl_gene_id&quot;</code> 可用 <code>listFilters($&#123;useEnsembl()_varname&#125;)</code> 查看選項</li>
+<li><code>values</code> 輸入內容 input query list</li>
+<li><code>mart</code> 指定 <code>useEnsembl()</code> 物件</li>
+</ul>
+<h3 id="Check-caches"><a href="#Check-caches" class="headerlink" title="Check caches"></a>Check caches</h3><p>若先前有跑過相同資料庫，透過 <code>biomartCacheInfo()</code> 查詢是否有 cache file</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">biomaRt cache</span><br><span class="line">- Location: C:\xxxx/biomaRt/Cache</span><br><span class="line">- No. of files: 12</span><br><span class="line">- Total size: 983.1 Kb</span><br></pre></td></tr></table></figure>
+
+<h3 id="Example-R-code"><a href="#Example-R-code" class="headerlink" title="Example R code"></a>Example R code</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">library(biomaRt)</span><br><span class="line"></span><br><span class="line">## check mart dbs</span><br><span class="line">listMarts() </span><br><span class="line">mart &lt;- useMart(&quot;ENSEMBL_MART_ENSEMBL&quot;) </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## check mart datasets and find rows where column &#x27;description&#x27; contains human</span><br><span class="line">ds &lt;- as.data.frame(listDatasets(mart=mart))</span><br><span class="line">ds %&gt;% filter(grepl(&quot;human&quot;,tolower(description))) </span><br><span class="line"></span><br><span class="line"># build this object which specify older version 103</span><br><span class="line">ensembl &lt;- useEnsembl(biomart = &#x27;ensembl&#x27;, dataset = &#x27;ggallus_gene_ensembl&#x27;, version = 103)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## run biomart convert</span><br><span class="line">data &lt;- read.table(&#x27;query_gene.txt&#x27;, header = T)</span><br><span class="line">inputs &lt;- as.vector(data$ensembl_gene_id)</span><br><span class="line"></span><br><span class="line"># send it to the Ensembl BioMart server</span><br><span class="line">genes &lt;- getBM(attributes=c(&quot;external_gene_name&quot;,&quot;ensembl_gene_id&quot;,&quot;entrezgene_id&quot;),</span><br><span class="line">               filters = &quot;ensembl_gene_id&quot;,</span><br><span class="line">               values = inputs, </span><br><span class="line">               mart = ensembl)</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="bitr"><a href="#bitr" class="headerlink" title="bitr"></a>bitr</h2><p><code>bitr()</code> 為 <code>clusterprofiler</code>套件內的函式，利用 <code>AnnotationDbi::select</code> 來篩選特定物種的 <code>OrgDB</code> 內的資訊，最後輸出dataframe<br>**所有的<code>.db</code>結尾的library其實就是使用AnnotationDbi來的物件</p>
+<h3 id="Installation-1"><a href="#Installation-1" class="headerlink" title="Installation"></a>Installation</h3><p><a target="_blank" rel="noopener" href="https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html">bioconductor website</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if (!require(&quot;BiocManager&quot;, quietly = TRUE))</span><br><span class="line">    install.packages(&quot;BiocManager&quot;)</span><br><span class="line"></span><br><span class="line">BiocManager::install(&quot;clusterProfiler&quot;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Run-bitr-function"><a href="#Run-bitr-function" class="headerlink" title="Run bitr() function"></a>Run bitr() function</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitr(geneID, fromType, toType, OrgDb, drop = TRUE)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>geneID</code> 為 input query list</li>
+<li><code>fromType</code> 和 <code>toType</code> 須為 <code>idType(orgDB)</code> 返回的類別(key): <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fromType&#x27; should be one of ACCNUM, ALIAS, ENSEMBL, ENSEMBLPROT, ENSEMBLTRANS, ENTREZID, ENZYME, EVIDENCE, EVIDENCEALL, GENENAME, GENETYPE, GO, GOALL, IPI, MAP, OMIM, ONTOLOGY, ONTOLOGYALL, PATH, PFAM, PMID, PROSITE, REFSEQ, SYMBOL, UCSCKG, UNIPROT.</span><br></pre></td></tr></table></figure></li>
+<li><code>OrgDb</code> 為指定物種的註解包，需要先安裝才能使用，物種匹配的orgDB 可以參考<a target="_blank" rel="noopener" href="https://evvail.com/2021/07/13/2459.html">這個網站</a></li>
+</ul>
+<h3 id="Example-R-code-1"><a href="#Example-R-code-1" class="headerlink" title="Example R code"></a>Example R code</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">library(clusterProfiler)</span><br><span class="line">library(org.Hs.eg.db)</span><br><span class="line"></span><br><span class="line">query_gene &lt;- c(&#x27;TP53&#x27;,&#x27;BRAF&#x27;,&#x27;PIK3CA&#x27;,&#x27;KRAS&#x27;)</span><br><span class="line">gene_out &lt;- bitr(query_gene, fromType=&quot;SYMBOL&quot;, toType=c(&quot;GENENAME&quot;, &quot;ENTREZID&quot;,&quot;ENSEMBL&quot;), OrgDb=org.Hs.eg.db)</span><br><span class="line">gene_out &lt;- as.data.frame(gene_out)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&gt; print(gene_out)</span><br><span class="line">  SYMBOL                                                               GENENAME ENTREZID    ENSEMBL</span><br><span class="line">1   TP53                                                      tumor protein p53     7157   ENSG00000141510</span><br><span class="line">2   BRAF                          B-Raf proto-oncogene, serine/threonine kinase      673   ENSG00000157764</span><br><span class="line">3 PIK3CA phosphatidylinositol-4,5-bisphosphate 3-kinase catalytic subunit alpha     5290   ENSG00000121879</span><br><span class="line">4   KRAS                                            KRAS proto-oncogene, GTPase     3845   ENSG00000133703</span><br></pre></td></tr></table></figure>
+
+<p>轉換完成會顯示有多少比例轉換失敗</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">50% of input gene IDs are fail to map...</span><br><span class="line">&gt; print(gene_out)</span><br><span class="line"></span><br><span class="line">    SYMBOL                    GENENAME ENTREZID</span><br><span class="line">1   TP53           tumor protein p53     7157</span><br><span class="line">4   KRAS KRAS proto-oncogene, GTPase     3845</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="mygene"><a href="#mygene" class="headerlink" title="mygene"></a>mygene</h2><p><code>mygene.info</code> 以API形式獲取公開資料庫的基因資訊，官方文件多以 python code 做示範使用，R 套件函式屬於 API qurey 的 wrapper </p>
+<blockquote>
+<p><code>queryMany</code> is a wrapper for POST query of “&#x2F;query” service</p>
+</blockquote>
+<h3 id="installation"><a href="#installation" class="headerlink" title="installation"></a>installation</h3><p><a target="_blank" rel="noopener" href="https://www.bioconductor.org/packages/release/bioc/html/mygene.html">bioconductor website</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if (!require(&quot;BiocManager&quot;, quietly = TRUE))</span><br><span class="line">    install.packages(&quot;BiocManager&quot;)</span><br><span class="line"></span><br><span class="line">BiocManager::install(&quot;mygene&quot;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Run-mygene-query"><a href="#Run-mygene-query" class="headerlink" title="Run mygene query"></a>Run mygene query</h3><p>主要使用 <code>queryMany</code> 函式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">queryMany(qterms, scopes=NULL, ..., return.as=c(&quot;DataFrame&quot;, &quot;records&quot;, &quot;text&quot;), mygene)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>qterm</code> 為 input query list</li>
+<li><code>scopes</code> 提供 query list 類型，可用 field請參考<a target="_blank" rel="noopener" href="https://docs.mygene.info/en/latest/doc/data.html#available-fields">官方文件</a>，如: query 給 <code>ENSGxx</code> 則 <code>scopes = ensembl.gene</code></li>
+<li>其他常用參數<ul>
+<li><code>species</code> 給予物種資訊如 <strong>taxid</strong>;</li>
+<li><code>fields</code> 指定輸出內容，可填類型跟 <code>scopes</code> field 相同</li>
+<li><code>return.as</code> 指定輸出類型: 目前支援”DataFrame” (default), “records” (list), “text” (JSON) 三種</li>
+</ul>
+</li>
+</ul>
+<h3 id="Example-R-code-2"><a href="#Example-R-code-2" class="headerlink" title="Example R code"></a>Example R code</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">library(mygene)</span><br><span class="line">geneList &lt;- c(&#x27;TP53&#x27;,&#x27;BRAF&#x27;,&#x27;PIK3CA&#x27;,&#x27;KRAS&#x27;)</span><br><span class="line">query_output &lt;- queryMany(geneList, scopes = &#x27;symbol&#x27;, species = 9606, fields = &#x27;ensembl.gene,name,entrezgene&#x27;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&gt; print(query_output)</span><br><span class="line">DataFrame with 4 rows and 6 columns</span><br><span class="line">        query         _id   X_score  entrezgene                   name    ensembl.gene</span><br><span class="line">  &lt;character&gt; &lt;character&gt; &lt;numeric&gt; &lt;character&gt;            &lt;character&gt;     &lt;character&gt;</span><br><span class="line">1        TP53        7157   18.0079        7157      tumor protein p53 ENSG00000141510</span><br><span class="line">2        BRAF         673   17.6012         673 B-Raf proto-oncogene.. ENSG00000157764</span><br><span class="line">3      PIK3CA        5290   17.8778        5290 phosphatidylinositol.. ENSG00000121879</span><br><span class="line">4        KRAS        3845   17.6623        3845 KRAS proto-oncogene,.. ENSG00000133703</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="Comments"><a href="#Comments" class="headerlink" title="Comments"></a>Comments</h2><p><code>bitr()</code> 和 <code>mygene queryMany()</code> 相當方便，常見或具有orgDB的物種基本上沒有太大問題，但有時會遇到以下情況導致轉換失敗:</p>
+<ul>
+<li>gene name alias 或 synonyms 無法直接聯繫到正確的HGNC資訊，這時可先用 <code>AnnotationDbi::select(org.$&#123;spec&#125;.eg.db, keys = alias_list, columns = c(&#39;SYMBOL&#39;), keytype = &quot;ALIAS&quot;)</code> 轉換基因名稱，或是找尋好用套件來轉換…  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">  alias_list &lt;- c(&#x27;MEK&#x27;,&#x27;PI3K&#x27;,&#x27;TP53&#x27;)</span><br><span class="line">  &gt; AnnotationDbi::select(org.Hs.eg.db, keys = alias_list, columns = c(&#x27;SYMBOL&#x27;), keytype = &quot;ALIAS&quot;)</span><br><span class="line">  &gt; &#x27;select()&#x27; returned 1:many mapping between keys and columns</span><br><span class="line">ALIAS SYMBOL</span><br><span class="line">1   MEK MAP2K7</span><br><span class="line">2  PI3K PIK3CA</span><br><span class="line">3  PI3K PIK3CB</span><br><span class="line">4  PI3K PIK3CD</span><br><span class="line">5  PI3K PIK3CG</span><br><span class="line">6  TP53   TP53</span><br></pre></td></tr></table></figure></li>
+<li>若資料庫以舊版 ensembl 註解，有些transcript ID 可能已經被移除，導致HGNC轉換失敗，這時 <code>biomaRT useEnsembl()</code> 指定資料集版本的功能相當方便，能多少救一些轉換，但也要注意這樣的轉換是否有意義，畢竟最新版沒有收錄……</li>
+</ul>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><blockquote>
+<p><a target="_blank" rel="noopener" href="https://bioconductor.org/packages/release/bioc/vignettes/biomaRt/inst/doc/accessing_ensembl.html">https://bioconductor.org/packages/release/bioc/vignettes/biomaRt/inst/doc/accessing_ensembl.html</a><br><a target="_blank" rel="noopener" href="https://mygene.info/">https://mygene.info/</a><br><a target="_blank" rel="noopener" href="https://github.com/gege-circle/home/issues/702">https://github.com/gege-circle/home/issues/702</a></p>
+</blockquote>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">標籤</span><br/>
+                
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/R/" rel="tag">R</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/20240919/Python/"
+                    data-tooltip="Python flask 小專案：下載公開資料庫的基因列表網頁"
+                    aria-label="下一篇: Python flask 小專案：下載公開資料庫的基因列表網頁"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="post.share"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20241108/Bioinformatics/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20241108/Bioinformatics/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20241108/Bioinformatics/"
+                    title="分享到 Google+"
+                    aria-label="分享到 Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目錄">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+        
+    </div>
+</article>
+
+
+
+    <div id="disqus_thread"></div>
+    <script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+        var disqus_config = function () {
+          this.page.url = 'https://pxchen110.github.io/20241108/Bioinformatics/';  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = '1731014362000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://pxchen110-blog.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2024 Xuan Chen. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/20240919/Python/"
+                    data-tooltip="Python flask 小專案：下載公開資料庫的基因列表網頁"
+                    aria-label="下一篇: Python flask 小專案：下載公開資料庫的基因列表網頁"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">下一篇</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="post.share"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20241108/Bioinformatics/"
+                    title="分享到 Facebook"
+                    aria-label="分享到 Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20241108/Bioinformatics/"
+                    title="分享到 Twitter"
+                    aria-label="分享到 Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://plus.google.com/share?url=https://pxchen110.github.io/20241108/Bioinformatics/"
+                    title="分享到 Google+"
+                    aria-label="分享到 Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="目錄">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://pxchen110.github.io/20241108/Bioinformatics/"
+                        aria-label="分享到 Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>分享到 Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://twitter.com/intent/tweet?text=https://pxchen110.github.io/20241108/Bioinformatics/"
+                        aria-label="分享到 Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>分享到 Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://plus.google.com/share?url=https://pxchen110.github.io/20241108/Bioinformatics/"
+                        aria-label="分享到 Google+"
+                    >
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>分享到 Google+</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/author_img.jpg" alt="作者的圖片"/>
+        
+            <h4 id="about-card-name">Xuan Chen</h4>
+        
+            <div id="about-card-bio"><p>長大以後就是小瑄～分享生物資訊、程式語言和讀後感的地方</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>Data Analyst</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Taipei
+            </div>
+        
+    </div>
+</div>
+
+        
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="/assets/images/logo-algolia-nebula-blue-full.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search"
+                    class="form-control input--large search-input" placeholder="Search "
+                    />
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">沒有找到文章</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://pxchen110.github.io/introduction/uncategorized/"
+                            aria-label=": Introduction"
+                        >
+                            <h3 class="media-heading">Introduction</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2024年1月20日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://pxchen110.github.io/20240201/Github/"
+                            aria-label=": 用Github+Hexo建立個人部落格：方法與問題紀錄"
+                        >
+                            <h3 class="media-heading">用Github+Hexo建立個人部落格：方法與問題紀錄</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2024年2月1日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240201/Github/20240201_img0.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@goumbik">Lukas Blazek</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+<p>決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://pxchen110.github.io/20240208/Front-end/"
+                            aria-label=": HTML+CSS成果展(1)：可愛貓咪網站"
+                        >
+                            <h3 class="media-heading">HTML+CSS成果展(1)：可愛貓咪網站</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2024年2月8日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240208/Front-end/20240208_img2.png"></p>
+<p>在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為<strong>要來我家看貓嗎</strong>的小網頁</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://pxchen110.github.io/20240211/Front-end/"
+                            aria-label=": HTML+CSS成果展(2)：仿寫拼多多網站"
+                        >
+                            <h3 class="media-heading">HTML+CSS成果展(2)：仿寫拼多多網站</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2024年2月11日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240211/Front-end/20240211_img0.png"></p>
+<p>參考資料來源：udemy 課程</p>
+<p>從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://pxchen110.github.io/20240215/Python/"
+                            aria-label=": Python實用系列： smtplib 模組實現自動寄信"
+                        >
+                            <h3 class="media-heading">Python實用系列： smtplib 模組實現自動寄信</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2024年2月15日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240215/Python/20240215_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@brett_jordan">Brett Jordan</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+<p>在信箱收件夾，不乏看到許多<strong>自動寄出</strong>的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://pxchen110.github.io/20240221/Python/"
+                            aria-label=": Python實用系列： 三種引入外部參數的方法"
+                        >
+                            <h3 class="media-heading">Python實用系列： 三種引入外部參數的方法</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2024年2月21日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240221/Python/20240221_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+<p>撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: <code>sys</code>, <code>argparse</code>, 以及 <code>click</code>，文章將介紹模組&#x2F;套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://pxchen110.github.io/20240222/Python/"
+                            aria-label=": Python實用系列： subprocess模組管理子進程"
+                        >
+                            <h3 class="media-heading">Python實用系列： subprocess模組管理子進程</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2024年2月22日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240222/Python/20240222_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+<p>撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\輸入檔案的方式，產生目標內容。</p>
+<p>同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://pxchen110.github.io/20240226/Life/"
+                            aria-label=": 楊德昌《 一一 》觀後感"
+                        >
+                            <h3 class="media-heading">楊德昌《 一一 》觀後感</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2024年2月26日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>A one and A two…<br><img src="/20240226/Life/20240226_img1.jpeg"></p>
+<p>這是一個喜宴開頭喪禮結尾，由一家人的生活片段交疊而成的電影，時空背景設定在沒有智慧型手機的台北，也是我尚未出生的時代，所以電影裡的台北景色對我來說都很新奇: 麥當勞內用區、誠品咖啡廳、或是圓山大飯店的宴會廳，帶有微顆粒感的畫質讓電影更吸引人。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://pxchen110.github.io/20240227/Life/"
+                            aria-label=": 尋覓陽光。追逐小鴨。高雄旅行雜記"
+                        >
+                            <h3 class="media-heading">尋覓陽光。追逐小鴨。高雄旅行雜記</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2024年2月27日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p><strong>一點渴望加一陣衝動，一場周末的出走就此成形。</strong> </p>
+<p><img src="/20240227/Life/20240227_img0.jpg"></p>
+<p>2024 Feb</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://pxchen110.github.io/20240307/Python/"
+                            aria-label=": Python實用系列：使用 os 成為系統操作大師"
+                        >
+                            <h3 class="media-heading">Python實用系列：使用 os 成為系統操作大師</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    2024年3月7日
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p><img src="/20240307/Python/20240307_img1.jpg"><br>Photo by <a target="_blank" rel="noopener" href="https://unsplash.com/@artturijalli">Artturi Jalli</a> on <a target="_blank" rel="noopener" href="https://unsplash.com/">Unsplash</a></p>
+<p>大家在撰寫 python 是否有遇到以下問題&#x2F;需求:</p>
+<ul>
+<li>目標檔案與路徑需要不停切換</li>
+<li>想自動化的遍歷目標路徑下是否有目標檔案，若檔案存在才進行後續處理</li>
+<li>在 python 環境下想跳轉至 linux 執行系統命令</li>
+</ul>
+<p>以上這些問題都可以使用 python 強大的內建模組 <strong>os (operating system)</strong> 來完成! 本文將介紹常用的 os 函式，<strong>特別是文件與路徑操作相關</strong>的內容，以及其實際應用。</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium"
+                data-message-zero="沒有找到文章"
+                data-message-one="找到 1 篇文章"
+                data-message-other="找到 {n} 篇文章">
+                找到 34 篇文章
+            </p>
+        </div>
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/sky-cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-iihbxl9lqmnahmq4wtnauuekhvo2kms9ycunkipajrs3a2acynpkecw6onjs.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+
+
+
+    
+<script src="/assets/js/moment-with-locales.js"></script>
+
+    
+<script src="/assets/js/algoliasearch.js"></script>
+
+    <script>
+      var algoliaClient = algoliasearch('Z7A3XW4R2I', '12db1ad54372045549ef465881c17e743');
+      var algoliaIndex = algoliaClient.initIndex('my-hexo-blog');
+    </script>
+
+
+    </body>
+</html>

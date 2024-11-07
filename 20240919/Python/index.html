@@ -17,7 +17,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg"},"articleBody":"\nsource code 已放在我的 Github downloadDB repository: https://github.com/pxchen110/downloadDB?tab=readme-ov-file\n\n\n\n專案動機基因途徑(gene pathway)在生物研究扮演重要角色，如分子生物機制(molecular mechanism)、基因表現量(gene-set enrichment)的探討；研究者常參考 Kyoto Encyclopedia of Genes and Genomes (KEGG), Harmonizome 等資料庫，並具有抓取特定途徑之基因列表的需求。\n但在資料取用上，對於沒有程式使用經驗(R, python)的使用者而言，常面臨以下幾個困難點:\n\n資料庫僅提供 REST api 取用資料 (KEGG 和 Harmonizme)。api 處理需要串聯 requests 等程式套件與網頁互動以存取資料\n即使網站提供api資料取用，也僅提供json格式輸出(範例參考)，一般文書處理程式(Microsoft Excel, Notepad++)無法直觀開啟和取用資訊\n\n為提供更直觀方便的基因途徑探索，本專案以python為基礎處理api資訊，並以flask套件撰寫動態網頁，提供友善的html介面操作: 使用者僅需選擇資料庫來源、輸入pathway ID、貼上api網址、或上傳含有多個網址的文檔，網頁會直接回傳機因列表，並提供一鍵友善下載功能，檔案將以TXT, CSV等方便開啟的格式儲存，若提供多個列表，將會以zip壓縮檔下載給使用者。\n示範操作\n將專案 git clone 回本機，並確保本機已滿足環境需求(environment requirements)： python 和 conda\n\n進入 downloadDB 資料夾並建立 conda 環境：conda create -f environment.yml\n\n執行專案前請開啟環境 conda activate flaskenv\n\n利用 python 開啟 flask 網頁 python3 app.py開啟 http://127.0.0.1:5000 連結後會看到以下網頁:\n\n根據需求選擇其中一個Block輸入資料: !注意一次僅接受一種輸入形式!:\n\n查詢一個基因途徑(single query): 選擇資料庫種類 (KEGG 或 Harmonizome) 並依照範例輸入 pathway ID, api URL、點選 Submit 送出\n查詢多個基因途徑(multiple query):準備一份紀錄api URL 的 TXT 檔，選擇資料庫種類 (KEGG 或 Harmonizome)並上傳檔案、點選 Submit 送出\n\n\n若目標api或基因途徑存在，將會返回以下網頁內容:\n\n點選 Download TXT 或 Download CSV 下載不同格式的基因列表；若提供多個基因途徑，點選Download ZIP 下載zip壓縮檔，解壓縮後每個基因列表產生一份TXT檔\n\n\n未來改善\n由於目前python程式寫法為: 取得資料後會將基因列表儲存成txt和csv檔(專案路徑下名為query_output和query_input的資料夾)，並以檔名作為變數傳遞至下個函數；若使用者點選 download 按鈕並將檔案下載至本機，此時電腦會有兩份相同的檔案，希望能增加自動清除檔案功能\n如何跳轉回最初頁面\n嘗試連結後端資料庫儲存的函數功能\n\n","dateCreated":"2024-09-19T19:37:57+08:00","dateModified":"2024-09-19T19:45:36+08:00","datePublished":"2024-09-19T19:37:57+08:00","description":"\nsource code 已放在我的 Github downloadDB repository: https://github.com/pxchen110/downloadDB?tab=readme-ov-file","headline":"Python flask 小專案：下載公開資料庫的基因列表網頁","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20240919/Python/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20240919/Python/","keywords":"Python"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg"},"articleBody":"\nsource code 已放在我的 Github downloadDB repository: https://github.com/pxchen110/downloadDB?tab=readme-ov-file\n\n\n\n專案動機基因途徑(gene pathway)在生物研究扮演重要角色，如分子生物機制(molecular mechanism)、基因表現量(gene-set enrichment)的探討；研究者常參考 Kyoto Encyclopedia of Genes and Genomes (KEGG), Harmonizome 等資料庫，並具有抓取特定途徑之基因列表的需求。\n但在資料取用上，對於沒有程式使用經驗(R, python)的使用者而言，常面臨以下幾個困難點:\n\n資料庫僅提供 REST api 取用資料 (KEGG 和 Harmonizme)。api 處理需要串聯 requests 等程式套件與網頁互動以存取資料\n即使網站提供api資料取用，也僅提供json格式輸出(範例參考)，一般文書處理程式(Microsoft Excel, Notepad++)無法直觀開啟和取用資訊\n\n為提供更直觀方便的基因途徑探索，本專案以python為基礎處理api資訊，並以flask套件撰寫動態網頁，提供友善的html介面操作: 使用者僅需選擇資料庫來源、輸入pathway ID、貼上api網址、或上傳含有多個網址的文檔，網頁會直接回傳機因列表，並提供一鍵友善下載功能，檔案將以TXT, CSV等方便開啟的格式儲存，若提供多個列表，將會以zip壓縮檔下載給使用者。\n示範操作\n將專案 git clone 回本機，並確保本機已滿足環境需求(environment requirements)： python 和 conda\n\n進入 downloadDB 資料夾並建立 conda 環境：conda create -f environment.yml\n\n執行專案前請開啟環境 conda activate flaskenv\n\n利用 python 開啟 flask 網頁 python3 app.py開啟 http://127.0.0.1:5000 連結後會看到以下網頁:\n\n根據需求選擇其中一個Block輸入資料: !注意一次僅接受一種輸入形式!:\n\n查詢一個基因途徑(single query): 選擇資料庫種類 (KEGG 或 Harmonizome) 並依照範例輸入 pathway ID, api URL、點選 Submit 送出\n查詢多個基因途徑(multiple query):準備一份紀錄api URL 的 TXT 檔，選擇資料庫種類 (KEGG 或 Harmonizome)並上傳檔案、點選 Submit 送出\n\n\n若目標api或基因途徑存在，將會返回以下網頁內容:\n\n點選 Download TXT 或 Download CSV 下載不同格式的基因列表；若提供多個基因途徑，點選Download ZIP 下載zip壓縮檔，解壓縮後每個基因列表產生一份TXT檔\n\n\n未來改善\n由於目前python程式寫法為: 取得資料後會將基因列表儲存成txt和csv檔(專案路徑下名為query_output和query_input的資料夾)，並以檔名作為變數傳遞至下個函數；若使用者點選 download 按鈕並將檔案下載至本機，此時電腦會有兩份相同的檔案，希望能增加自動清除檔案功能\n如何跳轉回最初頁面\n嘗試連結後端資料庫儲存的函數功能\n\n","dateCreated":"2024-09-19T19:37:57+08:00","dateModified":"2024-09-19T19:46:36+08:00","datePublished":"2024-09-19T19:37:57+08:00","description":"\nsource code 已放在我的 Github downloadDB repository: https://github.com/pxchen110/downloadDB?tab=readme-ov-file","headline":"Python flask 小專案：下載公開資料庫的基因列表網頁","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://pxchen110.github.io/20240919/Python/"},"publisher":{"@type":"Organization","name":"Xuan Chen","sameAs":["https://github.com/","http://stackoverflow.com/users"],"image":"author_img.jpg","logo":{"@type":"ImageObject","url":"author_img.jpg"}},"url":"https://pxchen110.github.io/20240919/Python/","keywords":"Python"}</script>
     <meta name="description" content="introducing my python side project about download gene pathway list via html interface and db api">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Python flask 小專案：下載公開資料庫的基因列表網頁">
@@ -29,7 +29,7 @@
 <meta property="og:image" content="https://pxchen110.github.io/20240919/Python/20240919_img1.png">
 <meta property="og:image" content="https://pxchen110.github.io/20240919/Python/20240919_img2.png">
 <meta property="article:published_time" content="2024-09-19T11:37:57.000Z">
-<meta property="article:modified_time" content="2024-09-19T11:45:36.179Z">
+<meta property="article:modified_time" content="2024-09-19T11:46:36.888Z">
 <meta property="article:author" content="Xuan Chen">
 <meta property="article:tag" content="Python">
 <meta name="twitter:card" content="summary">
@@ -354,11 +354,14 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a
-                        class="post-action-btn btn btn--disabled"
-                        aria-hidden="true"
-                    >
-                        
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/20241108/Bioinformatics/"
+                    data-tooltip="生資系列： 基因註解轉換套件 biomaRt, bitr, mygene"
+                    aria-label="上一篇: 生資系列： 基因註解轉換套件 biomaRt, bitr, mygene"
+                >
+                    
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -487,11 +490,14 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a
-                        class="post-action-btn btn btn--disabled"
-                        aria-hidden="true"
-                    >
-                        
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/20241108/Bioinformatics/"
+                    data-tooltip="生資系列： 基因註解轉換套件 biomaRt, bitr, mygene"
+                    aria-label="上一篇: 生資系列： 基因註解轉換套件 biomaRt, bitr, mygene"
+                >
+                    
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">上一篇</span>
                     </a>
@@ -940,7 +946,7 @@
                 data-message-zero="沒有找到文章"
                 data-message-one="找到 1 篇文章"
                 data-message-other="找到 {n} 篇文章">
-                找到 33 篇文章
+                找到 34 篇文章
             </p>
         </div>
     </div>
