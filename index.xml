@@ -547,17 +547,16 @@ $$</description>
         <pubDate>Mon, 20 Jan 2014 00:00:00 +0000</pubDate>
         
         <guid>https://pxchen110.github.io/about/</guid>
-        <description>&lt;h2 id=&#34;自我介紹&#34;&gt;自我介紹
-&lt;/h2&gt;&lt;p&gt;Hello World!
-我是 Xuan（瑄），很高興能在如銀河系般廣闊的網路世界遇見你/妳。
-生物資訊背景，主要使用語言／系統有 Linux, Python, R, HTML, CSS, JavaScript，也在自學其他程式語言：）
-工作以外的閒暇的喜好有閱讀書籍、音樂追星、電影和自助旅行。&lt;/p&gt;
+        <description>&lt;p&gt;Hello World!&lt;/p&gt;
+&lt;p&gt;我是 Xuan（瑄），很高興能在如銀河系般廣闊的網路世界遇見你/妳&lt;br&gt;
+生物資訊背景，主要使用語言／系統有 Linux, Python, R, HTML, CSS, JavaScript，對機器學習和後端感興趣，並自學擴列其他程式語言 &lt;br&gt;
+工作以外的閒暇的喜好有閱讀書籍、音樂追星、電影和自助旅行&lt;/p&gt;
 &lt;p&gt;想寫部落格的原因～
-希望能將這個網站當成是我的學習筆記倉庫，將新知識透過文字紀錄並疏理邏輯脈絡，讓內化更有效率
-學習過程中也從很多大神的blog獲得解決之道，自己也想記錄一些問題經驗與如何debug的方法，若以後有遇到類似問題可以快速避坑（避坑避雷你我有責XD）
+希望能將這個網站當成是我的學習筆記倉庫，將新知識透過文字紀錄並疏理邏輯脈絡，讓內化更有效率&lt;br&gt;
+學習過程中也從很多大神的blog獲得解決之道，自己也想記錄一些問題經驗與如何debug的方法，若以後有遇到類似問題可以快速避坑（避坑避雷你我有責XD）&lt;br&gt;
 也希望能將我所喜愛的事物記錄下來，雖然觸及率可能像朝遠山懸崖咆哮回音甚少，但至少當下很開心就足夠了:）&lt;/p&gt;
-&lt;p&gt;最後點播一首張敬軒的My Way，我的副標題亦是取自歌詞 &amp;ldquo;Baby長大以後就是小軒~&amp;rdquo;
-希望 “用心去追，感覺就對，I will find my way~”&lt;/p&gt;
+&lt;p&gt;最後點播一首張敬軒的My Way，我的副標題亦是取自歌詞 &amp;ldquo;Baby長大以後就是小軒~&amp;quot;。希望 &amp;ldquo;用心去追，感覺就對，I will find my way~&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;時間軸紀錄： 2024 年初開始使用 hugo 建立 blog -&amp;gt; 2025 砍掉重練改用 hugo 建立 blog&lt;/p&gt;
 </description>
         </item>
         <item>
