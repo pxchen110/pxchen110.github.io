@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="生物研究時常需要基因資訊，但分析工具與資料庫之間的註解未必能直接相通，如某些網站僅提供RefSeq ID, 有些只提供Ensembl ID等，雖然都是描述同一基因、但需要做進一步轉換才能串連資訊；另一常見狀況則是在GO enrichment analysis時，需要利用entrezid(gene id)來進行KEGG, GO enrichment分析。今天要介紹三種覺得好用的註解轉換套件:biomaRt, bitr, mygene，文章在R語言環境進行操作，若想使用python可以查詢是否支援並用 conda 安裝。\nbiomaRT biomaRT 套件主要協助取得 Ensembl 網站的資訊。\nInstallation bioconductor website\n1 2 3 4 if (!require(&#34;BiocManager&#34;, quietly = TRUE)) install.packages(&#34;BiocManager&#34;) BiocManager::install(&#34;biomaRt&#34;) Select desired BioMart database and dataset 以 useEnsembl() 來指定連線到哪個 biomaRT 資料庫與資料集\n1 2 library(biomaRt) ensembl &lt;- useEnsembl(biomart = &#34;genes&#34;, dataset = &#34;hsapiens_gene_ensembl&#34;, version = 113) 函式有兩個必要參數 biomart 和 dataset(層級 biomart &gt; dataset)，首先用 listEnsembl() 或 listMarts() 查詢 biomart選項，雖名稱不同但內容相等(如: genes 等價於 ENSEMBL_MART_ENSEMBL)\n">
+<title>生資系列：基因註解轉換套件 biomaRt, bitr, mygene </title>
+
+<link rel='canonical' href='https://pxchen110.github.io/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97%E5%9F%BA%E5%9B%A0%E8%A8%BB%E8%A7%A3%E8%BD%89%E6%8F%9B%E5%A5%97%E4%BB%B6-biomart-bitr-mygene/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="生資系列：基因註解轉換套件 biomaRt, bitr, mygene ">
+<meta property='og:description' content="生物研究時常需要基因資訊，但分析工具與資料庫之間的註解未必能直接相通，如某些網站僅提供RefSeq ID, 有些只提供Ensembl ID等，雖然都是描述同一基因、但需要做進一步轉換才能串連資訊；另一常見狀況則是在GO enrichment analysis時，需要利用entrezid(gene id)來進行KEGG, GO enrichment分析。今天要介紹三種覺得好用的註解轉換套件:biomaRt, bitr, mygene，文章在R語言環境進行操作，若想使用python可以查詢是否支援並用 conda 安裝。\nbiomaRT biomaRT 套件主要協助取得 Ensembl 網站的資訊。\nInstallation bioconductor website\n1 2 3 4 if (!require(&#34;BiocManager&#34;, quietly = TRUE)) install.packages(&#34;BiocManager&#34;) BiocManager::install(&#34;biomaRt&#34;) Select desired BioMart database and dataset 以 useEnsembl() 來指定連線到哪個 biomaRT 資料庫與資料集\n1 2 library(biomaRt) ensembl &lt;- useEnsembl(biomart = &#34;genes&#34;, dataset = &#34;hsapiens_gene_ensembl&#34;, version = 113) 函式有兩個必要參數 biomart 和 dataset(層級 biomart &gt; dataset)，首先用 listEnsembl() 或 listMarts() 查詢 biomart選項，雖名稱不同但內容相等(如: genes 等價於 ENSEMBL_MART_ENSEMBL)\n">
+<meta property='og:url' content='https://pxchen110.github.io/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97%E5%9F%BA%E5%9B%A0%E8%A8%BB%E8%A7%A3%E8%BD%89%E6%8F%9B%E5%A5%97%E4%BB%B6-biomart-bitr-mygene/'>
+<meta property='og:site_name' content='Xuan&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Bioinformatics' /><meta property='article:tag' content='Bio-tools' /><meta property='article:published_time' content='2024-11-08T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-11-08T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="生資系列：基因註解轉換套件 biomaRt, bitr, mygene ">
+<meta name="twitter:description" content="生物研究時常需要基因資訊，但分析工具與資料庫之間的註解未必能直接相通，如某些網站僅提供RefSeq ID, 有些只提供Ensembl ID等，雖然都是描述同一基因、但需要做進一步轉換才能串連資訊；另一常見狀況則是在GO enrichment analysis時，需要利用entrezid(gene id)來進行KEGG, GO enrichment分析。今天要介紹三種覺得好用的註解轉換套件:biomaRt, bitr, mygene，文章在R語言環境進行操作，若想使用python可以查詢是否支援並用 conda 安裝。\nbiomaRT biomaRT 套件主要協助取得 Ensembl 網站的資訊。\nInstallation bioconductor website\n1 2 3 4 if (!require(&#34;BiocManager&#34;, quietly = TRUE)) install.packages(&#34;BiocManager&#34;) BiocManager::install(&#34;biomaRt&#34;) Select desired BioMart database and dataset 以 useEnsembl() 來指定連線到哪個 biomaRT 資料庫與資料集\n1 2 library(biomaRt) ensembl &lt;- useEnsembl(biomart = &#34;genes&#34;, dataset = &#34;hsapiens_gene_ensembl&#34;, version = 113) 函式有兩個必要參數 biomart 和 dataset(層級 biomart &gt; dataset)，首先用 listEnsembl() 或 listMarts() 查詢 biomart選項，雖名稱不同但內容相等(如: genes 等價於 ENSEMBL_MART_ENSEMBL)\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/profile_hu_d0d4f9ff9a7faeba.jpg" width="300"
+                            height="299" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Xuan&#39;s Blog</a></h1>
+            <h2 class="site-description">長大以後就是小瑄</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/pxchen110'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#biomart">biomaRT</a>
+      <ol>
+        <li><a href="#installation">Installation</a></li>
+        <li><a href="#select-desired-biomart-database-and-dataset">Select desired BioMart database and dataset</a></li>
+        <li><a href="#run-biomart-query">Run biomaRT query</a></li>
+        <li><a href="#check-caches">Check caches</a></li>
+        <li><a href="#example-r-code">Example R code</a></li>
+      </ol>
+    </li>
+    <li><a href="#bitr">bitr</a>
+      <ol>
+        <li><a href="#installation-1">Installation</a></li>
+        <li><a href="#run-bitr-function">Run bitr() function</a></li>
+        <li><a href="#example-r-code-1">Example R code</a></li>
+      </ol>
+    </li>
+    <li><a href="#mygene">mygene</a>
+      <ol>
+        <li><a href="#installation-2">installation</a></li>
+        <li><a href="#run-mygene-query">Run mygene query</a></li>
+        <li><a href="#example-r-code-2">Example R code</a></li>
+      </ol>
+    </li>
+    <li><a href="#comments">Comments</a></li>
+    <li><a href="#references">References</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/bioinformatics/" >
+                Bioinformatics
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97%E5%9F%BA%E5%9B%A0%E8%A8%BB%E8%A7%A3%E8%BD%89%E6%8F%9B%E5%A5%97%E4%BB%B6-biomart-bitr-mygene/">生資系列：基因註解轉換套件 biomaRt, bitr, mygene </a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Nov 08, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    5 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>生物研究時常需要基因資訊，但分析工具與資料庫之間的註解未必能直接相通，如某些網站僅提供RefSeq ID, 有些只提供Ensembl ID等，雖然都是描述同一基因、但需要做進一步轉換才能串連資訊；另一常見狀況則是在GO enrichment analysis時，需要利用entrezid(gene id)來進行KEGG, GO enrichment分析。今天要介紹三種覺得好用的註解轉換套件:biomaRt, bitr, mygene，文章在R語言環境進行操作，若想使用python可以查詢是否支援並用 conda 安裝。</p>
+<!-- more -->
+<!-- toc -->
+<h2 id="biomart">biomaRT
+</h2><p><code>biomaRT</code> 套件主要協助取得 <a class="link" href="http://www.ensembl.org"  target="_blank" rel="noopener"
+    >Ensembl</a> 網站的資訊。</p>
+<h3 id="installation">Installation
+</h3><p><a class="link" href="https://bioconductor.org/packages/release/bioc/html/biomaRt.html"  target="_blank" rel="noopener"
+    >bioconductor website</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">if (!require(&#34;BiocManager&#34;, quietly = TRUE))
+</span></span><span class="line"><span class="cl">    install.packages(&#34;BiocManager&#34;)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">BiocManager::install(&#34;biomaRt&#34;)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="select-desired-biomart-database-and-dataset">Select desired BioMart database and dataset
+</h3><p>以 <code>useEnsembl()</code> 來指定連線到哪個 biomaRT 資料庫與資料集</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">library(biomaRt)
+</span></span><span class="line"><span class="cl">ensembl &lt;- useEnsembl(biomart = &#34;genes&#34;, dataset = &#34;hsapiens_gene_ensembl&#34;, version = 113)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>函式有兩個必要參數 <code>biomart</code> 和 <code>dataset</code>(層級 biomart &gt; dataset)，首先用 <code>listEnsembl()</code> 或 <code>listMarts()</code> 查詢 <code>biomart</code>選項，雖名稱不同但內容相等(如: <code>genes</code> 等價於 <code>ENSEMBL_MART_ENSEMBL</code>)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&gt; listEnsembl()
+</span></span><span class="line"><span class="cl">        biomart                version
+</span></span><span class="line"><span class="cl">1         genes      Ensembl Genes 113
+</span></span><span class="line"><span class="cl">2 mouse_strains      Mouse strains 113
+</span></span><span class="line"><span class="cl">3          snps  Ensembl Variation 113
+</span></span><span class="line"><span class="cl">4    regulation Ensembl Regulation 113
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&gt; listMarts() 
+</span></span><span class="line"><span class="cl">               biomart                version
+</span></span><span class="line"><span class="cl">1 ENSEMBL_MART_ENSEMBL      Ensembl Genes 113
+</span></span><span class="line"><span class="cl">2   ENSEMBL_MART_MOUSE      Mouse strains 113
+</span></span><span class="line"><span class="cl">3     ENSEMBL_MART_SNP  Ensembl Variation 113
+</span></span><span class="line"><span class="cl">4 ENSEMBL_MART_FUNCGEN Ensembl Regulation 113
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>以 <code>useMart()</code> 指定biomart資料庫 + <code>listDatasets()</code> 查詢可用的資料集，可搭配字串篩選:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">mart &lt;- useMart(&#34;ENSEMBL_MART_ENSEMBL&#34;)
+</span></span><span class="line"><span class="cl">ds &lt;- as.data.frame(listDatasets(mart=mart))
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">## find rows in dataset which contains &#39;human&#39; string
+</span></span><span class="line"><span class="cl">ds %&gt;% filter(grepl(&#34;human&#34;,tolower(description))) 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## output:
+</span></span><span class="line"><span class="cl">                dataset              description    version
+</span></span><span class="line"><span class="cl">1 hsapiens_gene_ensembl Human genes (GRCh38.p14) GRCh38.p14
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最後如果有指定ensembl版本需求，可用 <code>listEnsemblArchives()</code> 函數，並用 <code>useEnsembl(version = xxx)</code> 指定版本 (default: latest release)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">             name     date                                 url version current_release
+</span></span><span class="line"><span class="cl">1  Ensembl GRCh37 Feb 2014          https://grch37.ensembl.org  GRCh37                
+</span></span><span class="line"><span class="cl">2     Ensembl 113 Oct 2024 https://oct2024.archive.ensembl.org     113               *
+</span></span><span class="line"><span class="cl">3     Ensembl 112 May 2024 https://may2024.archive.ensembl.org     112                
+</span></span><span class="line"><span class="cl">4     Ensembl 111 Jan 2024 https://jan2024.archive.ensembl.org     111                
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="run-biomart-query">Run biomaRT query
+</h3><p>指定ensembl參考資料後，接著以 <code>getBM()</code>連線至 ensembl server 並針對query返回dataframe:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">getBM(attributes, filters = &#34;&#34;, values = &#34;&#34;, mart, curl = NULL, 
+</span></span><span class="line"><span class="cl">checkFilters = TRUE, verbose = FALSE, uniqueRows = TRUE, bmHeader = FALSE,
+</span></span><span class="line"><span class="cl">quote = &#34;\&#34;&#34;, useCache = TRUE)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>參數包含:</p>
+<ul>
+<li><code>atribute</code> 輸出ensembl的欄位，可用 <code>listAttributes(${useEnsembl()_varname})</code> 查看選項</li>
+<li><code>filters</code> 輸入內容的資訊類型，如輸入 <code>ENSGxxx</code> 則 <code>filters = &quot;ensembl_gene_id&quot;</code> 可用 <code>listFilters(${useEnsembl()_varname})</code> 查看選項</li>
+<li><code>values</code> 輸入內容 input query list</li>
+<li><code>mart</code> 指定 <code>useEnsembl()</code> 物件</li>
+</ul>
+<h3 id="check-caches">Check caches
+</h3><p>若先前有跑過相同資料庫，透過 <code>biomartCacheInfo()</code> 查詢是否有 cache file</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">biomaRt cache
+</span></span><span class="line"><span class="cl">- Location: C:\xxxx/biomaRt/Cache
+</span></span><span class="line"><span class="cl">- No. of files: 12
+</span></span><span class="line"><span class="cl">- Total size: 983.1 Kb
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="example-r-code">Example R code
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">library(biomaRt)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## check mart dbs
+</span></span><span class="line"><span class="cl">listMarts() 
+</span></span><span class="line"><span class="cl">mart &lt;- useMart(&#34;ENSEMBL_MART_ENSEMBL&#34;) 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## check mart datasets and find rows where column &#39;description&#39; contains human
+</span></span><span class="line"><span class="cl">ds &lt;- as.data.frame(listDatasets(mart=mart))
+</span></span><span class="line"><span class="cl">ds %&gt;% filter(grepl(&#34;human&#34;,tolower(description))) 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># build this object which specify older version 103
+</span></span><span class="line"><span class="cl">ensembl &lt;- useEnsembl(biomart = &#39;ensembl&#39;, dataset = &#39;ggallus_gene_ensembl&#39;, version = 103)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## run biomart convert
+</span></span><span class="line"><span class="cl">data &lt;- read.table(&#39;query_gene.txt&#39;, header = T)
+</span></span><span class="line"><span class="cl">inputs &lt;- as.vector(data$ensembl_gene_id)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># send it to the Ensembl BioMart server
+</span></span><span class="line"><span class="cl">genes &lt;- getBM(attributes=c(&#34;external_gene_name&#34;,&#34;ensembl_gene_id&#34;,&#34;entrezgene_id&#34;),
+</span></span><span class="line"><span class="cl">               filters = &#34;ensembl_gene_id&#34;,
+</span></span><span class="line"><span class="cl">               values = inputs, 
+</span></span><span class="line"><span class="cl">               mart = ensembl)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="bitr">bitr
+</h2><p><code>bitr()</code> 為 <code>clusterprofiler</code>套件內的函式，利用 <code>AnnotationDbi::select</code> 來篩選特定物種的 <code>OrgDB</code> 內的資訊，最後輸出dataframe
+**所有的<code>.db</code>結尾的library其實就是使用AnnotationDbi來的物件</p>
+<h3 id="installation-1">Installation
+</h3><p><a class="link" href="https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html"  target="_blank" rel="noopener"
+    >bioconductor website</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">if (!require(&#34;BiocManager&#34;, quietly = TRUE))
+</span></span><span class="line"><span class="cl">    install.packages(&#34;BiocManager&#34;)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">BiocManager::install(&#34;clusterProfiler&#34;)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="run-bitr-function">Run bitr() function
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bitr(geneID, fromType, toType, OrgDb, drop = TRUE)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>geneID</code> 為 input query list</li>
+<li><code>fromType</code> 和 <code>toType</code> 須為 <code>idType(orgDB)</code> 返回的類別(key):</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">fromType&#39; should be one of ACCNUM, ALIAS, ENSEMBL, ENSEMBLPROT, ENSEMBLTRANS, ENTREZID, ENZYME, EVIDENCE, EVIDENCEALL, GENENAME, GENETYPE, GO, GOALL, IPI, MAP, OMIM, ONTOLOGY, ONTOLOGYALL, PATH, PFAM, PMID, PROSITE, REFSEQ, SYMBOL, UCSCKG, UNIPROT.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>OrgDb</code> 為指定物種的註解包，需要先安裝才能使用，物種匹配的orgDB 可以參考<a class="link" href="https://evvail.com/2021/07/13/2459.html"  target="_blank" rel="noopener"
+    >這個網站</a></li>
+</ul>
+<h3 id="example-r-code-1">Example R code
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">library(clusterProfiler)
+</span></span><span class="line"><span class="cl">library(org.Hs.eg.db)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">query_gene &lt;- c(&#39;TP53&#39;,&#39;BRAF&#39;,&#39;PIK3CA&#39;,&#39;KRAS&#39;)
+</span></span><span class="line"><span class="cl">gene_out &lt;- bitr(query_gene, fromType=&#34;SYMBOL&#34;, toType=c(&#34;GENENAME&#34;, &#34;ENTREZID&#34;,&#34;ENSEMBL&#34;), OrgDb=org.Hs.eg.db)
+</span></span><span class="line"><span class="cl">gene_out &lt;- as.data.frame(gene_out)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&gt; print(gene_out)
+</span></span><span class="line"><span class="cl">  SYMBOL                                                               GENENAME ENTREZID    ENSEMBL
+</span></span><span class="line"><span class="cl">1   TP53                                                      tumor protein p53     7157   ENSG00000141510
+</span></span><span class="line"><span class="cl">2   BRAF                          B-Raf proto-oncogene, serine/threonine kinase      673   ENSG00000157764
+</span></span><span class="line"><span class="cl">3 PIK3CA phosphatidylinositol-4,5-bisphosphate 3-kinase catalytic subunit alpha     5290   ENSG00000121879
+</span></span><span class="line"><span class="cl">4   KRAS                                            KRAS proto-oncogene, GTPase     3845   ENSG00000133703
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>轉換完成會顯示有多少比例轉換失敗</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">50% of input gene IDs are fail to map...
+</span></span><span class="line"><span class="cl">&gt; print(gene_out)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    SYMBOL                    GENENAME ENTREZID
+</span></span><span class="line"><span class="cl">1   TP53           tumor protein p53     7157
+</span></span><span class="line"><span class="cl">4   KRAS KRAS proto-oncogene, GTPase     3845
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="mygene">mygene
+</h2><p><code>mygene.info</code> 以API形式獲取公開資料庫的基因資訊，官方文件多以 python code 做示範使用，R 套件函式屬於 API qurey 的 wrapper</p>
+<blockquote>
+<p><code>queryMany</code> is a wrapper for POST query of &ldquo;/query&rdquo; service</p></blockquote>
+<h3 id="installation-2">installation
+</h3><p><a class="link" href="https://www.bioconductor.org/packages/release/bioc/html/mygene.html"  target="_blank" rel="noopener"
+    >bioconductor website</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">if (!require(&#34;BiocManager&#34;, quietly = TRUE))
+</span></span><span class="line"><span class="cl">    install.packages(&#34;BiocManager&#34;)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">BiocManager::install(&#34;mygene&#34;)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="run-mygene-query">Run mygene query
+</h3><p>主要使用 <code>queryMany</code> 函式</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">queryMany(qterms, scopes=NULL, ..., return.as=c(&#34;DataFrame&#34;, &#34;records&#34;, &#34;text&#34;), mygene)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>qterm</code> 為 input query list</li>
+<li><code>scopes</code> 提供 query list 類型，可用 field請參考<a class="link" href="https://docs.mygene.info/en/latest/doc/data.html#available-fields"  target="_blank" rel="noopener"
+    >官方文件</a>，如: query 給 <code>ENSGxx</code> 則 <code>scopes = ensembl.gene</code></li>
+<li>其他常用參數
+<ul>
+<li><code>species</code> 給予物種資訊如 <strong>taxid</strong>;</li>
+<li><code>fields</code> 指定輸出內容，可填類型跟 <code>scopes</code> field 相同</li>
+<li><code>return.as</code> 指定輸出類型: 目前支援&quot;DataFrame&quot; (default), &ldquo;records&rdquo; (list), &ldquo;text&rdquo; (JSON) 三種</li>
+</ul>
+</li>
+</ul>
+<h3 id="example-r-code-2">Example R code
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">library(mygene)
+</span></span><span class="line"><span class="cl">geneList &lt;- c(&#39;TP53&#39;,&#39;BRAF&#39;,&#39;PIK3CA&#39;,&#39;KRAS&#39;)
+</span></span><span class="line"><span class="cl">query_output &lt;- queryMany(geneList, scopes = &#39;symbol&#39;, species = 9606, fields = &#39;ensembl.gene,name,entrezgene&#39;)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&gt; print(query_output)
+</span></span><span class="line"><span class="cl">DataFrame with 4 rows and 6 columns
+</span></span><span class="line"><span class="cl">        query         _id   X_score  entrezgene                   name    ensembl.gene
+</span></span><span class="line"><span class="cl">  &lt;character&gt; &lt;character&gt; &lt;numeric&gt; &lt;character&gt;            &lt;character&gt;     &lt;character&gt;
+</span></span><span class="line"><span class="cl">1        TP53        7157   18.0079        7157      tumor protein p53 ENSG00000141510
+</span></span><span class="line"><span class="cl">2        BRAF         673   17.6012         673 B-Raf proto-oncogene.. ENSG00000157764
+</span></span><span class="line"><span class="cl">3      PIK3CA        5290   17.8778        5290 phosphatidylinositol.. ENSG00000121879
+</span></span><span class="line"><span class="cl">4        KRAS        3845   17.6623        3845 KRAS proto-oncogene,.. ENSG00000133703
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="comments">Comments
+</h2><p><code>bitr()</code> 和 <code>mygene queryMany()</code> 相當方便，常見或具有orgDB的物種基本上沒有太大問題，但有時會遇到以下情況導致轉換失敗:</p>
+<ul>
+<li>gene name alias 或 synonyms 無法直接聯繫到正確的HGNC資訊，這時可先用 <code>AnnotationDbi::select(org.${spec}.eg.db, keys = alias_list, columns = c('SYMBOL'), keytype = &quot;ALIAS&quot;)</code> 轉換基因名稱，或是找尋好用套件來轉換&hellip;
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">alias_list &lt;- c(&#39;MEK&#39;,&#39;PI3K&#39;,&#39;TP53&#39;)
+</span></span><span class="line"><span class="cl">&gt; AnnotationDbi::select(org.Hs.eg.db, keys = alias_list, columns = c(&#39;SYMBOL&#39;), keytype = &#34;ALIAS&#34;)
+</span></span><span class="line"><span class="cl">&gt; &#39;select()&#39; returned 1:many mapping between keys and columns
+</span></span><span class="line"><span class="cl">ALIAS SYMBOL
+</span></span><span class="line"><span class="cl">1   MEK MAP2K7
+</span></span><span class="line"><span class="cl">2  PI3K PIK3CA
+</span></span><span class="line"><span class="cl">3  PI3K PIK3CB
+</span></span><span class="line"><span class="cl">4  PI3K PIK3CD
+</span></span><span class="line"><span class="cl">5  PI3K PIK3CG
+</span></span><span class="line"><span class="cl">6  TP53   TP53
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>若資料庫以舊版 ensembl 註解，有些transcript ID 可能已經被移除，導致HGNC轉換失敗，這時 <code>biomaRT useEnsembl()</code> 指定資料集版本的功能相當方便，能多少救一些轉換，但也要注意這樣的轉換是否有意義，畢竟最新版沒有收錄&hellip;&hellip;</li>
+</ul>
+<h2 id="references">References
+</h2><blockquote>
+<p><a class="link" href="https://bioconductor.org/packages/release/bioc/vignettes/biomaRt/inst/doc/accessing_ensembl.html"  target="_blank" rel="noopener"
+    >https://bioconductor.org/packages/release/bioc/vignettes/biomaRt/inst/doc/accessing_ensembl.html</a>
+<a class="link" href="https://mygene.info/"  target="_blank" rel="noopener"
+    >https://mygene.info/</a>
+<a class="link" href="https://github.com/gege-circle/home/issues/702"  target="_blank" rel="noopener"
+    >https://github.com/gege-circle/home/issues/702</a></p></blockquote>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/bioinformatics/">Bioinformatics</a>
+        
+            <a href="/tags/bio-tools/">Bio-Tools</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-%E4%B8%8B%E8%BC%89ncbi%E8%B3%87%E6%96%99%E7%9A%84%E6%96%B9%E6%B3%95/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-ncbi/20240829_img1.png" loading="lazy" data-key="" data-hash="/post/bioinfo-ncbi/20240829_img1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列： 下載NCBI資料的方法</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97%E7%A2%BA%E6%A0%A1%E8%B3%87%E6%96%99%E9%9B%86-benchmarking-truth-set/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-benchmarking/20240606_img0.png" loading="lazy" data-key="" data-hash="/post/bioinfo-benchmarking/20240606_img0.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列：確校資料集 Benchmarking truth set</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-gnomad-v4/20240523_img1.png" loading="lazy" data-key="" data-hash="/post/bioinfo-gnomad-v4/20240523_img1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列： gnomAD v3 database 介紹</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-gnomad-v4/20240523_img1.png" loading="lazy" data-key="" data-hash="/post/bioinfo-gnomad-v4/20240523_img1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列： gnomAD v3 database 介紹</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-all-of-us-research-program-%E4%BB%8B%E7%B4%B9/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-allofus/20240509_img1.jpg" loading="lazy" data-key="" data-hash="/post/bioinfo-allofus/20240509_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列： All of US research program 介紹</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "pxchen110-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 pxchen
+
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

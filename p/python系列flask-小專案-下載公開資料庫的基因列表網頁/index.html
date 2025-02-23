@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content=" source code 已放在我的 Github downloadDB repository: https://github.com/pxchen110/downloadDB?tab=readme-ov-file\n專案動機 基因途徑(gene pathway)在生物研究扮演重要角色，如分子生物機制(molecular mechanism)、基因表現量(gene-set enrichment)的探討；研究者常參考 Kyoto Encyclopedia of Genes and Genomes (KEGG), Harmonizome 等資料庫，並具有抓取特定途徑之基因列表的需求。\n但在資料取用上，對於沒有程式使用經驗(R, python)的使用者而言，常面臨以下幾個困難點:\n資料庫僅提供 REST api 取用資料 (KEGG 和 Harmonizme)。api 處理需要串聯 requests 等程式套件與網頁互動以存取資料 即使網站提供api資料取用，也僅提供json格式輸出(範例參考)，一般文書處理程式(Microsoft Excel, Notepad++)無法直觀開啟和取用資訊 為提供更直觀方便的基因途徑探索，本專案以python為基礎處理api資訊，並以flask套件撰寫動態網頁，提供友善的html介面操作: 使用者僅需選擇資料庫來源、輸入pathway ID、貼上api網址、或上傳含有多個網址的文檔，網頁會直接回傳機因列表，並提供一鍵友善下載功能，檔案將以TXT, CSV等方便開啟的格式儲存，若提供多個列表，將會以zip壓縮檔下載給使用者。\n示範操作 將專案 git clone 回本機，並確保本機已滿足環境需求(environment requirements)： python 和 conda 進入 downloadDB 資料夾並建立 conda 環境：conda create -f environment.yml 執行專案前請開啟環境 conda activate flaskenv 利用 python 開啟 flask 網頁 python3 app.py 開啟 http://127.0.0.1:5000 連結後會看到以下網頁: 根據需求選擇其中一個Block輸入資料: !注意一次僅接受一種輸入形式!: 查詢一個基因途徑(single query): 選擇資料庫種類 (KEGG 或 Harmonizome) 並依照範例輸入 pathway ID, api URL、點選 Submit 送出 查詢多個基因途徑(multiple query):準備一份紀錄api URL 的 TXT 檔，選擇資料庫種類 (KEGG 或 Harmonizome)並上傳檔案、點選 Submit 送出 若目標api或基因途徑存在，將會返回以下網頁內容: 點選 Download TXT 或 Download CSV 下載不同格式的基因列表；若提供多個基因途徑，點選Download ZIP 下載zip壓縮檔，解壓縮後每個基因列表產生一份TXT檔 未來改善 由於目前python程式寫法為: 取得資料後會將基因列表儲存成txt和csv檔(專案路徑下名為query_output和query_input的資料夾)，並以檔名作為變數傳遞至下個函數；若使用者點選 download 按鈕並將檔案下載至本機，此時電腦會有兩份相同的檔案，希望能增加自動清除檔案功能 如何跳轉回最初頁面 嘗試連結後端資料庫儲存的函數功能 ">
+<title>Python系列：flask 小專案 - 下載公開資料庫的基因列表網頁</title>
+
+<link rel='canonical' href='https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97flask-%E5%B0%8F%E5%B0%88%E6%A1%88-%E4%B8%8B%E8%BC%89%E5%85%AC%E9%96%8B%E8%B3%87%E6%96%99%E5%BA%AB%E7%9A%84%E5%9F%BA%E5%9B%A0%E5%88%97%E8%A1%A8%E7%B6%B2%E9%A0%81/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Python系列：flask 小專案 - 下載公開資料庫的基因列表網頁">
+<meta property='og:description' content=" source code 已放在我的 Github downloadDB repository: https://github.com/pxchen110/downloadDB?tab=readme-ov-file\n專案動機 基因途徑(gene pathway)在生物研究扮演重要角色，如分子生物機制(molecular mechanism)、基因表現量(gene-set enrichment)的探討；研究者常參考 Kyoto Encyclopedia of Genes and Genomes (KEGG), Harmonizome 等資料庫，並具有抓取特定途徑之基因列表的需求。\n但在資料取用上，對於沒有程式使用經驗(R, python)的使用者而言，常面臨以下幾個困難點:\n資料庫僅提供 REST api 取用資料 (KEGG 和 Harmonizme)。api 處理需要串聯 requests 等程式套件與網頁互動以存取資料 即使網站提供api資料取用，也僅提供json格式輸出(範例參考)，一般文書處理程式(Microsoft Excel, Notepad++)無法直觀開啟和取用資訊 為提供更直觀方便的基因途徑探索，本專案以python為基礎處理api資訊，並以flask套件撰寫動態網頁，提供友善的html介面操作: 使用者僅需選擇資料庫來源、輸入pathway ID、貼上api網址、或上傳含有多個網址的文檔，網頁會直接回傳機因列表，並提供一鍵友善下載功能，檔案將以TXT, CSV等方便開啟的格式儲存，若提供多個列表，將會以zip壓縮檔下載給使用者。\n示範操作 將專案 git clone 回本機，並確保本機已滿足環境需求(environment requirements)： python 和 conda 進入 downloadDB 資料夾並建立 conda 環境：conda create -f environment.yml 執行專案前請開啟環境 conda activate flaskenv 利用 python 開啟 flask 網頁 python3 app.py 開啟 http://127.0.0.1:5000 連結後會看到以下網頁: 根據需求選擇其中一個Block輸入資料: !注意一次僅接受一種輸入形式!: 查詢一個基因途徑(single query): 選擇資料庫種類 (KEGG 或 Harmonizome) 並依照範例輸入 pathway ID, api URL、點選 Submit 送出 查詢多個基因途徑(multiple query):準備一份紀錄api URL 的 TXT 檔，選擇資料庫種類 (KEGG 或 Harmonizome)並上傳檔案、點選 Submit 送出 若目標api或基因途徑存在，將會返回以下網頁內容: 點選 Download TXT 或 Download CSV 下載不同格式的基因列表；若提供多個基因途徑，點選Download ZIP 下載zip壓縮檔，解壓縮後每個基因列表產生一份TXT檔 未來改善 由於目前python程式寫法為: 取得資料後會將基因列表儲存成txt和csv檔(專案路徑下名為query_output和query_input的資料夾)，並以檔名作為變數傳遞至下個函數；若使用者點選 download 按鈕並將檔案下載至本機，此時電腦會有兩份相同的檔案，希望能增加自動清除檔案功能 如何跳轉回最初頁面 嘗試連結後端資料庫儲存的函數功能 ">
+<meta property='og:url' content='https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97flask-%E5%B0%8F%E5%B0%88%E6%A1%88-%E4%B8%8B%E8%BC%89%E5%85%AC%E9%96%8B%E8%B3%87%E6%96%99%E5%BA%AB%E7%9A%84%E5%9F%BA%E5%9B%A0%E5%88%97%E8%A1%A8%E7%B6%B2%E9%A0%81/'>
+<meta property='og:site_name' content='Xuan&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2024-09-19T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-09-19T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/python-flask/20240919_img0.jpg' />
+<meta name="twitter:title" content="Python系列：flask 小專案 - 下載公開資料庫的基因列表網頁">
+<meta name="twitter:description" content=" source code 已放在我的 Github downloadDB repository: https://github.com/pxchen110/downloadDB?tab=readme-ov-file\n專案動機 基因途徑(gene pathway)在生物研究扮演重要角色，如分子生物機制(molecular mechanism)、基因表現量(gene-set enrichment)的探討；研究者常參考 Kyoto Encyclopedia of Genes and Genomes (KEGG), Harmonizome 等資料庫，並具有抓取特定途徑之基因列表的需求。\n但在資料取用上，對於沒有程式使用經驗(R, python)的使用者而言，常面臨以下幾個困難點:\n資料庫僅提供 REST api 取用資料 (KEGG 和 Harmonizme)。api 處理需要串聯 requests 等程式套件與網頁互動以存取資料 即使網站提供api資料取用，也僅提供json格式輸出(範例參考)，一般文書處理程式(Microsoft Excel, Notepad++)無法直觀開啟和取用資訊 為提供更直觀方便的基因途徑探索，本專案以python為基礎處理api資訊，並以flask套件撰寫動態網頁，提供友善的html介面操作: 使用者僅需選擇資料庫來源、輸入pathway ID、貼上api網址、或上傳含有多個網址的文檔，網頁會直接回傳機因列表，並提供一鍵友善下載功能，檔案將以TXT, CSV等方便開啟的格式儲存，若提供多個列表，將會以zip壓縮檔下載給使用者。\n示範操作 將專案 git clone 回本機，並確保本機已滿足環境需求(environment requirements)： python 和 conda 進入 downloadDB 資料夾並建立 conda 環境：conda create -f environment.yml 執行專案前請開啟環境 conda activate flaskenv 利用 python 開啟 flask 網頁 python3 app.py 開啟 http://127.0.0.1:5000 連結後會看到以下網頁: 根據需求選擇其中一個Block輸入資料: !注意一次僅接受一種輸入形式!: 查詢一個基因途徑(single query): 選擇資料庫種類 (KEGG 或 Harmonizome) 並依照範例輸入 pathway ID, api URL、點選 Submit 送出 查詢多個基因途徑(multiple query):準備一份紀錄api URL 的 TXT 檔，選擇資料庫種類 (KEGG 或 Harmonizome)並上傳檔案、點選 Submit 送出 若目標api或基因途徑存在，將會返回以下網頁內容: 點選 Download TXT 或 Download CSV 下載不同格式的基因列表；若提供多個基因途徑，點選Download ZIP 下載zip壓縮檔，解壓縮後每個基因列表產生一份TXT檔 未來改善 由於目前python程式寫法為: 取得資料後會將基因列表儲存成txt和csv檔(專案路徑下名為query_output和query_input的資料夾)，並以檔名作為變數傳遞至下個函數；若使用者點選 download 按鈕並將檔案下載至本機，此時電腦會有兩份相同的檔案，希望能增加自動清除檔案功能 如何跳轉回最初頁面 嘗試連結後端資料庫儲存的函數功能 "><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/post/python-flask/20240919_img0.jpg' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/profile_hu_d0d4f9ff9a7faeba.jpg" width="300"
+                            height="299" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Xuan&#39;s Blog</a></h1>
+            <h2 class="site-description">長大以後就是小瑄</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/pxchen110'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#專案動機">專案動機</a></li>
+    <li><a href="#示範操作">示範操作</a></li>
+    <li><a href="#未來改善">未來改善</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/python%E7%B3%BB%E5%88%97flask-%E5%B0%8F%E5%B0%88%E6%A1%88-%E4%B8%8B%E8%BC%89%E5%85%AC%E9%96%8B%E8%B3%87%E6%96%99%E5%BA%AB%E7%9A%84%E5%9F%BA%E5%9B%A0%E5%88%97%E8%A1%A8%E7%B6%B2%E9%A0%81/">
+                
+                    <img src="/post/python-flask/20240919_img0.jpg" loading="lazy" alt="Featured image of post Python系列：flask 小專案 - 下載公開資料庫的基因列表網頁" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/python/" >
+                Python
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/python%E7%B3%BB%E5%88%97flask-%E5%B0%8F%E5%B0%88%E6%A1%88-%E4%B8%8B%E8%BC%89%E5%85%AC%E9%96%8B%E8%B3%87%E6%96%99%E5%BA%AB%E7%9A%84%E5%9F%BA%E5%9B%A0%E5%88%97%E8%A1%A8%E7%B6%B2%E9%A0%81/">Python系列：flask 小專案 - 下載公開資料庫的基因列表網頁</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Sep 19, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    1 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <img src="/post/python-flask/20240919_img1.png"  width="600">
+<p>source code 已放在我的 Github downloadDB repository: <a class="link" href="https://github.com/pxchen110/downloadDB?tab=readme-ov-file"  target="_blank" rel="noopener"
+    >https://github.com/pxchen110/downloadDB?tab=readme-ov-file</a></p>
+<!-- more -->
+<!-- toc -->
+<h2 id="專案動機">專案動機
+</h2><p>基因途徑(gene pathway)在生物研究扮演重要角色，如分子生物機制(molecular mechanism)、基因表現量(gene-set enrichment)的探討；研究者常參考 Kyoto Encyclopedia of Genes and Genomes (KEGG), Harmonizome 等資料庫，並具有抓取特定途徑之基因列表的需求。</p>
+<p>但在資料取用上，對於沒有程式使用經驗(R, python)的使用者而言，常面臨以下幾個困難點:</p>
+<ul>
+<li>資料庫僅提供 REST api 取用資料 (<a class="link" href="https://www.kegg.jp/kegg/rest/"  target="_blank" rel="noopener"
+    >KEGG</a> 和 <a class="link" href="https://maayanlab.cloud/Harmonizome/documentation#api"  target="_blank" rel="noopener"
+    >Harmonizme</a>)。api 處理需要串聯 <code>requests</code> 等程式套件與網頁互動以存取資料</li>
+<li>即使網站提供api資料取用，也僅提供json格式輸出(<a class="link" href="https://maayanlab.cloud/Harmonizome/api/1.0/gene_set/krasdriven/GeneRIF&#43;Biological&#43;Term&#43;Annotations"  target="_blank" rel="noopener"
+    >範例參考</a>)，一般文書處理程式(Microsoft Excel, Notepad++)無法直觀開啟和取用資訊</li>
+</ul>
+<p>為提供更直觀方便的基因途徑探索，本專案以python為基礎處理api資訊，並以flask套件撰寫動態網頁，提供友善的html介面操作: 使用者僅需選擇資料庫來源、輸入pathway ID、貼上api網址、或上傳含有多個網址的文檔，網頁會直接回傳機因列表，並提供一鍵友善下載功能，檔案將以TXT, CSV等方便開啟的格式儲存，若提供多個列表，將會以zip壓縮檔下載給使用者。</p>
+<h2 id="示範操作">示範操作
+</h2><ul>
+<li>將專案 git clone 回本機，並確保本機已滿足環境需求(environment requirements)： <code>python</code> 和 <code>conda</code></li>
+<li>進入 downloadDB 資料夾並建立 conda 環境：<code>conda create -f environment.yml</code></li>
+<li>執行專案前請開啟環境 <code>conda activate flaskenv</code></li>
+<li>利用 python 開啟 flask 網頁 <code>python3 app.py</code>
+開啟 <code>http://127.0.0.1:5000</code> 連結後會看到以下網頁:
+<img src="/20240919/20240919_img1.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image"
+	
+	
+></li>
+<li>根據需求選擇其中一個Block輸入資料: <strong>!注意一次僅接受一種輸入形式!</strong>:
+<ul>
+<li>查詢一個基因途徑(single query): 選擇資料庫種類 (<code>KEGG</code> 或 <code>Harmonizome</code>) 並依照範例輸入 pathway ID, api URL、點選 <code>Submit</code> 送出</li>
+<li>查詢多個基因途徑(multiple query):準備一份紀錄api URL 的 TXT 檔，選擇資料庫種類 (<code>KEGG</code> 或 <code>Harmonizome</code>)並上傳檔案、點選 <code>Submit</code> 送出</li>
+</ul>
+</li>
+<li>若目標api或基因途徑存在，將會返回以下網頁內容:</li>
+</ul>
+<img src="/post/python-flask/20240919_img2.png"  width="600">
+<ul>
+<li>點選 <strong>Download TXT</strong> 或 <strong>Download CSV</strong> 下載不同格式的基因列表；若提供多個基因途徑，點選<strong>Download ZIP</strong> 下載zip壓縮檔，解壓縮後每個基因列表產生一份TXT檔</li>
+</ul>
+<h2 id="未來改善">未來改善
+</h2><ul>
+<li>由於目前python程式寫法為: 取得資料後<strong>會將基因列表儲存成txt和csv檔</strong>(專案路徑下名為<code>query_output</code>和<code>query_input</code>的資料夾)，並以檔名作為變數傳遞至下個函數；若使用者點選 download 按鈕並將檔案下載至本機，此時電腦會有兩份相同的檔案，<strong>希望能增加自動清除檔案功能</strong></li>
+<li>如何跳轉回最初頁面</li>
+<li>嘗試連結後端資料庫儲存的函數功能</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97%E5%BB%BA%E7%AB%8B%E7%B0%A1%E5%96%AE%E7%9A%84%E4%BC%BA%E6%9C%8D%E5%99%A8/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-simple-server/20240905_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-simple-server/20240905_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列：建立簡單的伺服器</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python-%E7%B3%BB%E5%88%97-%E6%A8%A1%E7%B5%84module%E8%88%87%E5%A5%97%E4%BB%B6package%E6%92%B0%E5%AF%AB/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-module-package/20240807_img0.jpg" loading="lazy" data-key="" data-hash="/post/python-module-package/20240807_img0.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python 系列： 模組(module)與套件(package)撰寫</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97-itables-%E8%A3%BD%E4%BD%9C%E4%BA%92%E5%8B%95%E5%BC%8F%E8%A1%A8%E6%A0%BC/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-itables/20240802_img0.jpg" loading="lazy" data-key="" data-hash="/post/python-itables/20240802_img0.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列： itables 製作互動式表格</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97-%E5%88%A9%E7%94%A8-openpxyl-%E6%93%8D%E4%BD%9C-excel/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-openpxyl/20240724_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-openpxyl/20240724_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列： 利用 openpxyl 操作 excel</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97-%E5%88%A9%E7%94%A8-xlsxwriter-%E6%A8%A1%E7%B5%84%E8%BC%95%E9%AC%86%E8%A3%BD%E4%BD%9Cexcel/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-xlsxwriter/20240315_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-xlsxwriter/20240315_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列： 利用 xlsxwriter 模組輕鬆製作excel</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "pxchen110-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 pxchen
+
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

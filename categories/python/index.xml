@@ -7,7 +7,361 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>en</language>
         <copyright>pxchen</copyright>
-        <lastBuildDate>Wed, 07 Aug 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://pxchen110.github.io/categories/python/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 19 Sep 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://pxchen110.github.io/categories/python/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Python系列：flask 小專案 - 下載公開資料庫的基因列表網頁</title>
+        <link>https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97flask-%E5%B0%8F%E5%B0%88%E6%A1%88-%E4%B8%8B%E8%BC%89%E5%85%AC%E9%96%8B%E8%B3%87%E6%96%99%E5%BA%AB%E7%9A%84%E5%9F%BA%E5%9B%A0%E5%88%97%E8%A1%A8%E7%B6%B2%E9%A0%81/</link>
+        <pubDate>Thu, 19 Sep 2024 00:00:00 +0000</pubDate>
+        
+        <guid>https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97flask-%E5%B0%8F%E5%B0%88%E6%A1%88-%E4%B8%8B%E8%BC%89%E5%85%AC%E9%96%8B%E8%B3%87%E6%96%99%E5%BA%AB%E7%9A%84%E5%9F%BA%E5%9B%A0%E5%88%97%E8%A1%A8%E7%B6%B2%E9%A0%81/</guid>
+        <description>&lt;img src="https://pxchen110.github.io/post/python-flask/20240919_img0.jpg" alt="Featured image of post Python系列：flask 小專案 - 下載公開資料庫的基因列表網頁" /&gt;&lt;img src=&#34;https://pxchen110.github.io/post/python-flask/20240919_img1.png&#34;  width=&#34;600&#34;&gt;
+&lt;p&gt;source code 已放在我的 Github downloadDB repository: &lt;a class=&#34;link&#34; href=&#34;https://github.com/pxchen110/downloadDB?tab=readme-ov-file&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/pxchen110/downloadDB?tab=readme-ov-file&lt;/a&gt;&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;!-- toc --&gt;
+&lt;h2 id=&#34;專案動機&#34;&gt;專案動機
+&lt;/h2&gt;&lt;p&gt;基因途徑(gene pathway)在生物研究扮演重要角色，如分子生物機制(molecular mechanism)、基因表現量(gene-set enrichment)的探討；研究者常參考 Kyoto Encyclopedia of Genes and Genomes (KEGG), Harmonizome 等資料庫，並具有抓取特定途徑之基因列表的需求。&lt;/p&gt;
+&lt;p&gt;但在資料取用上，對於沒有程式使用經驗(R, python)的使用者而言，常面臨以下幾個困難點:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;資料庫僅提供 REST api 取用資料 (&lt;a class=&#34;link&#34; href=&#34;https://www.kegg.jp/kegg/rest/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;KEGG&lt;/a&gt; 和 &lt;a class=&#34;link&#34; href=&#34;https://maayanlab.cloud/Harmonizome/documentation#api&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Harmonizme&lt;/a&gt;)。api 處理需要串聯 &lt;code&gt;requests&lt;/code&gt; 等程式套件與網頁互動以存取資料&lt;/li&gt;
+&lt;li&gt;即使網站提供api資料取用，也僅提供json格式輸出(&lt;a class=&#34;link&#34; href=&#34;https://maayanlab.cloud/Harmonizome/api/1.0/gene_set/krasdriven/GeneRIF&amp;#43;Biological&amp;#43;Term&amp;#43;Annotations&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;範例參考&lt;/a&gt;)，一般文書處理程式(Microsoft Excel, Notepad++)無法直觀開啟和取用資訊&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;為提供更直觀方便的基因途徑探索，本專案以python為基礎處理api資訊，並以flask套件撰寫動態網頁，提供友善的html介面操作: 使用者僅需選擇資料庫來源、輸入pathway ID、貼上api網址、或上傳含有多個網址的文檔，網頁會直接回傳機因列表，並提供一鍵友善下載功能，檔案將以TXT, CSV等方便開啟的格式儲存，若提供多個列表，將會以zip壓縮檔下載給使用者。&lt;/p&gt;
+&lt;h2 id=&#34;示範操作&#34;&gt;示範操作
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;將專案 git clone 回本機，並確保本機已滿足環境需求(environment requirements)： &lt;code&gt;python&lt;/code&gt; 和 &lt;code&gt;conda&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;進入 downloadDB 資料夾並建立 conda 環境：&lt;code&gt;conda create -f environment.yml&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;執行專案前請開啟環境 &lt;code&gt;conda activate flaskenv&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;利用 python 開啟 flask 網頁 &lt;code&gt;python3 app.py&lt;/code&gt;
+開啟 &lt;code&gt;http://127.0.0.1:5000&lt;/code&gt; 連結後會看到以下網頁:
+&lt;img src=&#34;https://pxchen110.github.io/20240919/20240919_img1.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image&#34;
+	
+	
+&gt;&lt;/li&gt;
+&lt;li&gt;根據需求選擇其中一個Block輸入資料: &lt;strong&gt;!注意一次僅接受一種輸入形式!&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;查詢一個基因途徑(single query): 選擇資料庫種類 (&lt;code&gt;KEGG&lt;/code&gt; 或 &lt;code&gt;Harmonizome&lt;/code&gt;) 並依照範例輸入 pathway ID, api URL、點選 &lt;code&gt;Submit&lt;/code&gt; 送出&lt;/li&gt;
+&lt;li&gt;查詢多個基因途徑(multiple query):準備一份紀錄api URL 的 TXT 檔，選擇資料庫種類 (&lt;code&gt;KEGG&lt;/code&gt; 或 &lt;code&gt;Harmonizome&lt;/code&gt;)並上傳檔案、點選 &lt;code&gt;Submit&lt;/code&gt; 送出&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;若目標api或基因途徑存在，將會返回以下網頁內容:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;img src=&#34;https://pxchen110.github.io/post/python-flask/20240919_img2.png&#34;  width=&#34;600&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;點選 &lt;strong&gt;Download TXT&lt;/strong&gt; 或 &lt;strong&gt;Download CSV&lt;/strong&gt; 下載不同格式的基因列表；若提供多個基因途徑，點選&lt;strong&gt;Download ZIP&lt;/strong&gt; 下載zip壓縮檔，解壓縮後每個基因列表產生一份TXT檔&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;未來改善&#34;&gt;未來改善
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;由於目前python程式寫法為: 取得資料後&lt;strong&gt;會將基因列表儲存成txt和csv檔&lt;/strong&gt;(專案路徑下名為&lt;code&gt;query_output&lt;/code&gt;和&lt;code&gt;query_input&lt;/code&gt;的資料夾)，並以檔名作為變數傳遞至下個函數；若使用者點選 download 按鈕並將檔案下載至本機，此時電腦會有兩份相同的檔案，&lt;strong&gt;希望能增加自動清除檔案功能&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;如何跳轉回最初頁面&lt;/li&gt;
+&lt;li&gt;嘗試連結後端資料庫儲存的函數功能&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
+        <title>Python系列：建立簡單的伺服器</title>
+        <link>https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97%E5%BB%BA%E7%AB%8B%E7%B0%A1%E5%96%AE%E7%9A%84%E4%BC%BA%E6%9C%8D%E5%99%A8/</link>
+        <pubDate>Thu, 05 Sep 2024 00:00:00 +0000</pubDate>
+        
+        <guid>https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97%E5%BB%BA%E7%AB%8B%E7%B0%A1%E5%96%AE%E7%9A%84%E4%BC%BA%E6%9C%8D%E5%99%A8/</guid>
+        <description>&lt;img src="https://pxchen110.github.io/post/python-simple-server/20240905_img1.jpg" alt="Featured image of post Python系列：建立簡單的伺服器" /&gt;&lt;p&gt;使用 &lt;code&gt;http.server&lt;/code&gt; 和 &lt;code&gt;flask&lt;/code&gt; 套件&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;!-- toc --&gt;
+&lt;p&gt;伺服器(server)根據&lt;a class=&#34;link&#34; href=&#34;https://zh.wikipedia.org/zh-tw/%E6%9C%8D%E5%8A%A1%E5%99%A8#%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%88%86%E7%B1%BB%EF%BC%88%E8%BD%AF%E4%BB%B6%EF%BC%89&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;維基百科定義&lt;/a&gt;，為提供服務的電腦軟體，根據軟體種類可分為:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;檔案伺服器: NAS儲存裝置&amp;hellip;&lt;/li&gt;
+&lt;li&gt;網頁伺服器: Apache&amp;hellip;&lt;/li&gt;
+&lt;li&gt;資料庫伺服器: MySQL, MongoDB&amp;hellip;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;建置正式的伺服器需要諸多考量和維護；如果想檢查網頁專案的目前成果，或簡單分享電腦資源給其他協作者的話，可以透過python建立臨時的網頁伺服器。&lt;/p&gt;
+&lt;p&gt;在指定目錄內包含&lt;code&gt;index.html&lt;/code&gt;就能預覽網頁，若沒有則會顯示當前資料夾結構。以下使用 &lt;code&gt;http.server&lt;/code&gt; 模組建立靜態網頁伺服器&lt;/p&gt;
+&lt;h2 id=&#34;httpserver-產生靜態伺服器&#34;&gt;http.server 產生靜態伺服器
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;注意:Python2 和 Python3 使用的模組不同，這裡介紹的為適用於Python3套件與使用方式&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&#34;下載並引入套件&#34;&gt;下載並引入套件
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;pip install httpserver
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;import http.server
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;from http.server import SimpleHTTPRequestHandler, HTTPServer
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;還需多引入兩個物件: &lt;code&gt;SimpleHTTPRequestHandler&lt;/code&gt; 和 &lt;code&gt;HTTPServer&lt;/code&gt; 下面會簡單介紹他們的功能&lt;/p&gt;
+&lt;h3 id=&#34;最簡單的建置伺服器程式碼&#34;&gt;最簡單的建置伺服器程式碼
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;## example code to create and run the server from python docs
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;def run(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;     server_address = (&amp;#39;&amp;#39;, 8000)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;     httpd = server_class(server_address, handler_class)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;     httpd.serve_forever()
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;httpserver-和-simplehttprequesthandler&#34;&gt;HTTPServer 和 SimpleHTTPRequestHandler
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;HTTPServer&lt;/code&gt; 為socketserver.TCPServer的子類別，能建立一個伺服器實例
+還需要給個 &lt;code&gt;RequestHandlerClass&lt;/code&gt; 向HTTP提出請求與回應，有以下三種:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;BaseHTTPRequestHandler&lt;/li&gt;
+&lt;li&gt;SimpleHTTPRequestHandler: 讀取與發佈當前目錄 (比較多人用此object)&lt;/li&gt;
+&lt;li&gt;CGIHTTPRequestHandler
+最後給個協定版本(protocol)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;HandlerClass = SimpleHTTPRequestHandler
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ServerClass  = HTTPServer
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Protocol     = &amp;#34;HTTP/1.0&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;輸入伺服器相關資訊，包含ip位址，指定port(預設8000)等，並存為&lt;code&gt;httpd&lt;/code&gt;變數&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;if sys.argv[1:]:
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  port = int(sys.argv[1])
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;else:
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  port = 8000
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;server_address = (&amp;#39;127.0.0.1&amp;#39;, port)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;HandlerClass.protocol_version = Protocol
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;## standard formula: ip + port + handlerclass
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;httpd = ServerClass(server_address, HandlerClass)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;實體化與運作伺服器 &lt;code&gt;serve_forever()&lt;/code&gt;可以透過 &lt;code&gt;shutdown()&lt;/code&gt; 關閉&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sa = httpd.socket.getsockname() ## (&amp;#39;127.0.0.1&amp;#39; 8000)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;print (&amp;#34;Serving HTTP on&amp;#34;, sa[0], &amp;#34;port&amp;#34;, sa[1], &amp;#34;...&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;httpd.serve_forever()
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;console 顯示 GET &amp;hellip; 200 代表請求成功&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Serving HTTP on 127.0.0.1 port 8000 ...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;127.0.0.1 - - &amp;#34;GET / HTTP/1.1&amp;#34; 200 -
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;最後打開瀏覽器，輸入 &lt;code&gt;http://127.0.0.1:8000/&lt;/code&gt; 或是 &lt;code&gt;http://${your_ip}:8000/&lt;/code&gt; 就可看到成果了&lt;/p&gt;
+&lt;h3 id=&#34;完整-code&#34;&gt;完整 code
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# pip install httpserver
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;import sys
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;import http.server
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;from  http.server import SimpleHTTPRequestHandler, HTTPServer
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;HandlerClass = SimpleHTTPRequestHandler
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ServerClass  = HTTPServer
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Protocol     = &amp;#34;HTTP/1.0&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;if sys.argv[1:]:
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  port = int(sys.argv[1])
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;else:
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  port = 8000
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;server_address = (&amp;#39;127.0.0.1&amp;#39;, port)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;HandlerClass.protocol_version = Protocol
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;httpd = ServerClass(server_address, HandlerClass)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sa = httpd.socket.getsockname() ## (&amp;#39;127.0.0.1&amp;#39; 8000)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;print (&amp;#34;Serving HTTP on&amp;#34;, sa[0], &amp;#34;port&amp;#34;, sa[1], &amp;#34;...&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;httpd.serve_forever()
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;## it will print 127.0.0.1 - - &amp;#34;GET / HTTP/1.1&amp;#34; 200 - on console
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;## &amp;lt;-&amp;gt; to shutdown()
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;觀看結果&#34;&gt;觀看結果
+&lt;/h3&gt;&lt;p&gt;可以拿之前寫的 index.html 放在指定路徑，透過 httpserver 產生 localhost 以觀看 html 成果，若沒有 html 檔則會顯示本機資料夾路徑，可以透過這個方式，分享連結網址給別人以分享資料夾內容&lt;/p&gt;
+&lt;h2 id=&#34;動態伺服器與網路框架&#34;&gt;動態伺服器與網路框架
+&lt;/h2&gt;&lt;p&gt;網頁包含動態資訊如資料庫串接，自定義的網頁跳轉等，可利用python &lt;code&gt;flask&lt;/code&gt; 達成。此模組提供伺服器端的網頁框架，協助高效率架設網站。&lt;/p&gt;
+&lt;h3 id=&#34;下載與引入套件&#34;&gt;下載與引入套件
+&lt;/h3&gt;&lt;p&gt;這裡先引入最基本的 &lt;code&gt;Flask&lt;/code&gt; 其他常用函數（&lt;code&gt;redirect, url_for, send_from_directory...&lt;/code&gt;）會在後面介紹&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;#pip install Flask
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;from flask import Flask 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;簡單的範例&#34;&gt;簡單的範例
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;create &lt;code&gt;app.py&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# save this as app.py
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;from flask import Flask
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;app = Flask(__name__)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;@app.route(&amp;#34;/&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;def hello():
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    return &amp;#34;Hello, World!&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;if __name__ == &amp;#39;__main__&amp;#39;:
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    app.debug = True ## not shown in formal case
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    app.run()
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;在 &lt;code&gt;app.py&lt;/code&gt; 同層路徑下執行 &lt;code&gt;flask run&lt;/code&gt; flask 會生成網頁於 http://127.0.0.1:5000/&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;名詞和概念筆記&#34;&gt;名詞和概念筆記
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;flask 內含有 httpserver，但僅適合測試用，正式發布會建議用 &lt;strong&gt;WSGI server&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;裝飾器(decorator): &lt;code&gt;@app.route&lt;/code&gt; 做為路由，紀錄 URL/HTTP動作 與其對應的處理函式
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;@app.route(&#39;/&#39;)&lt;/code&gt; 這裡的 &lt;code&gt;/&lt;/code&gt; 代表 http://127.0.0.1:5000/ 這個URL&lt;/li&gt;
+&lt;li&gt;若連結到此網址，會執行 hello() 函數並在網頁印出 Hello, World!&lt;/li&gt;
+&lt;li&gt;若今天還有其他路由如下，打開 http://127.0.0.1:5000/&lt;strong&gt;page/5&lt;/strong&gt; 就會看到函式執行結果&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;app.route(&amp;#39;/page/5&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;def welcome():
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;return &amp;#34;Welcome&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;flask 可以吃URL變數，方法為 &lt;code&gt;&amp;lt;variable_name&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;flask-函式-url_for-redirect&#34;&gt;flask 函式 &lt;code&gt;url_for&lt;/code&gt; &lt;code&gt;redirect&lt;/code&gt;
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;url_for()&lt;/code&gt; 可以讓路由具有追蹤彈性，並搭配 &lt;code&gt;redirect()&lt;/code&gt; 跳轉網頁
+下面例子可知: http://127.0.0.1:5000/b 會被引導回 http://127.0.0.1:5000/&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;from flask import url_for, redirect
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;@app.route(&amp;#39;/&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;def hello():
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    return &amp;#39;hello&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;@app.route(&amp;#39;/b&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;def b():
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    return redirect(url_for(&amp;#39;hello&amp;#39;))
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;其他套件如結合 html css 模板的&lt;code&gt;render_template&lt;/code&gt;，或是上傳下載檔案的 &lt;code&gt;send_from_directory&lt;/code&gt; 會在下篇介紹我的side project時補上～&lt;/p&gt;
+&lt;h2 id=&#34;references&#34;&gt;References
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.python.org/3/library/http.server.html#&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://docs.python.org/3/library/http.server.html#&lt;/a&gt;
+&lt;a class=&#34;link&#34; href=&#34;https://chwang12341.medium.com/coding%E8%B5%B7%E4%BE%86-python-%E4%B8%80%E8%A1%8C%E6%8C%87%E4%BB%A4%E5%B0%B1%E8%83%BD%E8%BC%95%E9%AC%86%E5%BB%BA%E7%AB%8B%E7%B6%B2%E9%A0%81%E4%BC%BA%E6%9C%8D%E5%99%A8-simplehttpserver%E5%A5%97%E4%BB%B6-http-server%E4%BD%BF%E7%94%A8%E6%95%99%E5%AD%B8-34c30b81c26&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://chwang12341.medium.com/coding%E8%B5%B7%E4%BE%86-python-%E4%B8%80%E8%A1%8C%E6%8C%87%E4%BB%A4%E5%B0%B1%E8%83%BD%E8%BC%95%E9%AC%86%E5%BB%BA%E7%AB%8B%E7%B6%B2%E9%A0%81%E4%BC%BA%E6%9C%8D%E5%99%A8-simplehttpserver%E5%A5%97%E4%BB%B6-http-server%E4%BD%BF%E7%94%A8%E6%95%99%E5%AD%B8-34c30b81c26&lt;/a&gt;
+&lt;a class=&#34;link&#34; href=&#34;https://hackmd.io/@peterju/B18gmJ7Ph#15Flask-%E7%B6%B2%E9%A0%81%E6%A1%86%E6%9E%B6&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://hackmd.io/@peterju/B18gmJ7Ph#15Flask-%E7%B6%B2%E9%A0%81%E6%A1%86%E6%9E%B6&lt;/a&gt;
+&lt;a class=&#34;link&#34; href=&#34;https://medium.com/@charming_rust_oyster_221/%E4%BD%BF%E7%94%A8-flask-%E5%89%B5%E5%BB%BA-web-api-%E7%AD%86%E8%A8%98-b5618543632e&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://medium.com/@charming_rust_oyster_221/%E4%BD%BF%E7%94%A8-flask-%E5%89%B5%E5%BB%BA-web-api-%E7%AD%86%E8%A8%98-b5618543632e&lt;/a&gt;
+&lt;a class=&#34;link&#34; href=&#34;https://medium.com/@charming_rust_oyster_221/flask-%E6%AA%94%E6%A1%88%E4%B8%8A%E5%82%B3%E5%88%B0%E4%BC%BA%E6%9C%8D%E5%99%A8%E7%9A%84%E6%96%B9%E6%B3%95-1-c11097c23137&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://medium.com/@charming_rust_oyster_221/flask-%E6%AA%94%E6%A1%88%E4%B8%8A%E5%82%B3%E5%88%B0%E4%BC%BA%E6%9C%8D%E5%99%A8%E7%9A%84%E6%96%B9%E6%B3%95-1-c11097c23137&lt;/a&gt;
+&lt;a class=&#34;link&#34; href=&#34;https://hackmd.io/@shaoeChen/HJiZtEngG/https%3A%2F%2Fhackmd.io%2Fs%2FSyP4YEnef&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://hackmd.io/@shaoeChen/HJiZtEngG/https%3A%2F%2Fhackmd.io%2Fs%2FSyP4YEnef&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>Python 系列： 模組(module)與套件(package)撰寫</title>
         <link>https://pxchen110.github.io/p/python-%E7%B3%BB%E5%88%97-%E6%A8%A1%E7%B5%84module%E8%88%87%E5%A5%97%E4%BB%B6package%E6%92%B0%E5%AF%AB/</link>
         <pubDate>Wed, 07 Aug 2024 00:00:00 +0000</pubDate>
