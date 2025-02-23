@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="(Image from gnomAD website)\n計畫簡介 The Genome Aggregation Database (gnomAD) 前身為 2014 年發起之 Exome Aggregation Consortium (ExAC)，計畫主旨為收集外顯子定序資料(WES)進行大規模樣本分析；而 gnomAD 資料庫不僅涵蓋外顯子資料(WES)也致力於收集全基因定序(WGS)進行族群性分析，本文將介紹 gnomAD v3, v2 版的樣本收集與分析流程，並閱讀2020 年發表之 gnomAD SV 文章。\n樣本收集 下表整理 gnomAD 兩種版本資料庫：\nMost of the genomes from v2 are included in v3.1.\nversion reference (type)sample size gnomAD v2.1 GRCh37 (WES) 125,748 ; (WGS) 15,708 gnomAD-SV v2.1 GRCh37 (WGS) 10,847 gnomAD v3.1 GRCh38 (WGS) 76,156 資料庫的樣本由不同cohort study以及大規模基因體計畫組成，像官網提到gnomAD有部分樣本來自1000 Genome Project:\n">
+<title>生資系列： gnomAD v3 database 介紹</title>
+
+<link rel='canonical' href='https://pxchen110.github.io/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="生資系列： gnomAD v3 database 介紹">
+<meta property='og:description' content="(Image from gnomAD website)\n計畫簡介 The Genome Aggregation Database (gnomAD) 前身為 2014 年發起之 Exome Aggregation Consortium (ExAC)，計畫主旨為收集外顯子定序資料(WES)進行大規模樣本分析；而 gnomAD 資料庫不僅涵蓋外顯子資料(WES)也致力於收集全基因定序(WGS)進行族群性分析，本文將介紹 gnomAD v3, v2 版的樣本收集與分析流程，並閱讀2020 年發表之 gnomAD SV 文章。\n樣本收集 下表整理 gnomAD 兩種版本資料庫：\nMost of the genomes from v2 are included in v3.1.\nversion reference (type)sample size gnomAD v2.1 GRCh37 (WES) 125,748 ; (WGS) 15,708 gnomAD-SV v2.1 GRCh37 (WGS) 10,847 gnomAD v3.1 GRCh38 (WGS) 76,156 資料庫的樣本由不同cohort study以及大規模基因體計畫組成，像官網提到gnomAD有部分樣本來自1000 Genome Project:\n">
+<meta property='og:url' content='https://pxchen110.github.io/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/'>
+<meta property='og:site_name' content='Xuan&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Bioinformatics' /><meta property='article:tag' content='Database' /><meta property='article:published_time' content='2024-05-16T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-05-16T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/bioinfo-gnomad-v3/20240516_img1.png' />
+<meta name="twitter:title" content="生資系列： gnomAD v3 database 介紹">
+<meta name="twitter:description" content="(Image from gnomAD website)\n計畫簡介 The Genome Aggregation Database (gnomAD) 前身為 2014 年發起之 Exome Aggregation Consortium (ExAC)，計畫主旨為收集外顯子定序資料(WES)進行大規模樣本分析；而 gnomAD 資料庫不僅涵蓋外顯子資料(WES)也致力於收集全基因定序(WGS)進行族群性分析，本文將介紹 gnomAD v3, v2 版的樣本收集與分析流程，並閱讀2020 年發表之 gnomAD SV 文章。\n樣本收集 下表整理 gnomAD 兩種版本資料庫：\nMost of the genomes from v2 are included in v3.1.\nversion reference (type)sample size gnomAD v2.1 GRCh37 (WES) 125,748 ; (WGS) 15,708 gnomAD-SV v2.1 GRCh37 (WGS) 10,847 gnomAD v3.1 GRCh38 (WGS) 76,156 資料庫的樣本由不同cohort study以及大規模基因體計畫組成，像官網提到gnomAD有部分樣本來自1000 Genome Project:\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/post/bioinfo-gnomad-v3/20240516_img1.png' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/profile_hu_d0d4f9ff9a7faeba.jpg" width="300"
+                            height="299" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Xuan&#39;s Blog</a></h1>
+            <h2 class="site-description">長大以後就是小瑄</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/pxchen110'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#計畫簡介">計畫簡介</a></li>
+    <li><a href="#樣本收集">樣本收集</a></li>
+    <li><a href="#分析流程">分析流程</a>
+      <ol>
+        <li><a href="#sample-qc">Sample QC</a></li>
+        <li><a href="#variant-qc">Variant QC</a></li>
+      </ol>
+    </li>
+    <li><a href="#gnomad-sv-v21-文獻選讀">gnomAD-SV v2.1 文獻選讀</a>
+      <ol>
+        <li><a href="#sample-size-and-population">Sample size and population</a></li>
+        <li><a href="#sv-discovery-and-genotyping">SV discovery and genotyping</a></li>
+        <li><a href="#population-genetics-and-genome-biology">Population genetics and genome biology</a></li>
+        <li><a href="#dosage-sensivity-on-coding-and-non-coding-loci">Dosage sensivity on coding and non-coding loci</a></li>
+        <li><a href="#remarks">Remarks</a></li>
+      </ol>
+    </li>
+    <li><a href="#references">References</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/">
+                
+                    <img src="/post/bioinfo-gnomad-v4/20240523_img1.png" loading="lazy" alt="Featured image of post 生資系列： gnomAD v3 database 介紹" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/bioinformatics/" >
+                Bioinformatics
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/">生資系列： gnomAD v3 database 介紹</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">May 23, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>(Image from <a class="link" href="https://gnomad.broadinstitute.org/"  target="_blank" rel="noopener"
+    >gnomAD</a> website)</p>
+<!-- more -->
+<!-- toc -->
+<h2 id="計畫簡介">計畫簡介
+</h2><p>The Genome Aggregation Database (gnomAD) 前身為 2014 年發起之 Exome Aggregation Consortium (ExAC)，計畫主旨為收集外顯子定序資料(WES)進行大規模樣本分析；而 gnomAD 資料庫不僅涵蓋外顯子資料(WES)也致力於收集全基因定序(WGS)進行族群性分析，本文將介紹 gnomAD v3, v2 版的樣本收集與分析流程，並閱讀2020 年發表之 gnomAD SV 文章。</p>
+<h2 id="樣本收集">樣本收集
+</h2><p>下表整理 gnomAD 兩種版本資料庫：</p>
+<p><strong>Most of the genomes from v2 are included in v3.1.</strong></p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: left">version</th>
+          <th style="text-align: left">reference</th>
+          <th style="text-align: left">(type)sample size</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">gnomAD v2.1</td>
+          <td style="text-align: left">GRCh37</td>
+          <td style="text-align: left">(WES) 125,748 ; (WGS) 15,708</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">gnomAD-SV v2.1</td>
+          <td style="text-align: left">GRCh37</td>
+          <td style="text-align: left">(WGS) 10,847</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">gnomAD v3.1</td>
+          <td style="text-align: left">GRCh38</td>
+          <td style="text-align: left">(WGS) 76,156</td>
+      </tr>
+  </tbody>
+</table></div>
+<p>資料庫的樣本由不同cohort study以及大規模基因體計畫組成，像官網提到gnomAD有部分樣本來自1000 Genome Project:</p>
+<blockquote>
+<p>The majority of samples from the 1000 Genomes Project for which exome sequencing is available were included in v2. Whole genome sequencing from 3,202 subjects from the 1000 Genomes Project was included in gnomAD v3.1, though some were filtered out by our QC pipeline.</p></blockquote>
+<p>樣本來源包含以下特性：</p>
+<ul>
+<li>
+<p>近親樣本可同時被收錄：族群基因體學建議排除有親屬關係的樣本(如使用kinship等方式鑑定親屬關係)，而收錄家族樣本可用於驗證變異是否符合遺傳定律、並計算新發突變綠，如在面gnomAD-SV文章，就有提到使用970個<strong>family trio</strong>(父母加一位小孩的族譜)來驗證<em>de novo</em> mutation的比例。不過gnomAD在主要數值統計部分，為減少某allele因親緣關係干擾有先做樣本品質校正(sample QC)來排除二等親內的樣本共同被納入分析。</p>
+</li>
+<li>
+<p>統計樣本的族群來源：先前大規模基因定序計畫常有族群偏頗(population bias)的情況，而gnomAD致力於擴充非歐裔族群的樣本。</p>
+</li>
+<li>
+<p>樣本的健康狀況：資料庫的價值之一是作為不同研究的control，而control的特性就是相對於case(有特殊疾病或性狀者)、屬於沒有罹病或表現性狀的群體。gnomAD收集樣本會先將罹患罕病 (variant AF &lt; 1% ) 或因單基因造成嚴重遺傳疾病者排除。但也要注意，樣本收集當下的狀態，不代表未來的健康狀態，部分樣本可能帶有晚發性疾病(age onset disease, mostly relate to me)或常見疾病(common disease, associated with multi-variant loci)的變異。<strong>因此gnomAD較適合作為罕病的control，但不適合作為常見疾病的control</strong>。</p>
+</li>
+</ul>
+<p>樣本會依據以下條件分類：</p>
+<ul>
+<li>族群來源
+<ul>
+<li>族群可分成super population和sub-population(只有v2版有)兩種</li>
+<li>族群以genetic similarity 分群，使用 <a class="link" href="https://hail.is/docs/0.2/methods/genetics.html"  target="_blank" rel="noopener"
+    >hwe_normalized_pca function in Hail</a> principal component analysis (PCA) 分群並取前 10PC 當作 model feature</li>
+</ul>
+</li>
+<li>性別(XX, XY)</li>
+<li>資料型態(WES, WGS)</li>
+<li>特性篩選
+<ul>
+<li>non-cancer:排除罹患癌症或從相關cohort study收集來的樣本群</li>
+<li>non-neuro:排除罹患精神性疾病、或從相關cohort study收集來的樣本群</li>
+<li>no-TOPMed:沒有出現在TOPMed/BRAVO資料庫的樣本群，好處是計算出的allele count可直接和TOPMed合併而不用做樣本對照</li>
+<li>control(v2.1):排除掉曾經出現在常見疾病研究中、被歸類為case的樣本</li>
+<li>controls/biobanks(v3.1):在不同研究中屬於control sample、或是收錄在biobank、大規模基因體計畫(1000 Genome, HGDP, PAGE)等的樣本</li>
+<li>non-v2(v3.1):排除曾收錄在v2.1版的樣本</li>
+</ul>
+</li>
+</ul>
+<p>目前兩版的subsets統計如下表:</p>
+<img src="/post/bioinfo-gnomad-v3/20240516_img2.jpg"  width="600">
+<img src="/post/bioinfo-gnomad-v3/20240516_img3.jpg"  width="600">
+<h2 id="分析流程">分析流程
+</h2><p>gnomAD的主要利用雲端平台<a class="link" href="https://support.terra.bio/hc/en-us/sections/360007274612"  target="_blank" rel="noopener"
+    >Terra</a> 進行分析，前部分的處理依照<a class="link" href="https://gatk.broadinstitute.org/hc/en-us/sections/360007226651-Best-Practices-Workflows"  target="_blank" rel="noopener"
+    >GATK best practice</a>；分析的最小單位是 sample，中間會將幾百個樣本合併為一批次(batch)進行分析，最終合併成 joint callset。</p>
+<p>由於資料量龐大，為確保最終釋出的變異集有高特異性（specificity，即記載的都為真），分析過程使用嚴謹的校正(variant QC)，下部分介紹這些QC內容。</p>
+<h3 id="sample-qc">Sample QC
+</h3><ul>
+<li>Hard filters: filter by civerage(&gt;18X), Het/Hom ratio</li>
+<li>inferring sex using normalized coverage on chromosome X and Y</li>
+<li>relatedness and ancestry assignments</li>
+<li>QC metrics</li>
+</ul>
+<h3 id="variant-qc">Variant QC
+</h3><p>進行variant QC的變異是從141,456個通過sample QC的樣本所偵測到的，WES和WGS的校正會使用相同pipeline分別進行，校正最重要的部分是使用隨機森林(Random Forest model) 選擇allele-specific annotations作為特徵值(feature)進行模型訓練，此外也會特別排除以下條件的變異：</p>
+<ul>
+<li>
+<p>InbreedingCoeff: Excess heterozygotes defined by an inbreeding coefficient &lt; -0.3 觀測變異的異型合子比例是否正常，若同型合子(homozygote)比例過高，則可能是近親種族多造成的，需要等樣本增加或排除更多sample後再被列入資料庫。</p>
+</li>
+<li>
+<p>AC0: No sample had a high quality genotype (depth &gt;= 10, genotype quality &gt;= 20 and minor allele balance &gt; 0.2 for heterozygous genotypes) 變異位點的品質本身較差，因此大部分樣本在此位置的品質都不好，須用更嚴謹的分析技術後，才能得到品質較高較可信的變異回報。</p>
+</li>
+<li>
+<p>random forest selected feature:
+<img src="/post/bioinfo-gnomad-v3/20240516_img4.jpg"  width="600"></p>
+</li>
+<li>
+<p>進行模型訓練的資料集來自過往的大規模計畫如1000 Genome Project，或是其他資料庫如Omni, Mills等，再來應用至gnomAD資料庫。</p>
+</li>
+</ul>
+<hr>
+<h2 id="gnomad-sv-v21-文獻選讀">gnomAD-SV v2.1 文獻選讀
+</h2><h3 id="sample-size-and-population">Sample size and population
+</h3><p>共 14,891 個樣本 (14,237 are high QC)，族群分布比例: 46.1% European, 34.9% African or African American, <strong>9.2% East Asian</strong>, and 8.7% Latino samples, as well as 1.2% samples from admixed or other populations</p>
+<h3 id="sv-discovery-and-genotyping">SV discovery and genotyping
+</h3><p>gnomAD-SV從14,891個WGS樣本中找到433,371 SVs，其中335,470 SVs是高品質的變異位點；如下圖所示，相比於過去針對SVs定序分析的計畫，其所使用的樣本數、樣本族群豐富度及偵測的變異總數都有所突破。
+首先是研究的族群來源</p>
+<img src="/post/bioinfo-gnomad-v3/20240516_img5.jpg"  width="600">
+<p>可以看到仍以歐洲、非裔每週或非洲族群佔大宗，亞洲樣本數約一千多人</p>
+<img src="/post/bioinfo-gnomad-v3/20240516_img6.jpg"  width="600">
+<p>偵測與過濾變異的流程圖如上圖所示，左上角簡介分析的所有大流程，共有8大步驟，右下角顯示每個工具分析所使用的樣本大小，包含每個人都會跑的Picard QC, variant caller外，也有整合300-400人左右的批次樣本(batch)，進行joint-calling的步驟，最後將所有batch利用clustering聚集後，將會形成龐大的cohort-wide sample set；接著簡介以下流程：</p>
+<ul>
+<li>preprocessing:針對樣本的品質校正，利用Picard可以計算平均深度、高品質的數量等，而ploidy estimation利用序列計算基因倍體是否正常（diploid, triploid&hellip;）完成刪減樣本和組成批次樣本後，便會進行variant calling，使用的工具包含偵測SV的manta, DELLY、偵測跳躍分子(mobile element)的MELT和偵測大片段CNV的cnMOPS。</li>
+<li>clustering:將每個sample vcf將不同的algorithm偵測到的變異分開，並各自使用<a class="link" href="https://github.com/talkowski-lab/svtk"  target="_blank" rel="noopener"
+    >svtk vcfcluster</a> 進行合併</li>
+<li>evidence collection: 針對不同algorithm所進行的驗證也不一樣
+<ul>
+<li>PETest &amp; SRTest: 若使用split-read或pair-end偵測，將會測試number of discordant來確認變異的存在</li>
+<li>RDTest: 會計算帶有變異和沒帶有變異之兩樣本、在某區域所具有的平均深度，已確認變異真實存在（顯著性差異以two-sample t test /one sample Z-test計算）</li>
+<li>BAFTest: 主要是計算變異的來源，一般人有兩條序列，通常將其中一條命名為A、另一條為B，BAF即是計算序列來自兩allele的比例，以確保序列是heterozygous (A/B =0 )或是有一條特別多（CNV）。</li>
+</ul>
+</li>
+<li>variant filtering: 利用random forest test（在前面variant QC提到過）來篩選出變異品質不好的outlier</li>
+<li>genotyping</li>
+<li>batch integration: 前幾個步驟是以幾百個人的批次為單位進行，為了聚集成cohort 大小，會再將批次的結果合併，主要也是使用svtk工具進行合併和過濾品質。</li>
+<li>VCF refinement</li>
+<li>annotation：從其他database或預測變異會對下游蛋白造成的影響，雖沒有像SNV系統完善的ACMG guideline，目前有針對CNV提出的分類指南。</li>
+</ul>
+<p>為了確認此分析流程的可信度，gnomAD使用一些方法來benchmark，主要分為兩大類：</p>
+<ul>
+<li>technology quality: allele frequency of heterozygous rate, hardyy-weingerg equilibrium, LD with neighbor SNV events and AF concordance with 1KGP AF</li>
+<li>consistency in long-read data: using PacBio long read data to sequence same sample (NA12878, CHM1/13 cell line ) and calculate the SV confirmation rate</li>
+</ul>
+<h3 id="population-genetics-and-genome-biology">Population genetics and genome biology
+</h3><p>經由完整的單一樣本定序、批次整合、過濾SV位點和修正gneotype一致性的處理後，定義出這些人身上的SV總數，接著進行了以族群為單位SV總數差異、median SV size、SV AF、SV distribution in genome 和以演化角度的分析（mutation rate prediction）</p>
+<h3 id="dosage-sensivity-on-coding-and-non-coding-loci">Dosage sensivity on coding and non-coding loci
+</h3><p>SV變化對於蛋白質表現也會有影響，作者將這些SV依據對蛋白質的功能改變類型分成：Loss of function / copy gain / exon dupliation 以及inversion這四大類
+為了預測SV發生對於序列的影響是否存在演化上的意義，因此使用和gnomAD SNV database中pLOF定義相似的LOEUF來註解SV</p>
+<h3 id="remarks">Remarks
+</h3><ul>
+<li>使用的樣本數多，和CCDG以及HGSVC(做1KGP的分析)等團隊相比、樣本數最多</li>
+<li>使用的pipeline雖然沒有使用GIAB SV truth set進行表現衡量(2020同年發表)但在有家族關係的資料應用和分析上、可以確保不違背遺傳的genotype annotation，並預測這些SV的新發生率等</li>
+<li>雖說樣本數增加可以找到更多SV，但偵測效率也可能取決於以下幾個因素：sequencing data type, coverage, SV detection pipeline, 以及適合的QC control等</li>
+<li>像是1KGP收錄的樣本其深度最低有&lt; 10x，而本篇樣本WGS的平均深度32x還算深</li>
+<li>另外一個點在於gnomAD收錄的樣本多為health cohort，因此較適合用來評估common population SV allele frequency，對於rare disease-causing SV的應用方式，可能就是幫助他們過濾掉不太可能致病的位點，或是針對某個AR疾病計算其carrier rate</li>
+</ul>
+<h2 id="references">References
+</h2><blockquote>
+<p><a class="link" href="https://gnomad.broadinstitute.org"  target="_blank" rel="noopener"
+    >https://gnomad.broadinstitute.org</a>
+<a class="link" href="https://www.nature.com/articles/s41586-020-2287-8"  target="_blank" rel="noopener"
+    >https://www.nature.com/articles/s41586-020-2287-8</a>
+<a class="link" href="https://macarthurlab.org/2019/03/20/structural-variants-in-gnomad/"  target="_blank" rel="noopener"
+    >https://macarthurlab.org/2019/03/20/structural-variants-in-gnomad/</a></p></blockquote>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/bioinformatics/">Bioinformatics</a>
+        
+            <a href="/tags/database/">Database</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-gnomad-v4/20240523_img1.png" loading="lazy" data-key="" data-hash="/post/bioinfo-gnomad-v4/20240523_img1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列： gnomAD v3 database 介紹</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-all-of-us-research-program-%E4%BB%8B%E7%B4%B9/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-allofus/20240509_img1.jpg" loading="lazy" data-key="" data-hash="/post/bioinfo-allofus/20240509_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列： All of US research program 介紹</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "pxchen110-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 pxchen
+
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

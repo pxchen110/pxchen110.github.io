@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="(Program Image from NIH website)\n前言 隨定序技術的發展演進，定序分析已從單一樣本的探討、家族segregation analysis，擴展至大規模族群分析的階段。近年來已有許多國家或計畫組織，積極地針對群體健康，建立具價值的人體生物資料庫: UK Biobank, gnomAD, 或 Taiwan Biobank 等結果林立，並實際應用至臨床研究。今日要介紹的定序計畫，是由美國 National Institutes of Health (NIH) 主持的 All of Us Research Program，本文內容包含計畫簡介，收案狀況與近期成果。\n計畫簡介 All of US 起源於 2015 美國發起之精準醫療計畫 (Precision Medicine Initiative)，針對美國多元族群進行大規模的資料收集與討論\nAll of Us is working to improve health care through research. Unlike research studies that focus on one disease or group of people, All of Us is building a diverse database that can inform thousands of studies on a variety of health conditions. This creates more opportunities to:\n">
+<title>生資系列： All of US research program 介紹</title>
+
+<link rel='canonical' href='https://pxchen110.github.io/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-all-of-us-research-program-%E4%BB%8B%E7%B4%B9/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="生資系列： All of US research program 介紹">
+<meta property='og:description' content="(Program Image from NIH website)\n前言 隨定序技術的發展演進，定序分析已從單一樣本的探討、家族segregation analysis，擴展至大規模族群分析的階段。近年來已有許多國家或計畫組織，積極地針對群體健康，建立具價值的人體生物資料庫: UK Biobank, gnomAD, 或 Taiwan Biobank 等結果林立，並實際應用至臨床研究。今日要介紹的定序計畫，是由美國 National Institutes of Health (NIH) 主持的 All of Us Research Program，本文內容包含計畫簡介，收案狀況與近期成果。\n計畫簡介 All of US 起源於 2015 美國發起之精準醫療計畫 (Precision Medicine Initiative)，針對美國多元族群進行大規模的資料收集與討論\nAll of Us is working to improve health care through research. Unlike research studies that focus on one disease or group of people, All of Us is building a diverse database that can inform thousands of studies on a variety of health conditions. This creates more opportunities to:\n">
+<meta property='og:url' content='https://pxchen110.github.io/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-all-of-us-research-program-%E4%BB%8B%E7%B4%B9/'>
+<meta property='og:site_name' content='Xuan&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Bioinformatics' /><meta property='article:tag' content='Database' /><meta property='article:published_time' content='2024-05-09T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-05-09T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/bioinfo-allofus/20240509_img1.jpg' />
+<meta name="twitter:title" content="生資系列： All of US research program 介紹">
+<meta name="twitter:description" content="(Program Image from NIH website)\n前言 隨定序技術的發展演進，定序分析已從單一樣本的探討、家族segregation analysis，擴展至大規模族群分析的階段。近年來已有許多國家或計畫組織，積極地針對群體健康，建立具價值的人體生物資料庫: UK Biobank, gnomAD, 或 Taiwan Biobank 等結果林立，並實際應用至臨床研究。今日要介紹的定序計畫，是由美國 National Institutes of Health (NIH) 主持的 All of Us Research Program，本文內容包含計畫簡介，收案狀況與近期成果。\n計畫簡介 All of US 起源於 2015 美國發起之精準醫療計畫 (Precision Medicine Initiative)，針對美國多元族群進行大規模的資料收集與討論\nAll of Us is working to improve health care through research. Unlike research studies that focus on one disease or group of people, All of Us is building a diverse database that can inform thousands of studies on a variety of health conditions. This creates more opportunities to:\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/post/bioinfo-allofus/20240509_img1.jpg' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/profile_hu_d0d4f9ff9a7faeba.jpg" width="300"
+                            height="299" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Xuan&#39;s Blog</a></h1>
+            <h2 class="site-description">長大以後就是小瑄</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/pxchen110'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#計畫簡介">計畫簡介</a></li>
+    <li><a href="#計畫特點">計畫特點</a>
+      <ol>
+        <li><a href="#大規模的樣本收案">大規模的樣本收案</a></li>
+        <li><a href="#多元資料類型">多元資料類型</a></li>
+        <li><a href="#具一定準確度的分析架構">具一定準確度的分析架構</a>
+          <ol>
+            <li><a href="#workflow-benchmarking">Workflow Benchmarking</a></li>
+          </ol>
+        </li>
+        <li><a href="#雲端式共享空間">雲端式共享空間</a></li>
+      </ol>
+    </li>
+    <li><a href="#近期研究成果">近期研究成果</a>
+      <ol>
+        <li><a href="#variant-discovery-in-joint-callset">Variant discovery in joint callset</a></li>
+        <li><a href="#ancestry-and-relatedness">Ancestry and relatedness</a></li>
+        <li><a href="#genotype-by-phenotype-associations">Genotype-by-phenotype associations</a></li>
+      </ol>
+    </li>
+    <li><a href="#comments">Comments</a></li>
+    <li><a href="#references">References</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-all-of-us-research-program-%E4%BB%8B%E7%B4%B9/">
+                
+                    <img src="/post/bioinfo-allofus/20240509_img1.jpg" loading="lazy" alt="Featured image of post 生資系列： All of US research program 介紹" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/bioinformatics/" >
+                Bioinformatics
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-all-of-us-research-program-%E4%BB%8B%E7%B4%B9/">生資系列： All of US research program 介紹</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">May 09, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    4 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>(Program Image from <a class="link" href="https://www.nih.gov/"  target="_blank" rel="noopener"
+    >NIH website</a>)</p>
+<!-- more -->
+<!-- toc -->
+<h2 id="前言">前言
+</h2><p>隨定序技術的發展演進，定序分析已從單一樣本的探討、家族segregation analysis，擴展至大規模族群分析的階段。近年來已有許多國家或計畫組織，積極地針對群體健康，建立具價值的人體生物資料庫: UK Biobank, gnomAD, 或 Taiwan Biobank 等結果林立，並實際應用至臨床研究。今日要介紹的定序計畫，是由美國 National Institutes of Health (NIH) 主持的 <em>All of Us</em> Research Program，本文內容包含計畫簡介，收案狀況與近期成果。</p>
+<h2 id="計畫簡介">計畫簡介
+</h2><p><em>All of US</em> 起源於 2015 美國發起之精準醫療計畫 (Precision Medicine Initiative)，針對美國多元族群進行大規模的資料收集與討論</p>
+<blockquote>
+<p>All of Us is working to improve health care through research. Unlike research studies that focus on one disease or group of people, All of Us is building a <strong>diverse database</strong> that can inform thousands of studies on a variety of health conditions. This creates more opportunities to:</p>
+<ul>
+<li>Know the risk factors for certain diseases</li>
+<li>Figure out which treatments work best <strong>for people of different backgrounds</strong></li>
+<li>Connect people with the right clinical studies for their needs</li>
+<li>Learn how technologies can help us take steps to be healthier</li>
+</ul></blockquote>
+<p>從官網的簡介可知<strong>多元</strong>族群與資料類型為計畫核心，也勢必是基因體分析的發展趨勢</p>
+<h2 id="計畫特點">計畫特點
+</h2><h3 id="大規模的樣本收案">大規模的樣本收案
+</h3><p>美國幅員廣闊，又因歷史發展族群多元，使收案數量大族群多元。至2024年4月已有近80萬人註冊網站，<strong>近55萬人完成初步收案與調查</strong>，根據官方釋出(來自問卷)的族群統計，非歐洲族群的比例大幅提高。</p>
+<img src="/post/bioinfo-allofus/20240509_img2.jpg"  width="600">
+<p>下表為2024最新研究成果所公布的資料類別與族群樣本數，其實可發現擁有完整WGS資料的比例仍佔少數，並持續提升</p>
+<img src="/post/bioinfo-allofus/20240509_img3.jpg"  width="600">
+<h3 id="多元資料類型">多元資料類型
+</h3><p>問卷收集資訊包含基本生活習慣，還有因應前幾年COVID-19的追蹤。有些問題很有趣: 像是社交軟體帳號、管制藥品使用史(列出許多毒品名稱，還有正在服用的選項)、社區環境狀況等，和 Taiwan Biobank 相比，多收集許多環境與心理健康的資訊。族群詢問上相當詳細，依地區劃分後再分國家，如Asian下可再勾選Asian Indian, Chinese, Filipino, Japanese, Korean, Vietnamese&hellip; 以協助 PCA clustering 或model training 時做特徵依據</p>
+<p>除了問卷調查，All of US 也收集許多來源的個人資料:</p>
+<ul>
+<li>生物檢體(biosamples): blood, saliva, and/or urine sample 主要進行定序分析</li>
+<li>電子病例紀錄(electronic health records，EHR): 收集樣本相關疾病與生理測量數值，在前面 Data Broswer 網站也有釋出部分統計結果，資料使用前會經由 Observational Medical Outcomes Partnership (OMOP) 進行術語轉換與數據標準化</li>
+<li>體檢數值(physical measurement): 參與者可至合作醫院進行檢查，量測身高、體重、血壓等</li>
+<li>穿戴式裝置紀錄: 與Fitbit合作，當使用者同意共享紀錄，即可獲得如心跳、運動與睡眠狀態等監測數值</li>
+</ul>
+<p>目前收集狀況穩健，引述自最新發表文章:</p>
+<blockquote>
+<p>99% of participants with WGS data also have survey data and physical measurements, and 84% also have EHR data.</p></blockquote>
+<h3 id="具一定準確度的分析架構">具一定準確度的分析架構
+</h3><p><em>All of US</em> 以多元平台定序(short-read whole genome sequencing, long-read whole genome sequencing, and genome-wide genotyping arrays)，並偵測個體與族群階層的變異，分析流程皆以GIAB truth set與標準品衡量準確度</p>
+<p>以 short-read WGS sequencing data 分析為例:</p>
+<ul>
+<li>PCR-free barcoded Illumina Kapa HyperPrep kit</li>
+<li>sequenced on the <strong>Illumina NovaSeq 6000</strong> instrument</li>
+<li>GRCh38dh as reference</li>
+<li>Illumina DRAGEN v3.4.12 for preprocessing and variant calling，當時使用的command line 有公布在 <a class="link" href="https://developer.illumina.com/dragen/dragen-popgen"  target="_blank" rel="noopener"
+    >illumina 官網</a></li>
+<li>QC measures for each steps</li>
+<li>annotation using using Illumina Nirvana</li>
+</ul>
+<img src="/post/bioinfo-allofus/20240509_img4.jpg"  width="600">
+<p>分析流程中的Quality Control:</p>
+<ul>
+<li>single sample QC: (sample removal)
+<ul>
+<li>fingerprint concordance between the array and WGS data (selected 113 sites)</li>
+<li>sex concordance (seq result vs. self-report)</li>
+<li>cross-individual contamination rate (related to call rate) by counting number of reads at common homozygous alternate SNP</li>
+<li>mean coverage (threshold of ≥30×)</li>
+<li>genome coverage (threshold of ≥90% at 20×)</li>
+<li>coverage of hereditary disease risk genes (threshold of ≥95% at 20×)</li>
+<li>aligned Q30 bases (threshold of ≥8 × 1010)</li>
+</ul>
+</li>
+<li>joint callset QC: (similar to that of gnomAD 3.1, only flagged as failing QC)
+<ul>
+<li>population outlier through PCA</li>
+<li>variant hard filters ex: GQ, DP, QUAL flags, PASS filter&hellip;</li>
+<li>VQSR</li>
+<li>relatedness: kniship calculated by Hail</li>
+</ul>
+</li>
+</ul>
+<h4 id="workflow-benchmarking">Workflow Benchmarking
+</h4><p>使用 GIABv4.2.1 truth set: HG001(NA12878), HG003, HG004(parents of AJ trio), and HG005(son of Han trio)
+從下表的比對結果可知，<em>All of US</em> workflow 在 SNV/indel 的 Precision 超過 99%，代表偵測到的變異幾乎都為真( QC 做得很好，顯著降低false-positives)</p>
+<img src="/post/bioinfo-allofus/20240509_img5.jpg"  width="600">
+<h3 id="雲端式共享空間">雲端式共享空間
+</h3><p><em>All of US</em> <a class="link" href="https://www.researchallofus.org/"  target="_blank" rel="noopener"
+    >官方網站</a> 依照使用者身分與目的提供不同資源，主要分兩大類:</p>
+<img src="/post/bioinfo-allofus/20240509_img6.jpg"  width="600">
+<ul>
+<li><a class="link" href="https://databrowser.researchallofus.org/?_gl=1*161o2ef*_ga*MTY5MDQxNDA4MS4xNzE0MTEzMjgy*_ga_7MXT5FNNB6*MTcxNDM3ODE0NS4yLjEuMTcxNDM3ODQ0Ni4wLjAuMA.."  target="_blank" rel="noopener"
+    >Data Broswer</a>: 開源的族群性(aggregate-level data)統計成果</li>
+</ul>
+<p>以 GENOMICS VARIANT 為例，可用基因名稱、rs number 甚至是基因區段搜尋族群偵測到的變異位點，下圖示範以<em>TP53</em>搜尋結果</p>
+<img src="/post/bioinfo-allofus/20240509_img7.jpg"  width="600">
+<p>網站很讚的地方是提供<strong>客製化的篩選(圖中黃色標示處)</strong>，可以用註釋結果如 VEP consequence, ClinVar, 或族群頻率如allele count threshold 等篩出感興趣的位點。此外點選ID還有更詳細的統計，跟gnomAD broswer有得拚! 但目前網站只提供瀏覽功能，還沒找到export 按鈕</p>
+<ul>
+<li>Researcher Workbench: 若學術單位或研究者想使用資料，只要申請平台使用權，購買credit(儲存空間分析費用)，即可自由在雲端workspace下開創 project、上傳資料和使用pipeline。</li>
+</ul>
+<p>雲端分析的另一優點即是節省各自備份或傳輸資料的開銷:</p>
+<blockquote>
+<p>Storing one copy per institution of this data at 556 registered institutions would cost about US$1.16 billion per year. By contrast, storing a central cloud copy costs about US$1.14 million per year</p></blockquote>
+<h2 id="近期研究成果">近期研究成果
+</h2><p>2024年2月團隊於 <em>Nature</em> 期刊發表最新研究成果:</p>
+<blockquote>
+<p>The All of Us Research Program Genomics Investigators. Genomic data in the All of Us Research Program. Nature 627, 340–346 (2024).
+<a class="link" href="https://doi.org/10.1038/s41586-023-06957-x"  target="_blank" rel="noopener"
+    >https://doi.org/10.1038/s41586-023-06957-x</a></p></blockquote>
+<p>現階段收案情況與重點成果:</p>
+<ul>
+<li>release of 245,388 clinical-grade genome sequences, and identified more than 1 billion genetic variants</li>
+<li>new genotype-phenotype associations using longitudinal electronic health record</li>
+<li>Summary-level data are publicly available, and individual-level data can be accessed by researchers</li>
+</ul>
+<h3 id="variant-discovery-in-joint-callset">Variant discovery in joint callset
+</h3><ul>
+<li>將joint callset結果和dbSNP v153版資料庫位點比對，分別在 non-coding 跟 coding region 找到 272,051,104 和 3,913,722 個新位點</li>
+<li>依照族群 MAF 分類發現 99.98% 的 coding variants 屬於 MAF &lt; 1% 的罕見變異(rare variant)；有趣的是找到 0.01% 變異的屬於在非歐洲族群普遍(MAF &gt; 1%)，但單看歐洲族群屬於罕見的變異位點</li>
+<li>利用illumina Nirvana (DRAGEN implemented annotation tool) 進行註釋，並統計不同族群具有被 Clinvar 判定為 Likely Pathogenic 以上的位點數，利用OR、p-value等數值衡量後，發現歐洲族群發現rare pathogenic variant的比例最高，其他族群可能受限於樣本數大小而降低統計結果的顯著性。</li>
+</ul>
+<img src="/post/bioinfo-allofus/20240509_img8.jpg"  width="600">
+<h3 id="ancestry-and-relatedness">Ancestry and relatedness
+</h3><p>問卷的族群統計有 51.1% 屬於非歐洲族群，使用基因資訊進行族群分類:</p>
+<p>分類方式參考gnomAD資料庫的做法:</p>
+<blockquote>
+<p>training a random forest (RF) classifier on a subset of samples with provided genetic ancestry labels using the principal components from the PCA as features.</p></blockquote>
+<p>使用 HGDP and 1000 Genomes 計畫樣本作為 training set，並從 gnomAD 資料庫取得變異位點資訊當作PCA input，clustering 後取前 16PC 當作 random forest input，並輸出族群分類結果。</p>
+<p>將模型套用至 All of US 3202 個樣本上，發現問卷回答之族群(self-reported ethnicity) 與基因預測之族群結果一致性達87%</p>
+<h3 id="genotype-by-phenotype-associations">Genotype-by-phenotype associations
+</h3><p>大量的樣本與 variant genotype 很適合做GWAS，以 LDL-C phenotye 為例，從 manhattan plot 看到許多顯著關聯的位點，和過去從TOPMed資料庫偵測之顯著關聯位點做關聯性比較，發現兩計畫的beta (odds ratio) 值高度相關，代表位點對特徵的趨勢一致。但由於統計模型、族群組成的不同，使每個 variant loci 的 effect size 不同。</p>
+<p>此外也參照 <a class="link" href="https://www.cell.com/ajhg/fulltext/S0002-9297%2823%2900275-6?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS0002929723002756%3Fshowall%3Dtrue"  target="_blank" rel="noopener"
+    >phenotype-genotype reference map (PGRM)</a> 來驗證 All of US 做 PheWAS時，能否重現(replication)相同的顯著關聯結果</p>
+<blockquote>
+<p>phenotype-genotype reference map (PGRM), a set of 5,879 genetic associations from 523 GWAS publications that can be used for high-throughput replication experiments.</p></blockquote>
+<p>PGRM 如何定義replicated?</p>
+<blockquote>
+<p>Replication: an association with a <strong>p value &lt; 0.05</strong> and <strong>OR in the same direction</strong> as the original study.</p></blockquote>
+<p>PGRM 另一特別之處在於有族群特異的association，可以個別比對不同族群差異，最終在power &gt; 80% 的 association type 下，不同族群有成功 replicate 的比例分別為: 72.0% (18/25) in AFR, 100% (13/13) in AMR, 46.6% (7/15) in EAS, 74.9% (1,064/1,421) in EUR, and 100% (1/1) in SAS.</p>
+<p>這裡EAS重複狀況較差，可能和genetic loci boosting, EHR data updation等因素有關，而改變統計結果。</p>
+<hr>
+<h2 id="comments">Comments
+</h2><p>All of US 計畫的執行力高，並持續增進收案基數，對於族群基因體學的影響大，且過程中為因應資料量龐大的議題，會額外討論如資料保存、壓縮效率、以及位點QC等，對於之後有興趣做族群基因體分析者，可作為重要參考。這麼大的資料，若能持續的做追蹤並紀錄general population 是否有疾病發生，對長期研究也能有貢獻。當然維持計畫需龐大資金與研究者投入，相信NIH主持的計畫可以相當長壽。</p>
+<p>就族群多樣性的議題來說，USA多族群歷史較長，或許也挺適合觀察mixed-population後變異的特徵是否有保留或改變，甚至新發變異等議題；而本篇文章並沒有特別討論long-read和short-read data訂出來的樣本結果差異，但相信定序技術發展，當long-read使用越頻繁，就能將探討主軸從SNV延續至SV, CNV等大片段類型上。</p>
+<h2 id="references">References
+</h2><p><a class="link" href="https://www.nature.com/articles/s41586-023-06957-x"  target="_blank" rel="noopener"
+    >https://www.nature.com/articles/s41586-023-06957-x</a>
+<a class="link" href="https://www.ghd.tw/Home/International_data_standards"  target="_blank" rel="noopener"
+    >https://www.ghd.tw/Home/International_data_standards</a>
+<a class="link" href="https://cran.r-project.org/web/packages/allofus/vignettes/data.html"  target="_blank" rel="noopener"
+    >https://cran.r-project.org/web/packages/allofus/vignettes/data.html</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/bioinformatics/">Bioinformatics</a>
+        
+            <a href="/tags/database/">Database</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-gnomad-v4/20240523_img1.png" loading="lazy" data-key="" data-hash="/post/bioinfo-gnomad-v4/20240523_img1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列： gnomAD v3 database 介紹</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-gnomad-v4/20240523_img1.png" loading="lazy" data-key="" data-hash="/post/bioinfo-gnomad-v4/20240523_img1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列： gnomAD v3 database 介紹</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "pxchen110-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 pxchen
+
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
