@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。\n本機環境: MacOS Sonoma\nPart1: Github 創建倉庫專案 首先要創建GitHub帳號，Github是提供開發者存放專案、進行版本控制的好平台，大部分開源工具會將source code放在Github提供下載使用 選擇 Create a new repository 建立新專案，以 ${username}.github.io 來命名並以Public形式發表，初始狀態會產生一個空的reposiroty 回到本機端，以 git clone ${repository_url} 將專案載到本機端；完成後會在當前目錄找到和專案同名 ${username}.github.io 的資料夾 注意：由於之後我們會在這個資料夾下新增檔案，並推送回Github(git push)，過程牽涉authorization問題，可以先建立ssh-key 或 token 授權 Part2: 透過 npm 下載 Node.js 函式庫 Hexo 來推送管理Blog 在本機端安裝npm（Node.js的套件管理系統） 不同作業系統的安裝可參考 Node.js社群文件 我選擇透過Macport安裝： 先下載Macport 安裝 Node.js 和 npm 1 2 3 4 5 sudo port install nodejs10 sudo port -d selfupdate sudo port install npm npm -v #測試安裝是否成功 透過 npm 安裝 Hexo 並初始化，完成後會產生名為 blog 的資料夾 1 2 3 4 5 6 #install hexo (sudo) npm install hexo-cli -g # Blog initialization hexo init blog cd blog 將 blog/ 下的所有檔案複製到剛才clone回來的github repository 資料夾下，再執行npm 安裝 hexo 需要的套件 1 2 cp -R * /path/to/${username}.github.io (sudo) npm install 指令完成後將會看到以下檔案和資料夾，介紹我目前有編輯過的部分： _config.yml 是設定網站的配置檔案 theme/ 客製化主題存放的地方 source/_post/ 放置發布文章(.md)的地方 Part3: 編輯 configuration 並推回 Github 設定blog相關內容，keyword 解釋可參考官方文件。我編輯過的部分包含：\n">
+<title>用Github&#43;Hexo建立個人部落格：方法與問題紀錄</title>
+
+<link rel='canonical' href='https://pxchen110.github.io/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="用Github+Hexo建立個人部落格：方法與問題紀錄">
+<meta property='og:description' content="決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。\n本機環境: MacOS Sonoma\nPart1: Github 創建倉庫專案 首先要創建GitHub帳號，Github是提供開發者存放專案、進行版本控制的好平台，大部分開源工具會將source code放在Github提供下載使用 選擇 Create a new repository 建立新專案，以 ${username}.github.io 來命名並以Public形式發表，初始狀態會產生一個空的reposiroty 回到本機端，以 git clone ${repository_url} 將專案載到本機端；完成後會在當前目錄找到和專案同名 ${username}.github.io 的資料夾 注意：由於之後我們會在這個資料夾下新增檔案，並推送回Github(git push)，過程牽涉authorization問題，可以先建立ssh-key 或 token 授權 Part2: 透過 npm 下載 Node.js 函式庫 Hexo 來推送管理Blog 在本機端安裝npm（Node.js的套件管理系統） 不同作業系統的安裝可參考 Node.js社群文件 我選擇透過Macport安裝： 先下載Macport 安裝 Node.js 和 npm 1 2 3 4 5 sudo port install nodejs10 sudo port -d selfupdate sudo port install npm npm -v #測試安裝是否成功 透過 npm 安裝 Hexo 並初始化，完成後會產生名為 blog 的資料夾 1 2 3 4 5 6 #install hexo (sudo) npm install hexo-cli -g # Blog initialization hexo init blog cd blog 將 blog/ 下的所有檔案複製到剛才clone回來的github repository 資料夾下，再執行npm 安裝 hexo 需要的套件 1 2 cp -R * /path/to/${username}.github.io (sudo) npm install 指令完成後將會看到以下檔案和資料夾，介紹我目前有編輯過的部分： _config.yml 是設定網站的配置檔案 theme/ 客製化主題存放的地方 source/_post/ 放置發布文章(.md)的地方 Part3: 編輯 configuration 並推回 Github 設定blog相關內容，keyword 解釋可參考官方文件。我編輯過的部分包含：\n">
+<meta property='og:url' content='https://pxchen110.github.io/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/'>
+<meta property='og:site_name' content='Xuan&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Github' /><meta property='article:tag' content='Hexo' /><meta property='article:tag' content='Linux' /><meta property='article:published_time' content='2024-02-21T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-02-21T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/20240201_img5.jpg' />
+<meta name="twitter:title" content="用Github+Hexo建立個人部落格：方法與問題紀錄">
+<meta name="twitter:description" content="決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。\n本機環境: MacOS Sonoma\nPart1: Github 創建倉庫專案 首先要創建GitHub帳號，Github是提供開發者存放專案、進行版本控制的好平台，大部分開源工具會將source code放在Github提供下載使用 選擇 Create a new repository 建立新專案，以 ${username}.github.io 來命名並以Public形式發表，初始狀態會產生一個空的reposiroty 回到本機端，以 git clone ${repository_url} 將專案載到本機端；完成後會在當前目錄找到和專案同名 ${username}.github.io 的資料夾 注意：由於之後我們會在這個資料夾下新增檔案，並推送回Github(git push)，過程牽涉authorization問題，可以先建立ssh-key 或 token 授權 Part2: 透過 npm 下載 Node.js 函式庫 Hexo 來推送管理Blog 在本機端安裝npm（Node.js的套件管理系統） 不同作業系統的安裝可參考 Node.js社群文件 我選擇透過Macport安裝： 先下載Macport 安裝 Node.js 和 npm 1 2 3 4 5 sudo port install nodejs10 sudo port -d selfupdate sudo port install npm npm -v #測試安裝是否成功 透過 npm 安裝 Hexo 並初始化，完成後會產生名為 blog 的資料夾 1 2 3 4 5 6 #install hexo (sudo) npm install hexo-cli -g # Blog initialization hexo init blog cd blog 將 blog/ 下的所有檔案複製到剛才clone回來的github repository 資料夾下，再執行npm 安裝 hexo 需要的套件 1 2 cp -R * /path/to/${username}.github.io (sudo) npm install 指令完成後將會看到以下檔案和資料夾，介紹我目前有編輯過的部分： _config.yml 是設定網站的配置檔案 theme/ 客製化主題存放的地方 source/_post/ 放置發布文章(.md)的地方 Part3: 編輯 configuration 並推回 Github 設定blog相關內容，keyword 解釋可參考官方文件。我編輯過的部分包含：\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/20240201_img5.jpg' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/profile_hu_d0d4f9ff9a7faeba.jpg" width="300"
+                            height="299" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Xuan&#39;s Blog</a></h1>
+            <h2 class="site-description">長大以後就是小瑄</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/pxchen110'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#part1-github-創建倉庫專案">Part1: Github 創建倉庫專案</a></li>
+    <li><a href="#part2-透過-npm-下載-nodejs-函式庫-hexo-來推送管理blog">Part2: 透過 npm 下載 Node.js 函式庫 Hexo 來推送管理Blog</a></li>
+    <li><a href="#part3-編輯-configuration-並推回--github">Part3: 編輯 configuration 並推回  Github</a></li>
+    <li><a href="#part4-挑選客製化主題">Part4: 挑選客製化主題</a></li>
+    <li><a href="#part5-階段成果">Part5: 階段成果</a></li>
+    <li><a href="#part6-新增貼文">Part6: 新增貼文</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/">
+                
+                    <img src="/20240201_img5.jpg" loading="lazy" alt="Featured image of post 用Github&#43;Hexo建立個人部落格：方法與問題紀錄" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/github/" >
+                Github
+            </a>
+        
+            <a href="/categories/linux/" >
+                Linux
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/">用Github&#43;Hexo建立個人部落格：方法與問題紀錄</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Feb 21, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。</p>
+<!-- more -->
+<p>本機環境: MacOS Sonoma</p>
+<!-- toc -->
+<h2 id="part1-github-創建倉庫專案">Part1: Github 創建倉庫專案
+</h2><ol>
+<li>首先要創建<a class="link" href="https://github.com/"  target="_blank" rel="noopener"
+    >GitHub</a>帳號，Github是提供開發者存放專案、進行版本控制的好平台，大部分開源工具會將source code放在Github提供下載使用</li>
+<li>選擇 <strong>Create a new repository</strong> 建立新專案，以 <code>${username}.github.io</code> 來命名並以Public形式發表，初始狀態會產生一個空的reposiroty</li>
+<li>回到本機端，以 <code>git clone ${repository_url}</code> 將專案載到本機端；完成後會在當前目錄找到和專案同名 <code>${username}.github.io</code> 的資料夾
+<strong>注意：由於之後我們會在這個資料夾下新增檔案，並推送回Github(git push)，過程牽涉authorization問題，可以先建立ssh-key 或 token 授權</strong></li>
+</ol>
+<h2 id="part2-透過-npm-下載-nodejs-函式庫-hexo-來推送管理blog">Part2: 透過 npm 下載 Node.js 函式庫 Hexo 來推送管理Blog
+</h2><ol start="4">
+<li>在本機端安裝npm（Node.js的套件管理系統）
+<ul>
+<li>不同作業系統的安裝可參考 <a class="link" href="https://github.com/nodejs-tw/nodejs-wiki-book/blob/master/zh-tw/node_npm.rst?source=post_page-----4d295ed96236--------------------------------"  target="_blank" rel="noopener"
+    >Node.js社群文件</a></li>
+</ul>
+</li>
+<li>我選擇透過Macport安裝：
+<ul>
+<li>先下載<a class="link" href="https://www.macports.org/install.php"  target="_blank" rel="noopener"
+    >Macport</a></li>
+<li>安裝 <a class="link" href="https://ports.macports.org/port/nodejs10/"  target="_blank" rel="noopener"
+    >Node.js</a> 和 npm</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">sudo port install nodejs10
+</span></span><span class="line"><span class="cl">sudo port -d selfupdate
+</span></span><span class="line"><span class="cl">sudo port install npm
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">npm -v #測試安裝是否成功
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="6">
+<li>透過 npm 安裝 Hexo 並初始化，完成後會產生名為 blog 的資料夾</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">#install hexo
+</span></span><span class="line"><span class="cl">(sudo) npm install hexo-cli -g
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Blog initialization
+</span></span><span class="line"><span class="cl">hexo init blog
+</span></span><span class="line"><span class="cl">cd blog
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="7">
+<li><strong>將 <code>blog/</code> 下的所有檔案複製到剛才clone回來的github repository 資料夾下</strong>，再執行npm 安裝 hexo 需要的套件</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">cp -R * /path/to/${username}.github.io
+</span></span><span class="line"><span class="cl">(sudo) npm install
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="8">
+<li>指令完成後將會看到以下檔案和資料夾，介紹我目前有編輯過的部分：
+<ul>
+<li><code>_config.yml</code> 是設定網站的配置檔案</li>
+<li><code>theme/</code> 客製化主題存放的地方</li>
+<li><code>source/_post/</code> 放置發布文章(<code>.md</code>)的地方
+<img src="/20240201_img1.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></li>
+</ul>
+</li>
+</ol>
+<h2 id="part3-編輯-configuration-並推回--github">Part3: 編輯 configuration 並推回  Github
+</h2><ol start="9">
+<li>
+<p>設定blog相關內容，keyword 解釋可參考<a class="link" href="https://hexo.io/zh-tw/docs/configuration?source=post_page-----4d295ed96236--------------------------------"  target="_blank" rel="noopener"
+    >官方文件</a>。我編輯過的部分包含：</p>
+<ul>
+<li>網站標題、作者、網址：
+<img src="/20240201_img2.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></li>
+<li>deploy 來源：<strong>特別注意 push branch</strong>，由於 Github 目前 default branch 是 main，<strong>config 內要設定 push 到 main branch 才有效</strong>，當時我沒注意順手設 master，直接讓文章與主題樣式分離&hellip; repo 就貼上 ssh clone 的網址
+<img src="/20240201_img3.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></li>
+</ul>
+</li>
+<li>
+<p>儲存檔案後，透過以下指令推送回Github：</p>
+</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">hexo clean #清除靜態網頁
+</span></span><span class="line"><span class="cl">hexo generate # == hexo g 透過設定文件產生靜態網頁
+</span></span><span class="line"><span class="cl">hexo server # == hexo s 產生測試機看成果
+</span></span><span class="line"><span class="cl">hexo deployer # == hexo d 將內容部署到git上
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>注意: 執行 <code>hexo deployer</code> 可能遇到以下錯誤：<code>Deployer not found: git</code>，原因是缺少 <code>hexo-deployer-git</code> 套件</strong></p>
+<p>透過<a class="link" href="https://hexo.io/zh-tw/docs/one-command-deployment.html"  target="_blank" rel="noopener"
+    >以下指令</a>安裝：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">npm install hexo-deployer-git --save
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>都完成後可以透過以下網址看初始成果：<code>https://${username}.github.io</code></p>
+<h2 id="part4-挑選客製化主題">Part4: 挑選客製化主題
+</h2><ol start="11">
+<li>有了地基就可以蓋房子啦(誤) 除了 github 提供的基本網站樣式，<a class="link" href="https://hexo.io/themes/index.html"  target="_blank" rel="noopener"
+    >Hexo 網站有很多開源主題</a> 可以下載套用，如果沒頭緒可以看<a class="link" href="https://github.com/Ailln/awesome-hexo-theme"  target="_blank" rel="noopener"
+    >別人推薦</a></li>
+<li>套用主題的方法：
+<ul>
+<li>git clone 回名為 <strong>theme</strong> 的資料夾內</li>
+<li>到先前編輯過的 <code>_config.yml</code> 加上主題名稱，並依照主題的 documentation 進行操作</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">git clone ${theme_repository_url} /path/to/${username}.github.io/themes/theme_name
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/20240201_img4.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h2 id="part5-階段成果">Part5: 階段成果
+</h2><p>我的blog 使用的是 tranquilpeak 主題，第一眼就被簡約有質感的排版吸引 (尤其是sidebar部分)，主題目前支援中文樣式及嵌入搜索引擎，但 documentation 只有英文版</p>
+<ul>
+<li><a class="link" href="https://github.com/LouisBarranqueiro/hexo-theme-tranquilpeak"  target="_blank" rel="noopener"
+    >Github Link</a></li>
+<li><a class="link" href="https://louisbarranqueiro.github.io/hexo-theme-tranquilpeak/"  target="_blank" rel="noopener"
+    >Demo Link</a></li>
+</ul>
+<p>目前做了基礎設定和更改背景，官方文件還有很多功能沒測試，持續摸索～</p>
+<p><img src="/20240201_img5.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h2 id="part6-新增貼文">Part6: 新增貼文
+</h2><p>當要發布文章時，需要以markdown語法撰寫，我推薦使用<a class="link" href="https://hackmd.io"  target="_blank" rel="noopener"
+    >hackmd</a> 來協助在markdownm語法下完成文章，建立貼文的步驟如下：</p>
+<ul>
+<li>將當前目錄跳轉至<code>_post</code>內並以下方指令產生<code>.md檔</code>和放置圖片的同名資料夾</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">hexo new post_name 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>編輯 <code>.md檔</code> 將hackmd上的文章複製貼上即可</li>
+<li><strong>注意：圖片顯示需要一個確認＋三個步驟，四者缺一不可</strong>
+<ul>
+<li>確認 <code>_config.yml</code> 設定 <code>post_asset_folder: true</code></li>
+<li>npm 透過以下指令安裝圖片顯示套件 <code>(sudo) npm install https://github.com/CodeFalling/hexo-asset-image --save</code></li>
+<li>將圖片放在 <code>/_post/post_name/</code> 資料夾下，例如我在資料夾下放一張名為 <code>img1.png</code> 的圖檔</li>
+<li>若以放在上方資料夾，<code>.md檔</code>內圖片只要打名稱即可，例如我只要打 <code>![](img1.png)</code> 圖片就可顯示嘍！</li>
+</ul>
+</li>
+<li>最後以步驟10推送回Github就完成發文了</li>
+</ul>
+<p>以上就是我的第一篇文章分享，歡迎一起討論！</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/github/">Github</a>
+        
+            <a href="/tags/hexo/">Hexo</a>
+        
+            <a href="/tags/linux/">Linux</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "pxchen110-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 pxchen
+
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Linux on Xuan&#39;s Blog</title>
+        <link>https://pxchen110.github.io/categories/linux/</link>
+        <description>Recent content in Linux on Xuan&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en</language>
+        <copyright>pxchen</copyright>
+        <lastBuildDate>Wed, 21 Feb 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://pxchen110.github.io/categories/linux/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>用Github&#43;Hexo建立個人部落格：方法與問題紀錄</title>
+        <link>https://pxchen110.github.io/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/</link>
+        <pubDate>Wed, 21 Feb 2024 00:00:00 +0000</pubDate>
+        
+        <guid>https://pxchen110.github.io/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/</guid>
+        <description>&lt;img src="https://pxchen110.github.io/20240201_img5.jpg" alt="Featured image of post 用Github&#43;Hexo建立個人部落格：方法與問題紀錄" /&gt;&lt;p&gt;決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;p&gt;本機環境: MacOS Sonoma&lt;/p&gt;
+&lt;!-- toc --&gt;
+&lt;h2 id=&#34;part1-github-創建倉庫專案&#34;&gt;Part1: Github 創建倉庫專案
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;首先要創建&lt;a class=&#34;link&#34; href=&#34;https://github.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;GitHub&lt;/a&gt;帳號，Github是提供開發者存放專案、進行版本控制的好平台，大部分開源工具會將source code放在Github提供下載使用&lt;/li&gt;
+&lt;li&gt;選擇 &lt;strong&gt;Create a new repository&lt;/strong&gt; 建立新專案，以 &lt;code&gt;${username}.github.io&lt;/code&gt; 來命名並以Public形式發表，初始狀態會產生一個空的reposiroty&lt;/li&gt;
+&lt;li&gt;回到本機端，以 &lt;code&gt;git clone ${repository_url}&lt;/code&gt; 將專案載到本機端；完成後會在當前目錄找到和專案同名 &lt;code&gt;${username}.github.io&lt;/code&gt; 的資料夾
+&lt;strong&gt;注意：由於之後我們會在這個資料夾下新增檔案，並推送回Github(git push)，過程牽涉authorization問題，可以先建立ssh-key 或 token 授權&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;part2-透過-npm-下載-nodejs-函式庫-hexo-來推送管理blog&#34;&gt;Part2: 透過 npm 下載 Node.js 函式庫 Hexo 來推送管理Blog
+&lt;/h2&gt;&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;在本機端安裝npm（Node.js的套件管理系統）
+&lt;ul&gt;
+&lt;li&gt;不同作業系統的安裝可參考 &lt;a class=&#34;link&#34; href=&#34;https://github.com/nodejs-tw/nodejs-wiki-book/blob/master/zh-tw/node_npm.rst?source=post_page-----4d295ed96236--------------------------------&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Node.js社群文件&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;我選擇透過Macport安裝：
+&lt;ul&gt;
+&lt;li&gt;先下載&lt;a class=&#34;link&#34; href=&#34;https://www.macports.org/install.php&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Macport&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;安裝 &lt;a class=&#34;link&#34; href=&#34;https://ports.macports.org/port/nodejs10/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Node.js&lt;/a&gt; 和 npm&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo port install nodejs10
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo port -d selfupdate
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo port install npm
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;npm -v #測試安裝是否成功
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start=&#34;6&#34;&gt;
+&lt;li&gt;透過 npm 安裝 Hexo 並初始化，完成後會產生名為 blog 的資料夾&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;#install hexo
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;(sudo) npm install hexo-cli -g
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# Blog initialization
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;hexo init blog
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;cd blog
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start=&#34;7&#34;&gt;
+&lt;li&gt;&lt;strong&gt;將 &lt;code&gt;blog/&lt;/code&gt; 下的所有檔案複製到剛才clone回來的github repository 資料夾下&lt;/strong&gt;，再執行npm 安裝 hexo 需要的套件&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;cp -R * /path/to/${username}.github.io
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;(sudo) npm install
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start=&#34;8&#34;&gt;
+&lt;li&gt;指令完成後將會看到以下檔案和資料夾，介紹我目前有編輯過的部分：
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;_config.yml&lt;/code&gt; 是設定網站的配置檔案&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;theme/&lt;/code&gt; 客製化主題存放的地方&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;source/_post/&lt;/code&gt; 放置發布文章(&lt;code&gt;.md&lt;/code&gt;)的地方
+&lt;img src=&#34;https://pxchen110.github.io/20240201_img1.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;part3-編輯-configuration-並推回--github&#34;&gt;Part3: 編輯 configuration 並推回  Github
+&lt;/h2&gt;&lt;ol start=&#34;9&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;設定blog相關內容，keyword 解釋可參考&lt;a class=&#34;link&#34; href=&#34;https://hexo.io/zh-tw/docs/configuration?source=post_page-----4d295ed96236--------------------------------&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官方文件&lt;/a&gt;。我編輯過的部分包含：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;網站標題、作者、網址：
+&lt;img src=&#34;https://pxchen110.github.io/20240201_img2.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/li&gt;
+&lt;li&gt;deploy 來源：&lt;strong&gt;特別注意 push branch&lt;/strong&gt;，由於 Github 目前 default branch 是 main，&lt;strong&gt;config 內要設定 push 到 main branch 才有效&lt;/strong&gt;，當時我沒注意順手設 master，直接讓文章與主題樣式分離&amp;hellip; repo 就貼上 ssh clone 的網址
+&lt;img src=&#34;https://pxchen110.github.io/20240201_img3.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;儲存檔案後，透過以下指令推送回Github：&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;hexo clean #清除靜態網頁
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;hexo generate # == hexo g 透過設定文件產生靜態網頁
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;hexo server # == hexo s 產生測試機看成果
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;hexo deployer # == hexo d 將內容部署到git上
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;注意: 執行 &lt;code&gt;hexo deployer&lt;/code&gt; 可能遇到以下錯誤：&lt;code&gt;Deployer not found: git&lt;/code&gt;，原因是缺少 &lt;code&gt;hexo-deployer-git&lt;/code&gt; 套件&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;透過&lt;a class=&#34;link&#34; href=&#34;https://hexo.io/zh-tw/docs/one-command-deployment.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;以下指令&lt;/a&gt;安裝：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;npm install hexo-deployer-git --save
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;都完成後可以透過以下網址看初始成果：&lt;code&gt;https://${username}.github.io&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id=&#34;part4-挑選客製化主題&#34;&gt;Part4: 挑選客製化主題
+&lt;/h2&gt;&lt;ol start=&#34;11&#34;&gt;
+&lt;li&gt;有了地基就可以蓋房子啦(誤) 除了 github 提供的基本網站樣式，&lt;a class=&#34;link&#34; href=&#34;https://hexo.io/themes/index.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Hexo 網站有很多開源主題&lt;/a&gt; 可以下載套用，如果沒頭緒可以看&lt;a class=&#34;link&#34; href=&#34;https://github.com/Ailln/awesome-hexo-theme&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;別人推薦&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;套用主題的方法：
+&lt;ul&gt;
+&lt;li&gt;git clone 回名為 &lt;strong&gt;theme&lt;/strong&gt; 的資料夾內&lt;/li&gt;
+&lt;li&gt;到先前編輯過的 &lt;code&gt;_config.yml&lt;/code&gt; 加上主題名稱，並依照主題的 documentation 進行操作&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git clone ${theme_repository_url} /path/to/${username}.github.io/themes/theme_name
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://pxchen110.github.io/20240201_img4.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;part5-階段成果&#34;&gt;Part5: 階段成果
+&lt;/h2&gt;&lt;p&gt;我的blog 使用的是 tranquilpeak 主題，第一眼就被簡約有質感的排版吸引 (尤其是sidebar部分)，主題目前支援中文樣式及嵌入搜索引擎，但 documentation 只有英文版&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/LouisBarranqueiro/hexo-theme-tranquilpeak&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Github Link&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://louisbarranqueiro.github.io/hexo-theme-tranquilpeak/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Demo Link&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;目前做了基礎設定和更改背景，官方文件還有很多功能沒測試，持續摸索～&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://pxchen110.github.io/20240201_img5.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;part6-新增貼文&#34;&gt;Part6: 新增貼文
+&lt;/h2&gt;&lt;p&gt;當要發布文章時，需要以markdown語法撰寫，我推薦使用&lt;a class=&#34;link&#34; href=&#34;https://hackmd.io&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;hackmd&lt;/a&gt; 來協助在markdownm語法下完成文章，建立貼文的步驟如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;將當前目錄跳轉至&lt;code&gt;_post&lt;/code&gt;內並以下方指令產生&lt;code&gt;.md檔&lt;/code&gt;和放置圖片的同名資料夾&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;hexo new post_name 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;編輯 &lt;code&gt;.md檔&lt;/code&gt; 將hackmd上的文章複製貼上即可&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;注意：圖片顯示需要一個確認＋三個步驟，四者缺一不可&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;確認 &lt;code&gt;_config.yml&lt;/code&gt; 設定 &lt;code&gt;post_asset_folder: true&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;npm 透過以下指令安裝圖片顯示套件 &lt;code&gt;(sudo) npm install https://github.com/CodeFalling/hexo-asset-image --save&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;將圖片放在 &lt;code&gt;/_post/post_name/&lt;/code&gt; 資料夾下，例如我在資料夾下放一張名為 &lt;code&gt;img1.png&lt;/code&gt; 的圖檔&lt;/li&gt;
+&lt;li&gt;若以放在上方資料夾，&lt;code&gt;.md檔&lt;/code&gt;內圖片只要打名稱即可，例如我只要打 &lt;code&gt;![](img1.png)&lt;/code&gt; 圖片就可顯示嘍！&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;最後以步驟10推送回Github就完成發文了&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;以上就是我的第一篇文章分享，歡迎一起討論！&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>
