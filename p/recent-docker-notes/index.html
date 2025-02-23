@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="記錄最近跑 docker / singularity 的指令\n引入本機資料 在container內使用外部檔案，設定 --volume 或 -v 並指定在container可以access的路徑名稱，例如:\n1 2 3 ## my input file: /path/to/input/input.txt docker run -v /path/to/input:/data my_container:latest -input /data/input.txt singularity 也有相似指令 --bind\n1 singularity exec --bind /path/to/input:/data,/path/to/other:/index my_sing.sif -input /data/input.txt -output /index 修改寫入權限 有時遇到 docker 輸出檔案的權限為 root ，若以後要修改刪除等操作會不方便，使用 --user $(id -u):$(id -g) 來將輸出的owner, group 權限給下指令的使用者，例如:\n1 docker run -it -rm -v /path/to/input:/data --user $(id -u):$(id -g) my_container:latest -input /data/input.txt -output /data/output.txt 若owner為使用者，之後還可通過linux chgrp 修改 group 權限\n">
+<title>Recent docker notes</title>
+
+<link rel='canonical' href='https://pxchen110.github.io/p/recent-docker-notes/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Recent docker notes">
+<meta property='og:description' content="記錄最近跑 docker / singularity 的指令\n引入本機資料 在container內使用外部檔案，設定 --volume 或 -v 並指定在container可以access的路徑名稱，例如:\n1 2 3 ## my input file: /path/to/input/input.txt docker run -v /path/to/input:/data my_container:latest -input /data/input.txt singularity 也有相似指令 --bind\n1 singularity exec --bind /path/to/input:/data,/path/to/other:/index my_sing.sif -input /data/input.txt -output /index 修改寫入權限 有時遇到 docker 輸出檔案的權限為 root ，若以後要修改刪除等操作會不方便，使用 --user $(id -u):$(id -g) 來將輸出的owner, group 權限給下指令的使用者，例如:\n1 docker run -it -rm -v /path/to/input:/data --user $(id -u):$(id -g) my_container:latest -input /data/input.txt -output /data/output.txt 若owner為使用者，之後還可通過linux chgrp 修改 group 權限\n">
+<meta property='og:url' content='https://pxchen110.github.io/p/recent-docker-notes/'>
+<meta property='og:site_name' content='Xuan&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Docker' /><meta property='article:tag' content='Linux' /><meta property='article:published_time' content='2024-07-04T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-07-04T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/docker-notes/20240704_img0.png' />
+<meta name="twitter:title" content="Recent docker notes">
+<meta name="twitter:description" content="記錄最近跑 docker / singularity 的指令\n引入本機資料 在container內使用外部檔案，設定 --volume 或 -v 並指定在container可以access的路徑名稱，例如:\n1 2 3 ## my input file: /path/to/input/input.txt docker run -v /path/to/input:/data my_container:latest -input /data/input.txt singularity 也有相似指令 --bind\n1 singularity exec --bind /path/to/input:/data,/path/to/other:/index my_sing.sif -input /data/input.txt -output /index 修改寫入權限 有時遇到 docker 輸出檔案的權限為 root ，若以後要修改刪除等操作會不方便，使用 --user $(id -u):$(id -g) 來將輸出的owner, group 權限給下指令的使用者，例如:\n1 docker run -it -rm -v /path/to/input:/data --user $(id -u):$(id -g) my_container:latest -input /data/input.txt -output /data/output.txt 若owner為使用者，之後還可通過linux chgrp 修改 group 權限\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/post/docker-notes/20240704_img0.png' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/profile_hu_d0d4f9ff9a7faeba.jpg" width="300"
+                            height="299" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Xuan&#39;s Blog</a></h1>
+            <h2 class="site-description">長大以後就是小瑄</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/pxchen110'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#引入本機資料">引入本機資料</a></li>
+    <li><a href="#修改寫入權限">修改寫入權限</a></li>
+    <li><a href="#其他指令">其他指令</a></li>
+    <li><a href="#用-dockerfile-建立-docker-並使用">用 Dockerfile 建立 docker 並使用</a>
+      <ol>
+        <li><a href="#常用的-image-base">常用的 image base</a></li>
+      </ol>
+    </li>
+    <li><a href="#將建立好的-docker-存成-tar-檔並加載到其他環境">將建立好的 docker 存成 tar 檔並加載到其他環境</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/recent-docker-notes/">
+                
+                    <img src="/post/docker-notes/20240704_img0.png" loading="lazy" alt="Featured image of post Recent docker notes" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/docker/" >
+                Docker
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/recent-docker-notes/">Recent docker notes</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jul 04, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>記錄最近跑 docker / singularity 的指令</p>
+<!-- more -->
+<h2 id="引入本機資料">引入本機資料
+</h2><p>在container內使用外部檔案，設定 <code>--volume</code> 或 <code>-v</code> 並指定在container可以access的路徑名稱，例如:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">## my input file: /path/to/input/input.txt
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">docker run -v /path/to/input:/data my_container:latest -input /data/input.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>singularity 也有相似指令 <code>--bind</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">singularity exec --bind /path/to/input:/data,/path/to/other:/index my_sing.sif -input /data/input.txt -output /index 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="修改寫入權限">修改寫入權限
+</h2><p>有時遇到 docker 輸出檔案的權限為 <strong>root</strong> ，若以後要修改刪除等操作會不方便，使用 <code>--user $(id -u):$(id -g)</code> 來將輸出的owner, group 權限給下指令的使用者，例如:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">docker run -it -rm -v /path/to/input:/data --user $(id -u):$(id -g) my_container:latest -input /data/input.txt -output /data/output.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>若owner為使用者，之後還可通過linux <code>chgrp</code> 修改 group 權限</p>
+<h2 id="其他指令">其他指令
+</h2><p>加上 <code>--rm</code> 讓container執行完一併刪除
+加上 <code>--it</code> 進入互動模式，但有可能出現 <code>the input device is not a TTY</code> 錯誤</p>
+<h2 id="用-dockerfile-建立-docker-並使用">用 Dockerfile 建立 docker 並使用
+</h2><p>前陣子使用某docker遇到bug無法執行成功，因此稍微修改他的dockerfile -&gt; push至dockerhub -&gt; pull 回來使用
+註1: 以下有匿名處理 docker name 請參考code就好XD
+註2: 需要註冊 <a class="link" href="https://hub.docker.com/"  target="_blank" rel="noopener"
+    >https://hub.docker.com/</a> 才能push
+註3: <a class="link" href="https://ithelp.ithome.com.tw/articles/10192824"  target="_blank" rel="noopener"
+    >my references</a></p>
+<p>首先登入dockerhub 建立新專案</p>
+<p>回到linux建立docker</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">## cd to dockerfile directory and build docker
+</span></span><span class="line"><span class="cl">docker build -t local/origin_docker_fixed:latest .
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## need user login 
+</span></span><span class="line"><span class="cl">docker login
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## rename docker tag (origin TAG is &lt;none&gt;)
+</span></span><span class="line"><span class="cl">## the image name may be the same as the repository we created
+</span></span><span class="line"><span class="cl">docker tag 53a8d0dbxxxx pxchen/origin_docker_fixed
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## check 
+</span></span><span class="line"><span class="cl">docker image ls
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## push to the existing repository
+</span></span><span class="line"><span class="cl">docker push pxchen112/msisensor-pro-fixed
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>回到 dockerhub，點進去看push的image 以及Dockerfile layer</p>
+<img src="/post/docker-notes/20240704_img1.png"  width="600">
+<h3 id="常用的-image-base">常用的 image base
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>基礎映像</th>
+          <th>標籤</th>
+          <th>特點</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Alpine Linux</td>
+          <td><code>alpine:latest</code></td>
+          <td>輕量、安全、適合容器化應用，小映像大小</td>
+      </tr>
+      <tr>
+          <td>Ubuntu</td>
+          <td><code>ubuntu:latest</code></td>
+          <td>廣泛使用的 Linux 發行版，功能豐富</td>
+      </tr>
+      <tr>
+          <td>CentOS</td>
+          <td><code>centos:latest</code></td>
+          <td>穩定、適用於企業級應用，基於 RHEL</td>
+      </tr>
+      <tr>
+          <td>Debian</td>
+          <td><code>debian:latest</code></td>
+          <td>穩定，有廣泛的套件庫</td>
+      </tr>
+      <tr>
+          <td>Scratch</td>
+          <td><code>scratch</code></td>
+          <td>最小化基礎映像，不包含操作系統</td>
+      </tr>
+      <tr>
+          <td>Golang</td>
+          <td><code>golang:latest</code></td>
+          <td>包含 Go 程序語言和開發工具的基礎映像</td>
+      </tr>
+      <tr>
+          <td>Node.js</td>
+          <td><code>node:latest</code></td>
+          <td>包含 Node.js 環境的基礎映像</td>
+      </tr>
+  </tbody>
+</table></div>
+<h2 id="將建立好的-docker-存成-tar-檔並加載到其他環境">將建立好的 docker 存成 tar 檔並加載到其他環境
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">docker</span> <span class="n">save</span> <span class="o">-</span><span class="n">o</span> <span class="n">yourdocker</span><span class="o">.</span><span class="n">tar</span> <span class="n">local</span><span class="o">/</span><span class="n">origin_docker_fixed</span><span class="p">:</span><span class="n">latest</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">docker</span> <span class="nb">load</span> <span class="n">yourdocker</span><span class="o">.</span><span class="n">tar</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/docker/">Docker</a>
+        
+            <a href="/tags/linux/">Linux</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "pxchen110-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 pxchen
+
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

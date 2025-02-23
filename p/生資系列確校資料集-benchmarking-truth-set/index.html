@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="當團隊開發一套新工具，要如何評估工具的準確度?這時需要一組可信度高的正確資料集來協助衡量(benhcmark)工具表現，以下介紹在人類基因體常用的資料集來源。\nGIAB Genome In A Bottle Consotrium 由美國國家標準與技術研究所 (NIST) 主持的計畫，主要提供人類基因體相關的標準品與正確資料集(truth set):\n標準品主要從NIGMS Human Genetic Cell Repository挑選cell line 來產生，共有7個樣本(HG001-HG007)，標準品的編號和族群、家族關係等整理如下表:\n(table collected from Coriell Institute for medical research)\n製作正確資料集首先需要不同定序平台與偵測工具的檔案來源、在生資分析上也需要做好品質篩選(QC)、變異的比對合併(merging)以及基因型計算(genotyping)過程可說耗費精力。GIAB不僅提供多個標準品的正確資料集，也致力於提供不同種變異類型/參考序列的資料集，目前官網有提到以下幾種:\nStructural variants: Currently available for HG002 on GRCh37 and in Challenging Medically Relevant Gene benchmark below\nSmall variants in more difficult regions: v4.2.1 is available for all 7 GIAB samples on GRCh37 and GRCh38 (manuscript).\nMHC: Included in v4.2.1 small variant benchmark for HG001-HG007 (Manuscript describing MHC benchmark)\n">
+<title>生資系列：確校資料集 Benchmarking truth set</title>
+
+<link rel='canonical' href='https://pxchen110.github.io/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97%E7%A2%BA%E6%A0%A1%E8%B3%87%E6%96%99%E9%9B%86-benchmarking-truth-set/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="生資系列：確校資料集 Benchmarking truth set">
+<meta property='og:description' content="當團隊開發一套新工具，要如何評估工具的準確度?這時需要一組可信度高的正確資料集來協助衡量(benhcmark)工具表現，以下介紹在人類基因體常用的資料集來源。\nGIAB Genome In A Bottle Consotrium 由美國國家標準與技術研究所 (NIST) 主持的計畫，主要提供人類基因體相關的標準品與正確資料集(truth set):\n標準品主要從NIGMS Human Genetic Cell Repository挑選cell line 來產生，共有7個樣本(HG001-HG007)，標準品的編號和族群、家族關係等整理如下表:\n(table collected from Coriell Institute for medical research)\n製作正確資料集首先需要不同定序平台與偵測工具的檔案來源、在生資分析上也需要做好品質篩選(QC)、變異的比對合併(merging)以及基因型計算(genotyping)過程可說耗費精力。GIAB不僅提供多個標準品的正確資料集，也致力於提供不同種變異類型/參考序列的資料集，目前官網有提到以下幾種:\nStructural variants: Currently available for HG002 on GRCh37 and in Challenging Medically Relevant Gene benchmark below\nSmall variants in more difficult regions: v4.2.1 is available for all 7 GIAB samples on GRCh37 and GRCh38 (manuscript).\nMHC: Included in v4.2.1 small variant benchmark for HG001-HG007 (Manuscript describing MHC benchmark)\n">
+<meta property='og:url' content='https://pxchen110.github.io/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97%E7%A2%BA%E6%A0%A1%E8%B3%87%E6%96%99%E9%9B%86-benchmarking-truth-set/'>
+<meta property='og:site_name' content='Xuan&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Bioinformatics' /><meta property='article:tag' content='Database' /><meta property='article:published_time' content='2024-06-06T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-06-06T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/bioinfo-benchmarking/20240606_img0.png' />
+<meta name="twitter:title" content="生資系列：確校資料集 Benchmarking truth set">
+<meta name="twitter:description" content="當團隊開發一套新工具，要如何評估工具的準確度?這時需要一組可信度高的正確資料集來協助衡量(benhcmark)工具表現，以下介紹在人類基因體常用的資料集來源。\nGIAB Genome In A Bottle Consotrium 由美國國家標準與技術研究所 (NIST) 主持的計畫，主要提供人類基因體相關的標準品與正確資料集(truth set):\n標準品主要從NIGMS Human Genetic Cell Repository挑選cell line 來產生，共有7個樣本(HG001-HG007)，標準品的編號和族群、家族關係等整理如下表:\n(table collected from Coriell Institute for medical research)\n製作正確資料集首先需要不同定序平台與偵測工具的檔案來源、在生資分析上也需要做好品質篩選(QC)、變異的比對合併(merging)以及基因型計算(genotyping)過程可說耗費精力。GIAB不僅提供多個標準品的正確資料集，也致力於提供不同種變異類型/參考序列的資料集，目前官網有提到以下幾種:\nStructural variants: Currently available for HG002 on GRCh37 and in Challenging Medically Relevant Gene benchmark below\nSmall variants in more difficult regions: v4.2.1 is available for all 7 GIAB samples on GRCh37 and GRCh38 (manuscript).\nMHC: Included in v4.2.1 small variant benchmark for HG001-HG007 (Manuscript describing MHC benchmark)\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/post/bioinfo-benchmarking/20240606_img0.png' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/profile_hu_d0d4f9ff9a7faeba.jpg" width="300"
+                            height="299" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Xuan&#39;s Blog</a></h1>
+            <h2 class="site-description">長大以後就是小瑄</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/pxchen110'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#giab">GIAB</a>
+      <ol>
+        <li><a href="#資料下載">資料下載</a></li>
+      </ol>
+    </li>
+    <li><a href="#somatic-truth-set">Somatic truth set</a></li>
+    <li><a href="#討論">討論</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97%E7%A2%BA%E6%A0%A1%E8%B3%87%E6%96%99%E9%9B%86-benchmarking-truth-set/">
+                
+                    <img src="/post/bioinfo-benchmarking/20240606_img0.png" loading="lazy" alt="Featured image of post 生資系列：確校資料集 Benchmarking truth set" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/bioinformatics/" >
+                Bioinformatics
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97%E7%A2%BA%E6%A0%A1%E8%B3%87%E6%96%99%E9%9B%86-benchmarking-truth-set/">生資系列：確校資料集 Benchmarking truth set</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jun 06, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>當團隊開發一套新工具，要如何評估工具的準確度?這時需要一組可信度高的正確資料集來協助衡量(benhcmark)工具表現，以下介紹在人類基因體常用的資料集來源。</p>
+<!-- more -->
+<!-- toc -->
+<h2 id="giab">GIAB
+</h2><p><a class="link" href="https://www.nist.gov/programs-projects/genome-bottle"  target="_blank" rel="noopener"
+    >Genome In A Bottle Consotrium</a> 由美國國家標準與技術研究所 (NIST) 主持的計畫，主要提供人類基因體相關的標準品與正確資料集(truth set):</p>
+<p>標準品主要從NIGMS Human Genetic Cell Repository挑選cell line 來產生，共有7個樣本(HG001-HG007)，標準品的編號和族群、家族關係等整理如下表:</p>
+<img src="/post/bioinfo-benchmarking/20240606_img1.png"  width="600">
+<p>(table collected from <a class="link" href="https://www.coriell.org/1/NIGMS/Collections/NIST-Reference-Materials"  target="_blank" rel="noopener"
+    >Coriell Institute for medical research</a>)</p>
+<p>製作正確資料集首先需要不同定序平台與偵測工具的檔案來源、在生資分析上也需要做好品質篩選(QC)、變異的比對合併(merging)以及基因型計算(genotyping)過程可說耗費精力。GIAB不僅提供多個標準品的正確資料集，也致力於提供不同種變異類型/參考序列的資料集，目前官網有提到以下幾種:</p>
+<blockquote>
+<p><strong>Structural variants</strong>: Currently available for HG002 on GRCh37 and in Challenging Medically Relevant Gene benchmark below</p>
+<p><strong>Small variants</strong> in more difficult regions: v4.2.1 is available for all 7 GIAB samples on GRCh37 and GRCh38 (manuscript).</p>
+<p><strong>MHC</strong>: Included in v4.2.1 small variant benchmark for HG001-HG007 (Manuscript describing MHC benchmark)</p>
+<p>273 Challenging Medically Relevant Genes small variant and SV benchmarks in HG002 and Preliminary benchmark for T2T-CHM13v1.0</p>
+<p>v1.0 TR benchmark for HG002 indels and SVs &gt;=5bp in <strong>tandem repeats</strong> on GRCh38 (preprint)</p>
+<p>v1.0 XY benchmark for HG002 small variants in <strong>chromosomes X and Y</strong> on GRCh38 (preprint)</p></blockquote>
+<p>GIAB團隊以令人驚訝的速度前進，久沒關注竟然有針對tandem repeat跟性染色體的truth set，目前僅先釋出資料集給研究者，論文似乎還在preprint階段</p>
+<h3 id="資料下載">資料下載
+</h3><p>如果想要truth set，可以直接從ftp網站找檔案下載使用: <a class="link" href="https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/"  target="_blank" rel="noopener"
+    >https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/</a>
+或是去 GitHub 查看感興趣的標準品目前有沒有對應的 truth set: <a class="link" href="https://github.com/genome-in-a-bottle/giab_latest_release"  target="_blank" rel="noopener"
+    >https://github.com/genome-in-a-bottle/giab_latest_release</a>
+兩個路徑都行，<del>反正最後都會引導到相同的地方</del></p>
+<p>實際找個HG002 SNV/indel GRCh38 truth set來看，透過層層資料夾點選，最終找到目標VCF檔:</p>
+<img src="/post/bioinfo-benchmarking/20240606_img2.png"  width="600">
+<p>如果想要看開源的標準品fastq, bam 等檔案，以拿來當作測試工具的input，可以至以下網站查詢: <a class="link" href="https://github.com/genome-in-a-bottle/giab_data_indexes"  target="_blank" rel="noopener"
+    >https://github.com/genome-in-a-bottle/giab_data_indexes</a></p>
+<p>網站也是先依族群分標準品，然後分定序平台和檔案類型:</p>
+<img src="/post/bioinfo-benchmarking/20240606_img3.png"  width="600">
+<h2 id="somatic-truth-set">Somatic truth set
+</h2><p>上述可能針對human germline variant 為主，而想做somatic caller benchmarking 的話該如何?最近找到<a class="link" href="https://www.biostars.org/p/9558720/"  target="_blank" rel="noopener"
+    >一個Biostar的討論</a>，裡面有提到兩篇釋出somatic truth set的文章，一個是WGS, 一個針對panel，最近準備來讀:</p>
+<blockquote>
+<p>Fang, L.T., Zhu, B., Zhao, Y. et al. Establishing community reference samples, data and call sets for benchmarking cancer mutation detection using whole-genome sequencing. Nat Biotechnol 39, 1151–1160 (2021). <a class="link" href="https://doi.org/10.1038/s41587-021-00993-6"  target="_blank" rel="noopener"
+    >https://doi.org/10.1038/s41587-021-00993-6</a></p></blockquote>
+<blockquote>
+<p>Jones, W., Gong, B., Novoradovskaya, N. et al. A verified genomic reference sample for assessing performance of cancer panels detecting small variants of low allele frequency. Genome Biol 22, 111 (2021). <a class="link" href="https://doi.org/10.1186/s13059-021-02316-z"  target="_blank" rel="noopener"
+    >https://doi.org/10.1186/s13059-021-02316-z</a></p></blockquote>
+<h2 id="討論">討論
+</h2><p>過去在沒有資料及整合釋出前，會使用模擬資訊來作為正確答案；之後可能會使用同時具有WGS, WES等不同定序結果的樣本，透過不同層級的證據來驗證變異真實存在，或是使用sanger sequencing等實驗做驗證，但缺點為無法一次比較出結果，且驗證樣本的品質等因素也會影響評估結果。</p>
+<p>若對truth set 流變和其他團隊製作的truth set感興趣的話，可閱讀2023年這篇 review paper:</p>
+<blockquote>
+<p>Majidian, S., Agustinho, D.P., Chin, CS. et al. Genomic variant benchmark: if you cannot measure it, you cannot improve it. Genome Biol 24, 221 (2023). <a class="link" href="https://doi.org/10.1186/s13059-023-03061-1"  target="_blank" rel="noopener"
+    >https://doi.org/10.1186/s13059-023-03061-1</a></p></blockquote>
+<p>文章的corresonding author Fritz J. Sedlazeck 和 Medhat Mahmoud 都是 GIAB 的團隊領導，也參與美國許多定序計畫如All of US, T2T consortium 等</p>
+<p>不過雖然說是truth set，其製作過程也是將不同平台與工具偵測的結果經由比對，篩選留下的consensus cell-set，若未來隨著定序技術進步，如PacBio, Nanopore等long-read定序資料占比提高，一定會有更多位點被偵測到，或是篩掉某些位點；另外不同參考序列的取捨，也會影響留在truth set的位點資訊，如從GRCh37 truth set 經由座標轉換(liftover)至 GRCh38 後，拿來benchmark GRCh38 detected test set 就會有一些潛在無法比對的區域，導致false positive 數量增加。</p>
+<p>而有正確解答和代測檔案，就可以找做benchmarking的工具了，如 snv/indel比對的hap.py等，有機會可以寫一篇來介紹。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/bioinformatics/">Bioinformatics</a>
+        
+            <a href="/tags/database/">Database</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-gnomad-v4/20240523_img1.png" loading="lazy" data-key="" data-hash="/post/bioinfo-gnomad-v4/20240523_img1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列： gnomAD v3 database 介紹</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-gnomad-v4/20240523_img1.png" loading="lazy" data-key="" data-hash="/post/bioinfo-gnomad-v4/20240523_img1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列： gnomAD v3 database 介紹</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-all-of-us-research-program-%E4%BB%8B%E7%B4%B9/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-allofus/20240509_img1.jpg" loading="lazy" data-key="" data-hash="/post/bioinfo-allofus/20240509_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列： All of US research program 介紹</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "pxchen110-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 pxchen
+
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

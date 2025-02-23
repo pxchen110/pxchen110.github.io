@@ -7,7 +7,64 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>en</language>
         <copyright>pxchen</copyright>
-        <lastBuildDate>Thu, 23 May 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://pxchen110.github.io/tags/database/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 06 Jun 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://pxchen110.github.io/tags/database/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>生資系列：確校資料集 Benchmarking truth set</title>
+        <link>https://pxchen110.github.io/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97%E7%A2%BA%E6%A0%A1%E8%B3%87%E6%96%99%E9%9B%86-benchmarking-truth-set/</link>
+        <pubDate>Thu, 06 Jun 2024 00:00:00 +0000</pubDate>
+        
+        <guid>https://pxchen110.github.io/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97%E7%A2%BA%E6%A0%A1%E8%B3%87%E6%96%99%E9%9B%86-benchmarking-truth-set/</guid>
+        <description>&lt;img src="https://pxchen110.github.io/post/bioinfo-benchmarking/20240606_img0.png" alt="Featured image of post 生資系列：確校資料集 Benchmarking truth set" /&gt;&lt;p&gt;當團隊開發一套新工具，要如何評估工具的準確度?這時需要一組可信度高的正確資料集來協助衡量(benhcmark)工具表現，以下介紹在人類基因體常用的資料集來源。&lt;/p&gt;
+&lt;!-- more --&gt;
+&lt;!-- toc --&gt;
+&lt;h2 id=&#34;giab&#34;&gt;GIAB
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.nist.gov/programs-projects/genome-bottle&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Genome In A Bottle Consotrium&lt;/a&gt; 由美國國家標準與技術研究所 (NIST) 主持的計畫，主要提供人類基因體相關的標準品與正確資料集(truth set):&lt;/p&gt;
+&lt;p&gt;標準品主要從NIGMS Human Genetic Cell Repository挑選cell line 來產生，共有7個樣本(HG001-HG007)，標準品的編號和族群、家族關係等整理如下表:&lt;/p&gt;
+&lt;img src=&#34;https://pxchen110.github.io/post/bioinfo-benchmarking/20240606_img1.png&#34;  width=&#34;600&#34;&gt;
+&lt;p&gt;(table collected from &lt;a class=&#34;link&#34; href=&#34;https://www.coriell.org/1/NIGMS/Collections/NIST-Reference-Materials&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Coriell Institute for medical research&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;製作正確資料集首先需要不同定序平台與偵測工具的檔案來源、在生資分析上也需要做好品質篩選(QC)、變異的比對合併(merging)以及基因型計算(genotyping)過程可說耗費精力。GIAB不僅提供多個標準品的正確資料集，也致力於提供不同種變異類型/參考序列的資料集，目前官網有提到以下幾種:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Structural variants&lt;/strong&gt;: Currently available for HG002 on GRCh37 and in Challenging Medically Relevant Gene benchmark below&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Small variants&lt;/strong&gt; in more difficult regions: v4.2.1 is available for all 7 GIAB samples on GRCh37 and GRCh38 (manuscript).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;MHC&lt;/strong&gt;: Included in v4.2.1 small variant benchmark for HG001-HG007 (Manuscript describing MHC benchmark)&lt;/p&gt;
+&lt;p&gt;273 Challenging Medically Relevant Genes small variant and SV benchmarks in HG002 and Preliminary benchmark for T2T-CHM13v1.0&lt;/p&gt;
+&lt;p&gt;v1.0 TR benchmark for HG002 indels and SVs &amp;gt;=5bp in &lt;strong&gt;tandem repeats&lt;/strong&gt; on GRCh38 (preprint)&lt;/p&gt;
+&lt;p&gt;v1.0 XY benchmark for HG002 small variants in &lt;strong&gt;chromosomes X and Y&lt;/strong&gt; on GRCh38 (preprint)&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;GIAB團隊以令人驚訝的速度前進，久沒關注竟然有針對tandem repeat跟性染色體的truth set，目前僅先釋出資料集給研究者，論文似乎還在preprint階段&lt;/p&gt;
+&lt;h3 id=&#34;資料下載&#34;&gt;資料下載
+&lt;/h3&gt;&lt;p&gt;如果想要truth set，可以直接從ftp網站找檔案下載使用: &lt;a class=&#34;link&#34; href=&#34;https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/&lt;/a&gt;
+或是去 GitHub 查看感興趣的標準品目前有沒有對應的 truth set: &lt;a class=&#34;link&#34; href=&#34;https://github.com/genome-in-a-bottle/giab_latest_release&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/genome-in-a-bottle/giab_latest_release&lt;/a&gt;
+兩個路徑都行，&lt;del&gt;反正最後都會引導到相同的地方&lt;/del&gt;&lt;/p&gt;
+&lt;p&gt;實際找個HG002 SNV/indel GRCh38 truth set來看，透過層層資料夾點選，最終找到目標VCF檔:&lt;/p&gt;
+&lt;img src=&#34;https://pxchen110.github.io/post/bioinfo-benchmarking/20240606_img2.png&#34;  width=&#34;600&#34;&gt;
+&lt;p&gt;如果想要看開源的標準品fastq, bam 等檔案，以拿來當作測試工具的input，可以至以下網站查詢: &lt;a class=&#34;link&#34; href=&#34;https://github.com/genome-in-a-bottle/giab_data_indexes&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/genome-in-a-bottle/giab_data_indexes&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;網站也是先依族群分標準品，然後分定序平台和檔案類型:&lt;/p&gt;
+&lt;img src=&#34;https://pxchen110.github.io/post/bioinfo-benchmarking/20240606_img3.png&#34;  width=&#34;600&#34;&gt;
+&lt;h2 id=&#34;somatic-truth-set&#34;&gt;Somatic truth set
+&lt;/h2&gt;&lt;p&gt;上述可能針對human germline variant 為主，而想做somatic caller benchmarking 的話該如何?最近找到&lt;a class=&#34;link&#34; href=&#34;https://www.biostars.org/p/9558720/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;一個Biostar的討論&lt;/a&gt;，裡面有提到兩篇釋出somatic truth set的文章，一個是WGS, 一個針對panel，最近準備來讀:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Fang, L.T., Zhu, B., Zhao, Y. et al. Establishing community reference samples, data and call sets for benchmarking cancer mutation detection using whole-genome sequencing. Nat Biotechnol 39, 1151–1160 (2021). &lt;a class=&#34;link&#34; href=&#34;https://doi.org/10.1038/s41587-021-00993-6&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://doi.org/10.1038/s41587-021-00993-6&lt;/a&gt;&lt;/p&gt;&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Jones, W., Gong, B., Novoradovskaya, N. et al. A verified genomic reference sample for assessing performance of cancer panels detecting small variants of low allele frequency. Genome Biol 22, 111 (2021). &lt;a class=&#34;link&#34; href=&#34;https://doi.org/10.1186/s13059-021-02316-z&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://doi.org/10.1186/s13059-021-02316-z&lt;/a&gt;&lt;/p&gt;&lt;/blockquote&gt;
+&lt;h2 id=&#34;討論&#34;&gt;討論
+&lt;/h2&gt;&lt;p&gt;過去在沒有資料及整合釋出前，會使用模擬資訊來作為正確答案；之後可能會使用同時具有WGS, WES等不同定序結果的樣本，透過不同層級的證據來驗證變異真實存在，或是使用sanger sequencing等實驗做驗證，但缺點為無法一次比較出結果，且驗證樣本的品質等因素也會影響評估結果。&lt;/p&gt;
+&lt;p&gt;若對truth set 流變和其他團隊製作的truth set感興趣的話，可閱讀2023年這篇 review paper:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Majidian, S., Agustinho, D.P., Chin, CS. et al. Genomic variant benchmark: if you cannot measure it, you cannot improve it. Genome Biol 24, 221 (2023). &lt;a class=&#34;link&#34; href=&#34;https://doi.org/10.1186/s13059-023-03061-1&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://doi.org/10.1186/s13059-023-03061-1&lt;/a&gt;&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;文章的corresonding author Fritz J. Sedlazeck 和 Medhat Mahmoud 都是 GIAB 的團隊領導，也參與美國許多定序計畫如All of US, T2T consortium 等&lt;/p&gt;
+&lt;p&gt;不過雖然說是truth set，其製作過程也是將不同平台與工具偵測的結果經由比對，篩選留下的consensus cell-set，若未來隨著定序技術進步，如PacBio, Nanopore等long-read定序資料占比提高，一定會有更多位點被偵測到，或是篩掉某些位點；另外不同參考序列的取捨，也會影響留在truth set的位點資訊，如從GRCh37 truth set 經由座標轉換(liftover)至 GRCh38 後，拿來benchmark GRCh38 detected test set 就會有一些潛在無法比對的區域，導致false positive 數量增加。&lt;/p&gt;
+&lt;p&gt;而有正確解答和代測檔案，就可以找做benchmarking的工具了，如 snv/indel比對的hap.py等，有機會可以寫一篇來介紹。&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>生資系列： gnomAD v3 database 介紹</title>
         <link>https://pxchen110.github.io/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/</link>
         <pubDate>Thu, 23 May 2024 00:00:00 +0000</pubDate>
