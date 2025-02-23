@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Background photo by Rubaitul Azad on Unsplash\n過去曾介紹 xlsxwriter 套件將資料寫入輸出成 .xlsx 檔，若想讀取 .xlsx 內容、或想編輯已存在的檔案，推薦另一套件 openpyxl 套件。本文將介紹 python openpyxl 套件的常用函數、基本用法，並帶入範例說明。\n下載與引入套件 可選擇用 pip 或 conda install 安裝套件 注意：推薦用 pip 安裝，使用 conda 安裝容易出現 partially initialized module的抱錯\n1 2 3 4 5 pip install openpyxl conda install conda-forge::openpyxl import openpyxl from openpyxl import Workbook 開啟 excel 檔案 和 xlsxwriter 一樣， openpyxl 將整份 excel 檔案稱為 Workbook，內部的工作表稱為 worksheet，而每個格子稱為 cell。\n">
+<title>Python系列： 利用 openpxyl 操作 excel</title>
+
+<link rel='canonical' href='https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97-%E5%88%A9%E7%94%A8-openpxyl-%E6%93%8D%E4%BD%9C-excel/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Python系列： 利用 openpxyl 操作 excel">
+<meta property='og:description' content="Background photo by Rubaitul Azad on Unsplash\n過去曾介紹 xlsxwriter 套件將資料寫入輸出成 .xlsx 檔，若想讀取 .xlsx 內容、或想編輯已存在的檔案，推薦另一套件 openpyxl 套件。本文將介紹 python openpyxl 套件的常用函數、基本用法，並帶入範例說明。\n下載與引入套件 可選擇用 pip 或 conda install 安裝套件 注意：推薦用 pip 安裝，使用 conda 安裝容易出現 partially initialized module的抱錯\n1 2 3 4 5 pip install openpyxl conda install conda-forge::openpyxl import openpyxl from openpyxl import Workbook 開啟 excel 檔案 和 xlsxwriter 一樣， openpyxl 將整份 excel 檔案稱為 Workbook，內部的工作表稱為 worksheet，而每個格子稱為 cell。\n">
+<meta property='og:url' content='https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97-%E5%88%A9%E7%94%A8-openpxyl-%E6%93%8D%E4%BD%9C-excel/'>
+<meta property='og:site_name' content='Xuan&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2024-07-24T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-07-24T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/python-openpxyl/20240724_img1.jpg' />
+<meta name="twitter:title" content="Python系列： 利用 openpxyl 操作 excel">
+<meta name="twitter:description" content="Background photo by Rubaitul Azad on Unsplash\n過去曾介紹 xlsxwriter 套件將資料寫入輸出成 .xlsx 檔，若想讀取 .xlsx 內容、或想編輯已存在的檔案，推薦另一套件 openpyxl 套件。本文將介紹 python openpyxl 套件的常用函數、基本用法，並帶入範例說明。\n下載與引入套件 可選擇用 pip 或 conda install 安裝套件 注意：推薦用 pip 安裝，使用 conda 安裝容易出現 partially initialized module的抱錯\n1 2 3 4 5 pip install openpyxl conda install conda-forge::openpyxl import openpyxl from openpyxl import Workbook 開啟 excel 檔案 和 xlsxwriter 一樣， openpyxl 將整份 excel 檔案稱為 Workbook，內部的工作表稱為 worksheet，而每個格子稱為 cell。\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/post/python-openpxyl/20240724_img1.jpg' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/profile_hu_d0d4f9ff9a7faeba.jpg" width="300"
+                            height="299" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Xuan&#39;s Blog</a></h1>
+            <h2 class="site-description">長大以後就是小瑄</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/pxchen110'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#下載與引入套件">下載與引入套件</a></li>
+    <li><a href="#開啟-excel-檔案">開啟 excel 檔案</a></li>
+    <li><a href="#創建--寫入excel">創建 / 寫入excel</a>
+      <ol>
+        <li><a href="#實際例子">實際例子</a></li>
+      </ol>
+    </li>
+    <li><a href="#讀取-excel">讀取 excel</a></li>
+    <li><a href="#操作-cell-內容">操作 cell 內容</a>
+      <ol>
+        <li><a href="#實際例子-1">實際例子</a></li>
+      </ol>
+    </li>
+    <li><a href="#添加樣式">添加樣式</a></li>
+    <li><a href="#references">References</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/python%E7%B3%BB%E5%88%97-%E5%88%A9%E7%94%A8-openpxyl-%E6%93%8D%E4%BD%9C-excel/">
+                
+                    <img src="/post/python-openpxyl/20240724_img1.jpg" loading="lazy" alt="Featured image of post Python系列： 利用 openpxyl 操作 excel" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/python/" >
+                Python
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/python%E7%B3%BB%E5%88%97-%E5%88%A9%E7%94%A8-openpxyl-%E6%93%8D%E4%BD%9C-excel/">Python系列： 利用 openpxyl 操作 excel</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jul 24, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>Background photo by <a class="link" href="https://unsplash.com/@rubaitulazad"  target="_blank" rel="noopener"
+    >Rubaitul Azad</a> on <a class="link" href="https://unsplash.com/"  target="_blank" rel="noopener"
+    >Unsplash</a></p>
+<p>過去曾介紹 <code>xlsxwriter</code> 套件將資料寫入輸出成 <code>.xlsx</code> 檔，若想讀取 <code>.xlsx</code> 內容、或想編輯已存在的檔案，推薦另一套件 <code>openpyxl</code> 套件。本文將介紹 python <code>openpyxl</code> 套件的常用函數、基本用法，並帶入範例說明。</p>
+<!-- more -->
+<!-- toc -->
+<h2 id="下載與引入套件">下載與引入套件
+</h2><p>可選擇用 <code>pip</code> 或 <code>conda install</code> 安裝套件
+<strong>注意：推薦用 <code>pip</code> 安裝，使用 <code>conda</code> 安裝容易出現 <code>partially initialized module</code>的抱錯</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">pip install openpyxl
+</span></span><span class="line"><span class="cl">conda install conda-forge::openpyxl
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">import openpyxl
+</span></span><span class="line"><span class="cl">from openpyxl import Workbook
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="開啟-excel-檔案">開啟 excel 檔案
+</h2><p>和 <code>xlsxwriter</code> 一樣， <code>openpyxl</code> 將<strong>整份 excel 檔案稱為 Workbook</strong>，內部的<strong>工作表稱為 worksheet</strong>，而每個<strong>格子稱為 cell</strong>。</p>
+<p><code>openpyxl</code> 分成創建和讀取兩種模式</p>
+<h2 id="創建--寫入excel">創建 / 寫入excel
+</h2><p>以 <code>Workbook()</code> 創立表格文件，並透過 <code>active</code> 讀取第一份工作表 (active default:0)</p>
+<p>若想添加工作表，可用<code>.create_sheet(&quot;sheet_name&quot;,position)</code>來命名+決定放置順序</p>
+<p>可透過 <code>.sheetnames</code> 檢視當前所有工作表名稱，輸出為list</p>
+<p>完成操作後以<code>.save('output.xlsx')</code> 把 workbook 輸出成檔案，<strong>注意若系統有相同檔名的文件，openpyxl 會直接覆寫掉</strong>，此外若檔名結尾非.xlsx等有效格式，可能會造成檔案輸出後無法正常開啟的狀況</p>
+<h3 id="實際例子">實際例子
+</h3><p>開啟新workbook以及名為 test 的工作表，並指定在test內的A1寫入&rsquo;Hi&rsquo;字串輸出</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">import openpyxl
+</span></span><span class="line"><span class="cl">from openpyxl import Workbook
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## create new workbook
+</span></span><span class="line"><span class="cl">wb = Workbook()
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## create new worksheet other than default(name: Sheet)
+</span></span><span class="line"><span class="cl">wb.create_sheet(&#39;test&#39;)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## list current worksheet names
+</span></span><span class="line"><span class="cl">print(wb.sheetnames)
+</span></span><span class="line"><span class="cl">## [&#39;Sheet&#39;, &#39;test&#39;]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## write string into cell
+</span></span><span class="line"><span class="cl">sheet = wb[&#39;test&#39;]
+</span></span><span class="line"><span class="cl">sheet[&#39;A1&#39;] = &#39;Hi&#39;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## save(overwrite) as xlsx file
+</span></span><span class="line"><span class="cl">wb.save(&#39;test.xlsx&#39;)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>結果如下圖：
+<img src="/post/python-openpxyl/20240724_img1.png"  width="600"></p>
+<h2 id="讀取-excel">讀取 excel
+</h2><p>以 <code>openpyxl.load_workbook()</code> 來讀取特定檔案，若檔案內有多個工作表，可用工作表名稱指定(default為操作第一份工作表)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">wb</span> <span class="o">=</span> <span class="n">openpyxl</span><span class="o">.</span><span class="n">load_workbook</span><span class="p">(</span><span class="s1">&#39;my_file.xlsx&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">sheet</span> <span class="o">=</span> <span class="n">wb</span><span class="p">[</span><span class="s1">&#39;specific_sheetname&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">## 若想直接用第一份 worksheet</span>
+</span></span><span class="line"><span class="cl"><span class="n">sheet</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">active</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>load_workbook()</code> 有許多參數:</p>
+<ul>
+<li><code>data_only</code> 遇到公式時要印出公式本身(default)還是計算的結果</li>
+<li><code>keep_vba</code> 是否保留設定的儲存格事件(<a class="link" href="https://blog.gtwang.org/programming/excel-vba-events/"  target="_blank" rel="noopener"
+    >Visual Basic elements</a>) 預設為不保留，若選擇保留，也不能透過 openpyxl 編輯事件</li>
+<li><code>read-only</code> 以讀取模式開啟，會減少記憶體需求，且不支援讀取某些類型(表格、圖片)</li>
+<li><code>rich_text</code> 不否保留預設的樣式設定(default)</li>
+<li><code>keep_links</code> 保留超連結設定</li>
+</ul>
+<h2 id="操作-cell-內容">操作 cell 內容
+</h2><p>指定cell的方式也是以 row + column index (<strong>start from 1</strong>)或 cell index (如:A1)等方式，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">strings = sheet[&#39;A1&#39;] 
+</span></span><span class="line"><span class="cl">## the same as
+</span></span><span class="line"><span class="cl">strings = sheet.cell(row=1, column=1)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>若想看cell內容要加 <code>.value</code> 來將object轉換成內文<code>print(strings.value)</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">strings = sheet[&#39;A1&#39;]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">print(strings)
+</span></span><span class="line"><span class="cl">## &lt;Cell &#39;test&#39;.A1&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">print(strings.value)
+</span></span><span class="line"><span class="cl">## Amy
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>當想看特定範圍的格子，可用 <code>iter_rows()</code> 或是 <code>[index1:index2]</code> 來操作，並搭配迴圈觸及到每個cell內容</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">for row in worksheet.iter_rows(min_row=1, max_col=3, max_row=2):
+</span></span><span class="line"><span class="cl">   for cell in row:
+</span></span><span class="line"><span class="cl">       print(cell)
+</span></span><span class="line"><span class="cl">## print (1,1), (1,2), (1,3), (2,1), (2,2), and (2,3)
+</span></span><span class="line"><span class="cl">## same as A1, B1, C1, A2, B2, C2
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">multi_cell = worksheet[&#39;B10&#39;:&#39;C11&#39;]
+</span></span><span class="line"><span class="cl">#print(multi_cell)
+</span></span><span class="line"><span class="cl">for row in multi_cell:
+</span></span><span class="line"><span class="cl">    print(row[0].value, row[1].value) 
+</span></span><span class="line"><span class="cl">## print B10, C10 and then B11, C11
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="實際例子-1">實際例子
+</h3><p>有份 test.xlsx 紀錄營隊的資訊，今天想要讀取excel並將隊員資訊印出</p>
+<p>test.xlsx 的內容</p>
+<img src="/post/python-openpxyl/20240724_img2.png"  width="600">
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">wb</span> <span class="o">=</span> <span class="n">openpyxl</span><span class="o">.</span><span class="n">load_workbook</span><span class="p">(</span><span class="s1">&#39;test.xlsx&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">sheet</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">active</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">sheet</span><span class="p">[</span><span class="s1">&#39;A1:C13&#39;</span><span class="p">]:</span>  
+</span></span><span class="line"><span class="cl"><span class="c1">## == sheet.iter_rows(min_col=1, min_row=1):</span>
+</span></span><span class="line"><span class="cl">   <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">      <span class="nb">print</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="添加樣式">添加樣式
+</h2><p>引入相關函數</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>Font</code> 調整文字樣式</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">font = Font(name=&#39;Calibri&#39;, ## 字體名稱
+</span></span><span class="line"><span class="cl">                size=11,    ## 大小
+</span></span><span class="line"><span class="cl">                bold=False, ## 粗體
+</span></span><span class="line"><span class="cl">                italic=False, ## 斜體
+</span></span><span class="line"><span class="cl">                vertAlign=None, ## 垂直置中
+</span></span><span class="line"><span class="cl">                underline=&#39;none&#39;, ## 底線
+</span></span><span class="line"><span class="cl">                strike=False,      
+</span></span><span class="line"><span class="cl">                color=&#39;FF000000&#39;)  ## 顏色
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>PatternFill</code> 調整cell格子樣式</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">fill = PatternFill(fill_type=None,
+</span></span><span class="line"><span class="cl">                start_color=&#39;FFFFFFFF&#39;,
+</span></span><span class="line"><span class="cl">                end_color=&#39;FF000000&#39;)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>Border</code> 調整邊框邊界樣式</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">border = Border(left=Side(border_style=None, ## 是否加框線
+</span></span><span class="line"><span class="cl">                          color=&#39;FF000000&#39;), ## 框線顏色
+</span></span><span class="line"><span class="cl">                right=Side(border_style=None,
+</span></span><span class="line"><span class="cl">                           color=&#39;FF000000&#39;),
+</span></span><span class="line"><span class="cl">                top=Side(border_style=None,
+</span></span><span class="line"><span class="cl">                         color=&#39;FF000000&#39;),
+</span></span><span class="line"><span class="cl">                bottom=Side(border_style=None,
+</span></span><span class="line"><span class="cl">                            color=&#39;FF000000&#39;),
+</span></span><span class="line"><span class="cl">                diagonal=Side(border_style=None,
+</span></span><span class="line"><span class="cl">                              color=&#39;FF000000&#39;),
+</span></span><span class="line"><span class="cl">                diagonal_direction=0,
+</span></span><span class="line"><span class="cl">                outline=Side(border_style=None,
+</span></span><span class="line"><span class="cl">                             color=&#39;FF000000&#39;),
+</span></span><span class="line"><span class="cl">                vertical=Side(border_style=None,
+</span></span><span class="line"><span class="cl">                              color=&#39;FF000000&#39;),
+</span></span><span class="line"><span class="cl">                horizontal=Side(border_style=None,
+</span></span><span class="line"><span class="cl">                               color=&#39;FF000000&#39;)
+</span></span><span class="line"><span class="cl">               )
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>Alignment</code> 調整格子內文對齊方式</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">alignment=Alignment(horizontal=&#39;general&#39;,
+</span></span><span class="line"><span class="cl">                    vertical=&#39;bottom&#39;,
+</span></span><span class="line"><span class="cl">                    text_rotation=0,
+</span></span><span class="line"><span class="cl">                    wrap_text=False,
+</span></span><span class="line"><span class="cl">                    shrink_to_fit=False,
+</span></span><span class="line"><span class="cl">                    indent=0)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>Protection</code> 容許編輯或保護模式</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">protection = Protection(locked=True,
+</span></span><span class="line"><span class="cl">                        hidden=False)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>設定好樣式後，使用 <code>.font</code> 套用至cell上</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ft = Font(size = 15, bold = True)
+</span></span><span class="line"><span class="cl">sheet[&#39;A1&#39;].font = ft
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## 也可以透過 .font 直接調整樣式
+</span></span><span class="line"><span class="cl">sheet[&#39;A1&#39;].font.italic = True
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>若想將樣式套用在整行或整欄，可先用<code>column_dimensions['A','B','C'...]</code> 和 <code>row_dimensions[1,2,3...]</code> 指定索引，接著以 <code>.font</code> 套用樣式</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ft = Font(size = 15, bold = True)
+</span></span><span class="line"><span class="cl">col = wb.row_dimensions[2]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">col.font = ft
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="references">References
+</h2><p><a class="link" href="https://openpyxl.readthedocs.io/en/stable/tutorial.html#playing-with-data"  target="_blank" rel="noopener"
+    >https://openpyxl.readthedocs.io/en/stable/tutorial.html#playing-with-data</a>
+<a class="link" href="https://stringfestanalytics.com/how-to-understand-the-difference-between-the-openpyxl-and-xlsxwriter-python-packages-for-excel/"  target="_blank" rel="noopener"
+    >https://stringfestanalytics.com/how-to-understand-the-difference-between-the-openpyxl-and-xlsxwriter-python-packages-for-excel/</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/python-%E7%B3%BB%E5%88%97-%E6%A8%A1%E7%B5%84module%E8%88%87%E5%A5%97%E4%BB%B6package%E6%92%B0%E5%AF%AB/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-module-package/20240807_img0.jpg" loading="lazy" data-key="" data-hash="/post/python-module-package/20240807_img0.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python 系列： 模組(module)與套件(package)撰寫</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97-itables-%E8%A3%BD%E4%BD%9C%E4%BA%92%E5%8B%95%E5%BC%8F%E8%A1%A8%E6%A0%BC/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-itables/20240802_img0.jpg" loading="lazy" data-key="" data-hash="/post/python-itables/20240802_img0.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列： itables 製作互動式表格</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97-%E5%88%A9%E7%94%A8-xlsxwriter-%E6%A8%A1%E7%B5%84%E8%BC%95%E9%AC%86%E8%A3%BD%E4%BD%9Cexcel/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-xlsxwriter/20240315_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-xlsxwriter/20240315_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列： 利用 xlsxwriter 模組輕鬆製作excel</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97%E4%BD%BF%E7%94%A8-os-%E6%88%90%E7%82%BA%E7%B3%BB%E7%B5%B1%E6%93%8D%E4%BD%9C%E5%A4%A7%E5%B8%AB/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-os/20240307_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-os/20240307_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列：使用 os 成為系統操作大師</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97subprocess%E6%A8%A1%E7%B5%84%E7%AE%A1%E7%90%86%E5%AD%90%E9%80%B2%E7%A8%8B/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-subprocess/20240222_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-subprocess/20240222_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列：subprocess模組管理子進程</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "pxchen110-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 pxchen
+
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

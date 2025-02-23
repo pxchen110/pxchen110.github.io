@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="NCBI 公開收錄物種基因資訊，找到目標序列後，可透過本文列出四種方法來下載使用。\n讓我們找個實際例子開始，下面是搜尋 Escherichia coli str. K-12 substr. MG1655 其中一個 assembly 的頁面\n圖一: 搜尋 Escherichia coli 其中一個 assembly 的頁面截圖\n紅線標示處為NCBI提供的下載管道，由左至右分別是:\nDirect Download Command line tools API URL FTP Direct Download 直接下載非常直觀，選擇想要的來源(RefSeq, GenBank)和格式(FASTA,GTF&hellip;)，就會獲得一個zip檔 但若序列檔案過大，或是還有二次傳輸(到server)的需求，可以考慮其他方法\n圖二: 直接下載的各種選項\nCommand line tools NCBI 自己有個好用的工具 NCBI Datasets Command line interface (CLI) tool reference，分為協助檔案格式轉換(dataformat)和查詢下載資料集(datasets)兩大類型 注意: NCBI回傳格式為JSON，才會需要dataformat協助轉成XML, metadata等其他格式\n工具安裝 工具安裝方式多元，可去NCBI官網挑選，以下使用conda安裝:\n1 2 3 4 5 6 ## create new env &amp; activate conda create -n ncbi_datasets conda activate ncbi_datasets ## install via conda conda install -c conda-forge ncbi-datasets-cli 完成後在cml輸入datasets 或 datafromat 測試有無 help info出現\n">
+<title>生資系列： 下載NCBI資料的方法</title>
+
+<link rel='canonical' href='https://pxchen110.github.io/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-%E4%B8%8B%E8%BC%89ncbi%E8%B3%87%E6%96%99%E7%9A%84%E6%96%B9%E6%B3%95/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="生資系列： 下載NCBI資料的方法">
+<meta property='og:description' content="NCBI 公開收錄物種基因資訊，找到目標序列後，可透過本文列出四種方法來下載使用。\n讓我們找個實際例子開始，下面是搜尋 Escherichia coli str. K-12 substr. MG1655 其中一個 assembly 的頁面\n圖一: 搜尋 Escherichia coli 其中一個 assembly 的頁面截圖\n紅線標示處為NCBI提供的下載管道，由左至右分別是:\nDirect Download Command line tools API URL FTP Direct Download 直接下載非常直觀，選擇想要的來源(RefSeq, GenBank)和格式(FASTA,GTF&hellip;)，就會獲得一個zip檔 但若序列檔案過大，或是還有二次傳輸(到server)的需求，可以考慮其他方法\n圖二: 直接下載的各種選項\nCommand line tools NCBI 自己有個好用的工具 NCBI Datasets Command line interface (CLI) tool reference，分為協助檔案格式轉換(dataformat)和查詢下載資料集(datasets)兩大類型 注意: NCBI回傳格式為JSON，才會需要dataformat協助轉成XML, metadata等其他格式\n工具安裝 工具安裝方式多元，可去NCBI官網挑選，以下使用conda安裝:\n1 2 3 4 5 6 ## create new env &amp; activate conda create -n ncbi_datasets conda activate ncbi_datasets ## install via conda conda install -c conda-forge ncbi-datasets-cli 完成後在cml輸入datasets 或 datafromat 測試有無 help info出現\n">
+<meta property='og:url' content='https://pxchen110.github.io/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-%E4%B8%8B%E8%BC%89ncbi%E8%B3%87%E6%96%99%E7%9A%84%E6%96%B9%E6%B3%95/'>
+<meta property='og:site_name' content='Xuan&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Bioinformatics' /><meta property='article:tag' content='Database' /><meta property='article:published_time' content='2024-08-29T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-08-29T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/bioinfo-ncbi/20240829_img1.png' />
+<meta name="twitter:title" content="生資系列： 下載NCBI資料的方法">
+<meta name="twitter:description" content="NCBI 公開收錄物種基因資訊，找到目標序列後，可透過本文列出四種方法來下載使用。\n讓我們找個實際例子開始，下面是搜尋 Escherichia coli str. K-12 substr. MG1655 其中一個 assembly 的頁面\n圖一: 搜尋 Escherichia coli 其中一個 assembly 的頁面截圖\n紅線標示處為NCBI提供的下載管道，由左至右分別是:\nDirect Download Command line tools API URL FTP Direct Download 直接下載非常直觀，選擇想要的來源(RefSeq, GenBank)和格式(FASTA,GTF&hellip;)，就會獲得一個zip檔 但若序列檔案過大，或是還有二次傳輸(到server)的需求，可以考慮其他方法\n圖二: 直接下載的各種選項\nCommand line tools NCBI 自己有個好用的工具 NCBI Datasets Command line interface (CLI) tool reference，分為協助檔案格式轉換(dataformat)和查詢下載資料集(datasets)兩大類型 注意: NCBI回傳格式為JSON，才會需要dataformat協助轉成XML, metadata等其他格式\n工具安裝 工具安裝方式多元，可去NCBI官網挑選，以下使用conda安裝:\n1 2 3 4 5 6 ## create new env &amp; activate conda create -n ncbi_datasets conda activate ncbi_datasets ## install via conda conda install -c conda-forge ncbi-datasets-cli 完成後在cml輸入datasets 或 datafromat 測試有無 help info出現\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/post/bioinfo-ncbi/20240829_img1.png' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/profile_hu_d0d4f9ff9a7faeba.jpg" width="300"
+                            height="299" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Xuan&#39;s Blog</a></h1>
+            <h2 class="site-description">長大以後就是小瑄</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/pxchen110'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#direct-download">Direct Download</a></li>
+    <li><a href="#command-line-tools">Command line tools</a>
+      <ol>
+        <li><a href="#工具安裝">工具安裝</a></li>
+        <li><a href="#datasets-summary">datasets summary</a></li>
+        <li><a href="#datasets-download">datasets download</a></li>
+      </ol>
+    </li>
+    <li><a href="#api-url">API URL</a>
+      <ol>
+        <li><a href="#使用-curl-下載">使用 curl 下載</a></li>
+        <li><a href="#使用-python-requests-下載">使用 python requests 下載</a></li>
+        <li><a href="#使用-rest-api">使用 REST API</a></li>
+      </ol>
+    </li>
+    <li><a href="#ftp">FTP</a></li>
+    <li><a href="#comments">Comments</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-%E4%B8%8B%E8%BC%89ncbi%E8%B3%87%E6%96%99%E7%9A%84%E6%96%B9%E6%B3%95/">
+                
+                    <img src="/post/bioinfo-ncbi/20240829_img1.png" loading="lazy" alt="Featured image of post 生資系列： 下載NCBI資料的方法" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/bioinformatics/" >
+                Bioinformatics
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-%E4%B8%8B%E8%BC%89ncbi%E8%B3%87%E6%96%99%E7%9A%84%E6%96%B9%E6%B3%95/">生資系列： 下載NCBI資料的方法</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 29, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>NCBI 公開收錄物種基因資訊，找到目標序列後，可透過本文列出四種方法來下載使用。</p>
+<!-- more -->
+<!-- toc -->
+<p>讓我們找個實際例子開始，下面是搜尋 <a class="link" href="https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000005845.2/"  target="_blank" rel="noopener"
+    >Escherichia coli str. K-12 substr. MG1655</a> 其中一個 assembly 的頁面</p>
+<img src="/post/bioinfo-ncbi/20240829_img2.png"  width="600">
+<p>圖一: 搜尋 Escherichia coli 其中一個 assembly 的頁面截圖</p>
+<p>紅線標示處為NCBI提供的下載管道，由左至右分別是:</p>
+<ul>
+<li>Direct Download</li>
+<li>Command line tools</li>
+<li>API URL</li>
+<li>FTP</li>
+</ul>
+<h2 id="direct-download">Direct Download
+</h2><p>直接下載非常直觀，選擇想要的來源(RefSeq, GenBank)和格式(FASTA,GTF&hellip;)，就會獲得一個zip檔
+但若序列檔案過大，或是還有二次傳輸(到server)的需求，可以考慮其他方法</p>
+<img src="/post/bioinfo-ncbi/20240829_img3.png"  width="600">
+<p>圖二: 直接下載的各種選項</p>
+<h2 id="command-line-tools">Command line tools
+</h2><p>NCBI 自己有個好用的工具 NCBI Datasets Command line interface (CLI) tool reference，分為協助檔案格式轉換(dataformat)和查詢下載資料集(datasets)兩大類型
+<strong>注意:</strong> NCBI回傳格式為JSON，才會需要<code>dataformat</code>協助轉成XML, metadata等其他格式</p>
+<h3 id="工具安裝">工具安裝
+</h3><p>工具安裝方式多元，可去<a class="link" href="https://www.ncbi.nlm.nih.gov/datasets/docs/v2/download-and-install/"  target="_blank" rel="noopener"
+    >NCBI官網挑選</a>，以下使用conda安裝:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">## create new env &amp; activate 
+</span></span><span class="line"><span class="cl">conda create -n ncbi_datasets
+</span></span><span class="line"><span class="cl">conda activate ncbi_datasets
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## install via conda
+</span></span><span class="line"><span class="cl">conda install -c conda-forge ncbi-datasets-cli
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>完成後在cml輸入<code>datasets</code> 或 <code>datafromat</code> 測試有無 help info出現</p>
+<p>datasets 基本功能有 <code>summary</code>、<code>download</code>、<code>rehydrate</code>、<code>completion</code></p>
+<h3 id="datasets-summary">datasets summary
+</h3><p>利用 序列ID(genome accession)、物種學名(taxon)、基因名稱或ID(gene gene_id / symbol) 等關鍵字來查詢資料庫現有資訊</p>
+<p>假設今天想查 <em><strong>TP53</strong></em> 在<strong>人類</strong>有什麼註解資訊:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">datasets summary gene symbol tp53 --taxon &#34;homo sapiens&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">##如果有一份基因列表，可以用 --inputfile 提供 txt 檔一次查詢
+</span></span><span class="line"><span class="cl">datasets summary gene symbol --inputfile symbol.txt --taxon &#34;homo sapiens&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>會回傳JSON字串，可以串python用 <code>json</code> 來整理取出資訊:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">    &#34;reports&#34;: [
+</span></span><span class="line"><span class="cl">        {
+</span></span><span class="line"><span class="cl">            &#34;gene&#34;: {
+</span></span><span class="line"><span class="cl">                &#34;annotations&#34;: [
+</span></span><span class="line"><span class="cl">                    {
+</span></span><span class="line"><span class="cl">                        &#34;annotation_name&#34;: &#34;GCF_000001405.40-RS_2023_10&#34;,
+</span></span><span class="line"><span class="cl">                        &#34;annotation_release_date&#34;: &#34;2023-10-02&#34;,
+</span></span><span class="line"><span class="cl">                        &#34;assembly_accession&#34;: &#34;GCF_000001405.40&#34;,
+</span></span><span class="line"><span class="cl">                        &#34;assembly_name&#34;: &#34;GRCh38.p14&#34;,
+</span></span><span class="line"><span class="cl">                        &#34;genomic_locations&#34;: [
+</span></span><span class="line"><span class="cl">                            {
+</span></span><span class="line"><span class="cl">                                &#34;genomic_accession_version&#34;: &#34;NC_000017.11&#34;,
+</span></span><span class="line"><span class="cl">                                &#34;genomic_range&#34;: {
+</span></span><span class="line"><span class="cl">                                    &#34;begin&#34;: &#34;7668421&#34;,
+</span></span><span class="line"><span class="cl">                                    &#34;end&#34;: &#34;7687490&#34;,
+</span></span><span class="line"><span class="cl">                                    &#34;orientation&#34;: &#34;minus&#34;
+</span></span><span class="line"><span class="cl">                                },
+</span></span><span class="line"><span class="cl">                                &#34;sequence_name&#34;: &#34;17&#34;
+</span></span><span class="line"><span class="cl">                            }
+</span></span><span class="line"><span class="cl">                        ]
+</span></span><span class="line"><span class="cl">                    },
+</span></span><span class="line"><span class="cl">                    (下略)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="datasets-download">datasets download
+</h3><p>點選圖一的 datasets 就會跳出指令，複製回去簡單上手，可再根據想要的格式增減 <code>--include</code> 參數</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">datasets</span> <span class="n">download</span> <span class="n">genome</span> <span class="n">accession</span> <span class="n">GCF_000005845</span><span class="o">.</span><span class="mi">2</span> <span class="o">--</span><span class="n">include</span> <span class="n">gff3</span><span class="p">,</span><span class="n">rna</span><span class="p">,</span><span class="n">cds</span><span class="p">,</span><span class="n">protein</span><span class="p">,</span><span class="n">genome</span><span class="p">,</span><span class="n">seq</span><span class="o">-</span><span class="n">report</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最終獲得一個zip檔</p>
+<h2 id="api-url">API URL
+</h2><p>點選圖一的 URL 會跳出 API URL</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">api</span><span class="o">.</span><span class="n">ncbi</span><span class="o">.</span><span class="n">nlm</span><span class="o">.</span><span class="n">nih</span><span class="o">.</span><span class="n">gov</span><span class="o">/</span><span class="n">datasets</span><span class="o">/</span><span class="n">v2alpha</span><span class="o">/</span><span class="n">genome</span><span class="o">/</span><span class="n">accession</span><span class="o">/</span><span class="n">GCF_000005845</span><span class="o">.</span><span class="mi">2</span><span class="o">/</span><span class="n">download</span><span class="err">?</span><span class="n">include_annotation_type</span><span class="o">=</span><span class="n">GENOME_FASTA</span><span class="o">&amp;</span><span class="n">include_annotation_type</span><span class="o">=</span><span class="n">GENOME_GFF</span><span class="o">&amp;</span><span class="n">include_annotation_type</span><span class="o">=</span><span class="n">RNA_FASTA</span><span class="o">&amp;</span><span class="n">include_annotation_type</span><span class="o">=</span><span class="n">CDS_FASTA</span><span class="o">&amp;</span><span class="n">include_annotation_type</span><span class="o">=</span><span class="n">PROT_FASTA</span><span class="o">&amp;</span><span class="n">include_annotation_type</span><span class="o">=</span><span class="n">SEQUENCE_REPORT</span><span class="o">&amp;</span><span class="n">hydrated</span><span class="o">=</span><span class="n">FULLY_HYDRATED</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>可根據喜好用不同方式取得並下載</p>
+<h3 id="使用-curl-下載">使用 curl 下載
+</h3><p>把 API URL複製到以下curl模板裡的 <code>${api_url}</code> 變數 (也記得改輸出名稱 <code>${output_name}</code>)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">curl -X GET &#34;${api_url}&#34; -H &#34;accept: application/zip&#34; -o ${output_name}.zip
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>以圖一的例子示範:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">GET</span> <span class="s2">&#34;https://api.ncbi.nlm.nih.gov/datasets/v2alpha/genome/accession/GCF_000005845.2/download?include_annotation_type=GENOME_FASTA&amp;include_annotation_type=GENOME_GFF&amp;include_annotation_type=RNA_FASTA&amp;include_annotation_type=CDS_FASTA&amp;include_annotation_type=PROT_FASTA&amp;include_annotation_type=SEQUENCE_REPORT&amp;hydrated=FULLY_HYDRATED&#34;</span> <span class="o">-</span><span class="n">H</span> <span class="s2">&#34;accept: application/zip&#34;</span> <span class="o">-</span><span class="n">o</span> <span class="n">genome</span><span class="o">.</span><span class="n">zip</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>會看到下載進度:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl">  <span class="o">%</span> <span class="n">Total</span>    <span class="o">%</span> <span class="n">Received</span> <span class="o">%</span> <span class="n">Xferd</span>  <span class="n">Average</span> <span class="n">Speed</span>   <span class="n">Time</span>    <span class="n">Time</span>     <span class="n">Time</span>  <span class="n">Current</span>
+</span></span><span class="line"><span class="cl">                                 <span class="n">Dload</span>  <span class="n">Upload</span>   <span class="n">Total</span>   <span class="n">Spent</span>    <span class="n">Left</span>  <span class="n">Speed</span>
+</span></span><span class="line"><span class="cl"><span class="mi">100</span> <span class="mi">4100</span><span class="n">k</span>    <span class="mi">0</span> <span class="mi">4100</span><span class="n">k</span>    <span class="mi">0</span>     <span class="mi">0</span>  <span class="mi">1500</span><span class="n">k</span>      <span class="mi">0</span> <span class="o">--</span><span class="p">:</span><span class="o">--</span><span class="p">:</span><span class="o">--</span>  <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">02</span> <span class="o">--</span><span class="p">:</span><span class="o">--</span><span class="p">:</span><span class="o">--</span> <span class="mi">1501</span><span class="n">k</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>完成後解壓縮取得檔案:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">unzip genome.zip
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">replace README.md? [y]es, [n]o, [A]ll, [N]one, [r]ename: n
+</span></span><span class="line"><span class="cl">  inflating: ncbi_dataset/data/assembly_data_report.jsonl
+</span></span><span class="line"><span class="cl">  inflating: ncbi_dataset/data/GCF_000005845.2/GCF_000005845.2_ASM584v2_genomic.fna
+</span></span><span class="line"><span class="cl">  inflating: ncbi_dataset/data/GCF_000005845.2/genomic.gff
+</span></span><span class="line"><span class="cl">  inflating: ncbi_dataset/data/GCF_000005845.2/cds_from_genomic.fna
+</span></span><span class="line"><span class="cl">  inflating: ncbi_dataset/data/GCF_000005845.2/protein.faa
+</span></span><span class="line"><span class="cl">  inflating: ncbi_dataset/data/GCF_000005845.2/sequence_report.jsonl
+</span></span><span class="line"><span class="cl">  inflating: ncbi_dataset/data/dataset_catalog.json
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="使用-python-requests-下載">使用 python requests 下載
+</h3><p>需要引入<code>requests</code>套件，把 API URL 存進 <code>down_url</code> 變數，以 <code>GET</code> 方式取得並將內容 <code>.content</code> 寫入 zip 檔</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">import</span> <span class="n">requests</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">down_url</span> <span class="o">=</span> <span class="s1">&#39;https://api.ncbi.nlm.nih.gov/datasets/v2alpha/genome/accession/GCF_000005845.2/download?include_annotation_type=GENOME_FASTA&amp;include_annotation_type=GENOME_GFF&amp;include_annotation_type=RNA_FASTA&amp;include_annotation_type=CDS_FASTA&amp;include_annotation_type=PROT_FASTA&amp;include_annotation_type=SEQUENCE_REPORT&amp;hydrated=FULLY_HYDRATED&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/zip&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">down_url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span> 
+</span></span><span class="line"><span class="cl">    <span class="n">with</span> <span class="n">open</span><span class="p">(</span><span class="s1">&#39;genome.zip&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="n">as</span> <span class="n">fw</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Fails {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>若想讓URL簡潔一些，可將 <code>download?</code> 問號後面的參數存成 <code>params</code> dict</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">down_url</span> <span class="o">=</span> <span class="s1">&#39;https://api.ncbi.nlm.nih.gov/datasets/v2alpha/genome/accession/GCF_000005845.2/download&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/zip&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;include_annotation_type&#39;</span><span class="p">:</span> <span class="s1">&#39;GENOME_FASTA&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;include_annotation_type&#39;</span><span class="p">:</span><span class="s1">&#39;GENOME_GFF&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">down_url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="使用-rest-api">使用 REST API
+</h3><p>直接去<a class="link" href="https://www.ncbi.nlm.nih.gov/datasets/docs/v2/reference-docs/rest-api/#get-/genome/accession/-accessions-/download"  target="_blank" rel="noopener"
+    >NCBI REST API 網頁</a> 對照網址打上 <code>assembly ID</code>, <code>include_annotation_type</code> 等資訊，接著按照下圖順序操作:</p>
+<ol>
+<li>點選TRY</li>
+<li>確認response狀態為200</li>
+<li>直接下載zip，或是複製curl指令使用</li>
+</ol>
+<img src="/post/bioinfo-ncbi/20240829_img4.png"  width="600">
+<p>圖三: NCBI REST API 實際畫面截圖</p>
+<h2 id="ftp">FTP
+</h2><p>點選圖一的FTP 就會跳轉至FTP server，可點選檔名下載，或複製檔案網址到server以 <code>wget</code> 取得</p>
+<h2 id="comments">Comments
+</h2><p>NCBI資料庫使用頻繁，可照個人偏好選擇方法，因最近學習 <code>requests</code> 和 <code>API</code> 相關知，有將以上code寫成 python function 來使用；而有conda建個NCBI cml 環境來玩也很方便XD</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/bioinformatics/">Bioinformatics</a>
+        
+            <a href="/tags/database/">Database</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97%E7%A2%BA%E6%A0%A1%E8%B3%87%E6%96%99%E9%9B%86-benchmarking-truth-set/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-benchmarking/20240606_img0.png" loading="lazy" data-key="" data-hash="/post/bioinfo-benchmarking/20240606_img0.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列：確校資料集 Benchmarking truth set</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-gnomad-v4/20240523_img1.png" loading="lazy" data-key="" data-hash="/post/bioinfo-gnomad-v4/20240523_img1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列： gnomAD v3 database 介紹</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-gnomad-v4/20240523_img1.png" loading="lazy" data-key="" data-hash="/post/bioinfo-gnomad-v4/20240523_img1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列： gnomAD v3 database 介紹</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-all-of-us-research-program-%E4%BB%8B%E7%B4%B9/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/bioinfo-allofus/20240509_img1.jpg" loading="lazy" data-key="" data-hash="/post/bioinfo-allofus/20240509_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">生資系列： All of US research program 介紹</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "pxchen110-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 pxchen
+
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

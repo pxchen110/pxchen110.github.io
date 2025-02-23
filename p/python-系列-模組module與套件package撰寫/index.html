@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="紀錄一些關於python module 和 package 的學習筆記，希望以後能常用上。\npython module 模組化 (modularization): 將常會使用的函式(或物件)單獨寫成一份 script 後，再利用 (from) import 方式呼叫，可方便管理函式，不用從單一script追溯以增加效率\npython package 套件 (package) 指的是 包含相關的程式檔案的資料夾結構，類似普渡的樂式大禮包只要引用套件就可任意使用內部模組，一般套件名稱等於資料夾名稱\n將模組打包成套件的步驟:\n建立一個資料夾，並命名為套件名稱 建立 __init__.py ，python要求資料夾必須包含此檔案，才可以被識別為套件 將相關模組script放進來 在新的script以 import 或是 from ... imoprt 來引入套件與模組使用，詳細差異可看下面實例會更清楚 **還有一種引入為from .. import* 但容易在模組名稱相同時發生衝突，就不給例子了 實例 今天簡單寫一個名為 helpwork 的套件，內含 tellname.py 和 telltime.py 兩份script分別定義函式:\n1 2 3 4 5 6 7 ## telltime.py import datetime def telltime(): now = datetime.datetime.now() print(now) 1 2 3 ## tellname.py def tellname(name): print(&#39;welcome {}&#39;.format(name)) 資料夾結構為:\n">
+<title>Python 系列： 模組(module)與套件(package)撰寫</title>
+
+<link rel='canonical' href='https://pxchen110.github.io/p/python-%E7%B3%BB%E5%88%97-%E6%A8%A1%E7%B5%84module%E8%88%87%E5%A5%97%E4%BB%B6package%E6%92%B0%E5%AF%AB/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Python 系列： 模組(module)與套件(package)撰寫">
+<meta property='og:description' content="紀錄一些關於python module 和 package 的學習筆記，希望以後能常用上。\npython module 模組化 (modularization): 將常會使用的函式(或物件)單獨寫成一份 script 後，再利用 (from) import 方式呼叫，可方便管理函式，不用從單一script追溯以增加效率\npython package 套件 (package) 指的是 包含相關的程式檔案的資料夾結構，類似普渡的樂式大禮包只要引用套件就可任意使用內部模組，一般套件名稱等於資料夾名稱\n將模組打包成套件的步驟:\n建立一個資料夾，並命名為套件名稱 建立 __init__.py ，python要求資料夾必須包含此檔案，才可以被識別為套件 將相關模組script放進來 在新的script以 import 或是 from ... imoprt 來引入套件與模組使用，詳細差異可看下面實例會更清楚 **還有一種引入為from .. import* 但容易在模組名稱相同時發生衝突，就不給例子了 實例 今天簡單寫一個名為 helpwork 的套件，內含 tellname.py 和 telltime.py 兩份script分別定義函式:\n1 2 3 4 5 6 7 ## telltime.py import datetime def telltime(): now = datetime.datetime.now() print(now) 1 2 3 ## tellname.py def tellname(name): print(&#39;welcome {}&#39;.format(name)) 資料夾結構為:\n">
+<meta property='og:url' content='https://pxchen110.github.io/p/python-%E7%B3%BB%E5%88%97-%E6%A8%A1%E7%B5%84module%E8%88%87%E5%A5%97%E4%BB%B6package%E6%92%B0%E5%AF%AB/'>
+<meta property='og:site_name' content='Xuan&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2024-08-07T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-08-07T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/python-module-package/20240807_img0.jpg' />
+<meta name="twitter:title" content="Python 系列： 模組(module)與套件(package)撰寫">
+<meta name="twitter:description" content="紀錄一些關於python module 和 package 的學習筆記，希望以後能常用上。\npython module 模組化 (modularization): 將常會使用的函式(或物件)單獨寫成一份 script 後，再利用 (from) import 方式呼叫，可方便管理函式，不用從單一script追溯以增加效率\npython package 套件 (package) 指的是 包含相關的程式檔案的資料夾結構，類似普渡的樂式大禮包只要引用套件就可任意使用內部模組，一般套件名稱等於資料夾名稱\n將模組打包成套件的步驟:\n建立一個資料夾，並命名為套件名稱 建立 __init__.py ，python要求資料夾必須包含此檔案，才可以被識別為套件 將相關模組script放進來 在新的script以 import 或是 from ... imoprt 來引入套件與模組使用，詳細差異可看下面實例會更清楚 **還有一種引入為from .. import* 但容易在模組名稱相同時發生衝突，就不給例子了 實例 今天簡單寫一個名為 helpwork 的套件，內含 tellname.py 和 telltime.py 兩份script分別定義函式:\n1 2 3 4 5 6 7 ## telltime.py import datetime def telltime(): now = datetime.datetime.now() print(now) 1 2 3 ## tellname.py def tellname(name): print(&#39;welcome {}&#39;.format(name)) 資料夾結構為:\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/post/python-module-package/20240807_img0.jpg' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/profile_hu_d0d4f9ff9a7faeba.jpg" width="300"
+                            height="299" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Xuan&#39;s Blog</a></h1>
+            <h2 class="site-description">長大以後就是小瑄</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/pxchen110'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#python-module">python module</a></li>
+    <li><a href="#python-package">python package</a>
+      <ol>
+        <li><a href="#實例">實例</a></li>
+      </ol>
+    </li>
+    <li><a href="#套件研究-openpyxl">套件研究: openpyxl</a></li>
+    <li><a href="#進階-打包套件與推送">(進階) 打包套件與推送</a></li>
+    <li><a href="#references">References</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/python-%E7%B3%BB%E5%88%97-%E6%A8%A1%E7%B5%84module%E8%88%87%E5%A5%97%E4%BB%B6package%E6%92%B0%E5%AF%AB/">
+                
+                    <img src="/post/python-module-package/20240807_img0.jpg" loading="lazy" alt="Featured image of post Python 系列： 模組(module)與套件(package)撰寫" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/python/" >
+                Python
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/python-%E7%B3%BB%E5%88%97-%E6%A8%A1%E7%B5%84module%E8%88%87%E5%A5%97%E4%BB%B6package%E6%92%B0%E5%AF%AB/">Python 系列： 模組(module)與套件(package)撰寫</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 07, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>紀錄一些關於python module 和 package 的學習筆記，希望以後能常用上。</p>
+<!-- more -->
+<!-- toc -->
+<h2 id="python-module">python module
+</h2><p>模組化 (modularization): 將常會使用的函式(或物件)單獨寫成一份 script 後，再利用 <code>(from) import </code> 方式呼叫，可方便管理函式，不用從單一script追溯以增加效率</p>
+<h2 id="python-package">python package
+</h2><p>套件 (package) 指的是 <strong>包含相關的程式檔案的資料夾結構</strong>，<del>類似普渡的樂式大禮包</del>只要引用套件就可任意使用內部模組，一般套件名稱等於資料夾名稱</p>
+<p>將模組打包成套件的步驟:</p>
+<ol>
+<li>建立一個資料夾，並命名為套件名稱</li>
+<li>建立 <code>__init__.py</code> ，python<strong>要求資料夾必須包含</strong>此檔案，才可以被識別為套件</li>
+<li>將相關模組script放進來</li>
+<li>在新的script以 <code>import</code> 或是 <code>from ... imoprt </code> 來引入套件與模組使用，詳細差異可看下面實例會更清楚
+**還有一種引入為<code>from .. import*</code> 但容易在模組名稱相同時發生衝突，就不給例子了</li>
+</ol>
+<h3 id="實例">實例
+</h3><p>今天簡單寫一個名為 helpwork 的套件，內含 <code>tellname.py</code> 和 <code>telltime.py</code> 兩份script分別定義函式:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">## telltime.py
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">import datetime
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">def telltime():
+</span></span><span class="line"><span class="cl">    now = datetime.datetime.now()
+</span></span><span class="line"><span class="cl">    print(now)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">## tellname.py
+</span></span><span class="line"><span class="cl">def tellname(name):
+</span></span><span class="line"><span class="cl">    print(&#39;welcome {}&#39;.format(name))
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>資料夾結構為:</p>
+<img src="/post/python-module-package/20240807_img1.png"  width="600">
+<p>開啟新 python script 測試能否引入:</p>
+<ul>
+<li>使用 <code>from ${package_name} import ${module_name}</code>，引用函式要 <code>${module_name}.${func_name}()</code></li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">from helpwork import tellname, telltime
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">telltime.telltime() 
+</span></span><span class="line"><span class="cl">tellname.tellname(&#39;Amy&#39;)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>成功執行函式，並印出</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">2024-08-xx xx:xx:xx.xxxxx
+</span></span><span class="line"><span class="cl">welcome Amy
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>使用 <code>import ${package_name}</code>，以<code>${package_name}.${module_name}.${func_name}()</code>引用函式
+<strong>注意:</strong> 若只給到 <code>${package_name}.${module_name}</code> 會報錯 <code>TypeError: 'module' object is not callable</code></li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">import helpwork
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">helpwork.telltime.telltime()
+</span></span><span class="line"><span class="cl">helpwork.tellname.tellname(&#39;Cindy&#39;)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>成功執行函式，並印出</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">2024-08-xx xx:xx:xx.xxxxx
+</span></span><span class="line"><span class="cl">welcome Cindy
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>這時會看到原本 helpwork資料夾下多了 <code>pycache</code> 資料夾</p>
+<img src="/post/python-module-package/20240807_img2.png"  width="600">
+<h2 id="套件研究-openpyxl">套件研究: openpyxl
+</h2><p>之前介紹過操作 xlsx 檔的實用套件 <code>openpyxl</code>，當時寫的引入方式為</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">import openpyxl
+</span></span><span class="line"><span class="cl">from openpyxl import workbook, worksheet
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>這裡的 <code>workbook, workshet</code> 都屬於模組，在<a class="link" href="https://github.com/theorchard/openpyxl/tree/master"  target="_blank" rel="noopener"
+    >官方github</a> 可看到套件的資料夾結構:
+<img src="/post/python-module-package/20240807_img3.png"  width="600"></p>
+<p>補充說明，若想區隔模組或避免同名函式混用出錯，可以<strong>將模組單獨建一個資料夾</strong>並放置函式script以及一份<code>__init__.py</code>；如上圖可見 <code>workbook</code> 模組資料夾下、有一份<code>__init__.py</code> 和放函示跟物件的 <code>workbook.py</code></p>
+<p>因此想建立 <code>workbook/workbook.py</code> 裡面定義的 <code>Workbook</code> 物件，以下兩種方式都能做到:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">### method1
+</span></span><span class="line"><span class="cl">from openpyxl import workbook
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">wb = workbook.Workbook()
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">### method2
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">from openpyxl import Workbook
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">wb = Workbook()
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>測試<code>workbook.py</code> 內定義的其中一個函式 <code>sheetnames</code></p>
+<img src="/post/python-module-package/20240807_img4.png"  width="600">
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wb = workbook.Workbook()
+</span></span><span class="line"><span class="cl">wb.create_sheet(&#39;New_created&#39;)
+</span></span><span class="line"><span class="cl">print(wb.sheetnames)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>成功印出新建的sheet跟預設sheet</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[&#39;Sheet&#39;, &#39;New_created&#39;]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="進階-打包套件與推送">(進階) 打包套件與推送
+</h2><p>若想在不同平台使用同個套件，可以打包推送再安裝回本地使用
+建議可先將 package code 推送至 Github，須包含以下基本內容:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">${package_name}(.git那層)
+</span></span><span class="line"><span class="cl">${package_name}/
+</span></span><span class="line"><span class="cl">├── README.md
+</span></span><span class="line"><span class="cl">├── module/
+</span></span><span class="line"><span class="cl">│   └── __init__.py
+</span></span><span class="line"><span class="cl">└── setup.py
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>其中 <code>setup.py</code> 紀錄套件相關的資訊，一般會引用兩種套件協助打包: <code>distutils</code> 或 <code>setuptools</code> (後者較常用)
+以 <code>setup()</code> 提供<a class="link" href="https://setuptools.pypa.io/en/latest/deprecated/changed_keywords.html"  target="_blank" rel="noopener"
+    >套件相關資訊</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="c1">## pip install setuptools</span>
+</span></span><span class="line"><span class="cl"><span class="n">from</span> <span class="n">setuptools</span> <span class="n">import</span> <span class="n">setup</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">setup</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl"><span class="n">name</span><span class="o">=</span><span class="s1">&#39;helpwork&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="n">version</span><span class="o">=</span><span class="s1">&#39;v0.0.1&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="n">description</span><span class="o">=</span><span class="s1">&#39;simple script to test&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="n">author</span><span class="o">=</span><span class="s1">&#39;px&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="n">author_email</span><span class="o">=</span><span class="s1">&#39;hello123@gmail.com&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>打包完成，可以選擇:</p>
+<ul>
+<li>安裝在環境 <code>python3 setup.py install</code></li>
+<li>打包 <code>python3 setup.py sdist / bdist_{egg;wheel}</code> 一個式 source code 一個式打包 metadata (出來的格式類似.zip)</li>
+<li>推送到TestPyPI 或 PyPI (需要申請帳號) <code>python3 setup.py sdist upload -r pypi</code></li>
+</ul>
+<p>關於打包的更多介紹可以看這個網站: <a class="link" href="https://fuchencong.com/2021/12/07/python-package/"  target="_blank" rel="noopener"
+    >https://fuchencong.com/2021/12/07/python-package/</a>
+由於沒有實際完成這步，未來有做會再來更新~</p>
+<h2 id="references">References
+</h2><p><a class="link" href="https://hackmd.io/@celineyeh/SyJSK8AXB"  target="_blank" rel="noopener"
+    >https://hackmd.io/@celineyeh/SyJSK8AXB</a>
+<a class="link" href="https://medium.com/pyladies-taiwan/python-%E7%9A%84-import-%E9%99%B7%E9%98%B1-3538e74f57e3"  target="_blank" rel="noopener"
+    >https://medium.com/pyladies-taiwan/python-%E7%9A%84-import-%E9%99%B7%E9%98%B1-3538e74f57e3</a>
+<a class="link" href="https://www.learncodewithmike.com/2020/01/python-module-and-package.html"  target="_blank" rel="noopener"
+    >https://www.learncodewithmike.com/2020/01/python-module-and-package.html</a>
+<a class="link" href="https://medium.com/seaniap/python-%E6%A8%A1%E7%B5%84%E8%88%87%E5%A5%97%E4%BB%B6-8aa890eda31a"  target="_blank" rel="noopener"
+    >https://medium.com/seaniap/python-%E6%A8%A1%E7%B5%84%E8%88%87%E5%A5%97%E4%BB%B6-8aa890eda31a</a>
+<a class="link" href="https://setuptools.pypa.io/en/latest/setuptools.html"  target="_blank" rel="noopener"
+    >https://setuptools.pypa.io/en/latest/setuptools.html</a>
+<a class="link" href="https://fuchencong.com/2021/12/07/python-package/"  target="_blank" rel="noopener"
+    >https://fuchencong.com/2021/12/07/python-package/</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97-itables-%E8%A3%BD%E4%BD%9C%E4%BA%92%E5%8B%95%E5%BC%8F%E8%A1%A8%E6%A0%BC/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-itables/20240802_img0.jpg" loading="lazy" data-key="" data-hash="/post/python-itables/20240802_img0.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列： itables 製作互動式表格</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97-%E5%88%A9%E7%94%A8-openpxyl-%E6%93%8D%E4%BD%9C-excel/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-openpxyl/20240724_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-openpxyl/20240724_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列： 利用 openpxyl 操作 excel</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97-%E5%88%A9%E7%94%A8-xlsxwriter-%E6%A8%A1%E7%B5%84%E8%BC%95%E9%AC%86%E8%A3%BD%E4%BD%9Cexcel/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-xlsxwriter/20240315_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-xlsxwriter/20240315_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列： 利用 xlsxwriter 模組輕鬆製作excel</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97%E4%BD%BF%E7%94%A8-os-%E6%88%90%E7%82%BA%E7%B3%BB%E7%B5%B1%E6%93%8D%E4%BD%9C%E5%A4%A7%E5%B8%AB/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-os/20240307_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-os/20240307_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列：使用 os 成為系統操作大師</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97subprocess%E6%A8%A1%E7%B5%84%E7%AE%A1%E7%90%86%E5%AD%90%E9%80%B2%E7%A8%8B/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-subprocess/20240222_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-subprocess/20240222_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列：subprocess模組管理子進程</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "pxchen110-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 pxchen
+
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
