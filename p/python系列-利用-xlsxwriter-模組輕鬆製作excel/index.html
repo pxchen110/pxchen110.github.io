@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Background photo by Rubaitul Azad on Unsplash\nexcel 是製作工作報表的好幫手，比起手動新增資料，若能用 python 自動生成 excel 檔並填入內容，可節省時間增加辦公效率。今天將介紹一款可客製化生成 excel 的 python 套件 xlsxwriter，包含常用的函數功能，並以實例呈現參數的使用結果。\n下載與引入套件 若在 Anaconda 環境下使用python或jupytor notebook， xlsxwriter 屬於內建套件，可直截引入；若在 miniconda 等其他環境，需要 conda / pip install 下載後引入\n1 import xlsxwriter 生成 excel 文件 xlsxwriter 將整份 excel 檔案稱為 Workbook，內部的工作表稱為 worksheet，而每個格子稱為 cell。\n開啟新.xlsx檔並注意最後要關閉工作表\n1 2 workbook = xlsxwriter.Workbook(&#39;example.xlsx&#39;) workbook.close() 注意:如果使用 with 方式開啟 可以不用加上close()來關閉工作表\n1 2 with xlsxwriter.Workbook(&#39;example.xlsx&#39;) as workbook: ... worksheet 建立工作表 透過 workbook.add_worksheet() 實體化工作表，工作表名稱可自行更改\n">
+<title>Python系列： 利用 xlsxwriter 模組輕鬆製作excel</title>
+
+<link rel='canonical' href='https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97-%E5%88%A9%E7%94%A8-xlsxwriter-%E6%A8%A1%E7%B5%84%E8%BC%95%E9%AC%86%E8%A3%BD%E4%BD%9Cexcel/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Python系列： 利用 xlsxwriter 模組輕鬆製作excel">
+<meta property='og:description' content="Background photo by Rubaitul Azad on Unsplash\nexcel 是製作工作報表的好幫手，比起手動新增資料，若能用 python 自動生成 excel 檔並填入內容，可節省時間增加辦公效率。今天將介紹一款可客製化生成 excel 的 python 套件 xlsxwriter，包含常用的函數功能，並以實例呈現參數的使用結果。\n下載與引入套件 若在 Anaconda 環境下使用python或jupytor notebook， xlsxwriter 屬於內建套件，可直截引入；若在 miniconda 等其他環境，需要 conda / pip install 下載後引入\n1 import xlsxwriter 生成 excel 文件 xlsxwriter 將整份 excel 檔案稱為 Workbook，內部的工作表稱為 worksheet，而每個格子稱為 cell。\n開啟新.xlsx檔並注意最後要關閉工作表\n1 2 workbook = xlsxwriter.Workbook(&#39;example.xlsx&#39;) workbook.close() 注意:如果使用 with 方式開啟 可以不用加上close()來關閉工作表\n1 2 with xlsxwriter.Workbook(&#39;example.xlsx&#39;) as workbook: ... worksheet 建立工作表 透過 workbook.add_worksheet() 實體化工作表，工作表名稱可自行更改\n">
+<meta property='og:url' content='https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97-%E5%88%A9%E7%94%A8-xlsxwriter-%E6%A8%A1%E7%B5%84%E8%BC%95%E9%AC%86%E8%A3%BD%E4%BD%9Cexcel/'>
+<meta property='og:site_name' content='Xuan&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2024-03-15T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-03-15T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/python-xlsxwriter/20240315_img1.jpg' />
+<meta name="twitter:title" content="Python系列： 利用 xlsxwriter 模組輕鬆製作excel">
+<meta name="twitter:description" content="Background photo by Rubaitul Azad on Unsplash\nexcel 是製作工作報表的好幫手，比起手動新增資料，若能用 python 自動生成 excel 檔並填入內容，可節省時間增加辦公效率。今天將介紹一款可客製化生成 excel 的 python 套件 xlsxwriter，包含常用的函數功能，並以實例呈現參數的使用結果。\n下載與引入套件 若在 Anaconda 環境下使用python或jupytor notebook， xlsxwriter 屬於內建套件，可直截引入；若在 miniconda 等其他環境，需要 conda / pip install 下載後引入\n1 import xlsxwriter 生成 excel 文件 xlsxwriter 將整份 excel 檔案稱為 Workbook，內部的工作表稱為 worksheet，而每個格子稱為 cell。\n開啟新.xlsx檔並注意最後要關閉工作表\n1 2 workbook = xlsxwriter.Workbook(&#39;example.xlsx&#39;) workbook.close() 注意:如果使用 with 方式開啟 可以不用加上close()來關閉工作表\n1 2 with xlsxwriter.Workbook(&#39;example.xlsx&#39;) as workbook: ... worksheet 建立工作表 透過 workbook.add_worksheet() 實體化工作表，工作表名稱可自行更改\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/post/python-xlsxwriter/20240315_img1.jpg' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/profile_hu_d0d4f9ff9a7faeba.jpg" width="300"
+                            height="299" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Xuan&#39;s Blog</a></h1>
+            <h2 class="site-description">長大以後就是小瑄</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/pxchen110'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#下載與引入套件">下載與引入套件</a></li>
+    <li><a href="#生成-excel-文件">生成 excel 文件</a></li>
+    <li><a href="#worksheet-建立工作表">worksheet 建立工作表</a>
+      <ol>
+        <li><a href="#輸入內容">輸入內容</a></li>
+        <li><a href="#指定輸入類型">指定輸入類型</a></li>
+        <li><a href="#整列整欄輸入-搭配迴圈">整列/整欄輸入 (搭配迴圈)</a></li>
+      </ol>
+    </li>
+    <li><a href="#worksheet-樣式設定">worksheet 樣式設定</a>
+      <ol>
+        <li><a href="#整列整欄-設定高度寬度">整列/整欄 設定高度/寬度</a></li>
+        <li><a href="#隨內容最適化格子大小">隨內容最適化格子大小</a></li>
+        <li><a href="#自動增加篩選">自動增加篩選</a></li>
+        <li><a href="#固定某列欄">固定某列/欄</a></li>
+        <li><a href="#縮放比例">縮放比例</a></li>
+      </ol>
+    </li>
+    <li><a href="#format-客製化設定">format 客製化設定</a>
+      <ol>
+        <li><a href="#傳入工作表">傳入工作表</a></li>
+      </ol>
+    </li>
+    <li><a href="#chart-生成圖表">chart 生成圖表</a></li>
+    <li><a href="#參考資料">參考資料</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/python%E7%B3%BB%E5%88%97-%E5%88%A9%E7%94%A8-xlsxwriter-%E6%A8%A1%E7%B5%84%E8%BC%95%E9%AC%86%E8%A3%BD%E4%BD%9Cexcel/">
+                
+                    <img src="/post/python-xlsxwriter/20240315_img1.jpg" loading="lazy" alt="Featured image of post Python系列： 利用 xlsxwriter 模組輕鬆製作excel" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/python/" >
+                Python
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/python%E7%B3%BB%E5%88%97-%E5%88%A9%E7%94%A8-xlsxwriter-%E6%A8%A1%E7%B5%84%E8%BC%95%E9%AC%86%E8%A3%BD%E4%BD%9Cexcel/">Python系列： 利用 xlsxwriter 模組輕鬆製作excel</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 15, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>Background photo by <a class="link" href="https://unsplash.com/@rubaitulazad"  target="_blank" rel="noopener"
+    >Rubaitul Azad</a> on <a class="link" href="https://unsplash.com/"  target="_blank" rel="noopener"
+    >Unsplash</a></p>
+<p>excel 是製作工作報表的好幫手，比起手動新增資料，若能<strong>用 python 自動生成 excel 檔並填入內容，可節省時間增加辦公效率</strong>。今天將介紹一款可客製化生成 excel 的 python 套件 xlsxwriter，包含常用的函數功能，並以實例呈現參數的使用結果。</p>
+<!-- more -->
+<!-- toc -->
+<h2 id="下載與引入套件">下載與引入套件
+</h2><p>若在 Anaconda 環境下使用python或jupytor notebook， xlsxwriter 屬於內建套件，可直截引入；若在 miniconda 等其他環境，需要 <code>conda / pip install</code> 下載後引入</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">import xlsxwriter
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="生成-excel-文件">生成 excel 文件
+</h2><p>xlsxwriter 將<strong>整份 excel 檔案稱為 Workbook</strong>，內部的<strong>工作表稱為 worksheet</strong>，而每個<strong>格子稱為 cell</strong>。</p>
+<p>開啟新<code>.xlsx</code>檔<strong>並注意最後要關閉工作表</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">workbook = xlsxwriter.Workbook(&#39;example.xlsx&#39;)
+</span></span><span class="line"><span class="cl">workbook.close()
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>注意:如果使用 <code>with</code> 方式開啟 可以不用加上<code>close()</code>來關閉工作表</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">with xlsxwriter.Workbook(&#39;example.xlsx&#39;) as workbook:
+</span></span><span class="line"><span class="cl">    ...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="worksheet-建立工作表">worksheet 建立工作表
+</h2><p>透過 <code>workbook.add_worksheet()</code> 實體化工作表，工作表名稱可自行更改</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">worksheet = workbook.add_worksheet() # default命名為sheet1 或 工作表1
+</span></span><span class="line"><span class="cl">worksheet = workbook.add_worksheet(&#39;Data&#39;) # 開啟名為Data的工作表
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>注意: xlsxWriter 支援處理的工作表邊界值為 1,048,576 rows x 16,384 columns</strong></p>
+<h3 id="輸入內容">輸入內容
+</h3><p>透過 <code>worksheet.wtire()</code> 在指定位置寫入內容
+excel 的格線就跟棋盤一樣，可以用列/欄編號，來指定棋子放置的地方，如在A1填上 &lsquo;apple&rsquo; 文字</p>
+<p>xlsxwriter 接受以下兩種指示方式:</p>
+<ul>
+<li>使用索引 <code>.write(row_index, col_index, args)</code> :<strong>注意工作表跟 python list 一樣使用 0-index</strong>，因此第一列/欄的 index = 0</li>
+<li>使用標記 <code>.write('row-col-notation', args)</code> : 例如第一列第一欄等價於 <strong>A1</strong>，第二列第三欄等價於 <strong>C2</strong></li>
+</ul>
+<p>實例: 當我想將資料填入第一列(row 1)的第一欄(col 1)，以下兩種寫法都會在相同位置填入字串:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">worksheet.write(0, 0, &#39;hello&#39;)
+</span></span><span class="line"><span class="cl">worksheet.write(&#39;A1&#39;, &#39;hello&#39;)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="指定輸入類型">指定輸入類型
+</h3><p>為防止輸入內容被自動轉換型別，如 <code>2/29</code> 的字串被 excel 當成日期轉成 <code>2月29日</code>，可以用<code>.write_${type}()</code>函數<strong>指定寫入類型</strong>，常用的有:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">worksheet.write_string()
+</span></span><span class="line"><span class="cl">worksheet.write_number()
+</span></span><span class="line"><span class="cl">worksheet.write_formula(&#39;A1&#39;, &#39;=SUM(B1:B4)&#39;)
+</span></span><span class="line"><span class="cl">worksheet.write_boolean(0, 0, False)
+</span></span><span class="line"><span class="cl">worksheet.write_blank(0, 0, None)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">worksheet.write_datetime(&#39;B2&#39;, date_time)
+</span></span><span class="line"><span class="cl">date_time = datetime.datetime.strptime(&#39;2013-01-23&#39;, &#39;%Y-%m-%d&#39;)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="整列整欄輸入-搭配迴圈">整列/整欄輸入 (搭配迴圈)
+</h3><p>當你想將list, dict 內的資料寫入同一列/欄內，可以用 <code>.wirte_row()</code> 和 <code>.write_column()</code> 兩函數，以下舉個例子:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 如果想將 python list 寫入 excel A 欄位
+</span></span><span class="line"><span class="cl">input_list = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;]
+</span></span><span class="line"><span class="cl">worksheet.write_column(&#39;A1&#39;, input_list)
+</span></span><span class="line"><span class="cl">worksheet.write_column(0, 0, input_list)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>結果輸出如下:
+<img src="/post/python-xlsxwriter/20240315_img2.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h2 id="worksheet-樣式設定">worksheet 樣式設定
+</h2><h3 id="整列整欄-設定高度寬度">整列/整欄 設定高度/寬度
+</h3><p>透過 <code>.set_row()</code> 和 <code>.set_column()</code> 設定格子大小，常會搭配樣式設定
+<strong>注意<code>.set_row()</code> 以設定一列的高度為限，而<code>.set_column()</code> 要指定範圍，如 &lsquo;B:D&rsquo; 或 1, 3 等</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">worksheet.set_row(1, 20)
+</span></span><span class="line"><span class="cl">worksheet.set_column(&#39;D:D&#39;, 20)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="隨內容最適化格子大小">隨內容最適化格子大小
+</h3><p>使用<code>worksheet.autofit()</code>，讓最長的內容寬度當作欄位寬度，減少文字遮蓋</p>
+<h3 id="自動增加篩選">自動增加篩選
+</h3><p>透過 <code>worksheet.autofilter(first_row, first_col, last_row, last_col)</code> 添加篩選符號，須設定作用範圍</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">worksheet.write(0, 0, &#39;hello&#39;)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## 以下兩者等價
+</span></span><span class="line"><span class="cl">worksheet.autofilter(0,0,1,1)
+</span></span><span class="line"><span class="cl">worksheet.autofilter(&#39;A1:B2&#39;)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>結果如下圖所示，可以看見篩選符號(三角形)自動出現在工作表上</p>
+<p><img src="/post/python-xlsxwriter/20240315_img3.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h3 id="固定某列欄">固定某列/欄
+</h3><p>為了增加比對方便性，透過<code>.freeze_panes()</code> 在滑動工作表時，讓指定欄位固定不消失</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">worksheet.freeze_panes(1,1) ## 將第一列/第一欄固定不動
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="縮放比例">縮放比例
+</h3><p><code>worksheet.set_zoom()</code> 設定工作表開啟時，初始的縮放大小(default 100%)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">worksheet.set_zoom(150) ## 開啟大小放大為150%
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="format-客製化設定">format 客製化設定
+</h2><p>透過 <code>workbook.add_format()</code> 增添客製化，樣式需用中括號 <code>{}</code> 包起並以 <code>key: value</code> 形式撰寫:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">a_format = workbook.add_format({&#39;bold&#39;: True, &#39;font_color&#39;: &#39;red&#39;})
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>定義客製化樣式的方式有兩種:</p>
+<ol>
+<li>變數和樣式一起定義<code>cell_format = workbook.add_format({'font_color': 'red'})</code></li>
+<li>先定義變數再賦予樣式</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">cell_format = workbook.add_format()
+</span></span><span class="line"><span class="cl">cell_format.set_font_color(&#39;red&#39;)
+</span></span><span class="line"><span class="cl">cell_format.set_bold(True)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>樣式種類可參考<a class="link" href="https://xlsxwriter.readthedocs.io/format.html"  target="_blank" rel="noopener"
+    >官方網站</a>
+樣式有分六大類Font, Number, Protection, Alignment, Pattern, and Border</p>
+<h3 id="傳入工作表">傳入工作表
+</h3><p>傳入工作表的方式有以下兩種</p>
+<ol>
+<li>在 <code>worksheet.write()</code> 寫入同時加上樣式</li>
+<li>用 <code>worksheet.set_row()</code> 和 <code>worksheet.set_column()</code> 為整列/欄加上樣式</li>
+</ol>
+<p>實際例子:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">## 在 A1 寫入 &#39;hello&#39; 並設定文字顏色為紅色
+</span></span><span class="line"><span class="cl">a1_format = workbook.add_format({&#39;font_color&#39;: &#39;red&#39;})
+</span></span><span class="line"><span class="cl">worksheet.write(0, 0, &#39;hello&#39;, a1_format)
+</span></span><span class="line"><span class="cl">## 將 B1 整行的背景顏色設為黃色，寬度調整為11
+</span></span><span class="line"><span class="cl">bcol_format = workbook.add_format({&#39;bg_color&#39;: &#39;yellow&#39;})
+</span></span><span class="line"><span class="cl">worksheet.set_column(&#39;B:B&#39;, 11, bcol_format)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>生成結果入下圖所示:
+可以看到注意B欄的寬度調整為 11，和 default 8.43 相比(A, C, D欄) 變得較寬</p>
+<p><img src="/post/python-xlsxwriter/20240315_img4.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<hr>
+<h2 id="chart-生成圖表">chart 生成圖表
+</h2><p>透過 <code>workbook.add_chart()</code> 生成圖表後，使用 <code>worksheet.insert_chart()</code> 插入</p>
+<p>個人喜歡將資料整理好並使用R ggplot 做視覺化，所以省略 xlsxwriter 生成圖表的函數介紹</p>
+<h2 id="參考資料">參考資料
+</h2><p><a class="link" href="https://xlsxwriter.readthedocs.io/worksheet.html"  target="_blank" rel="noopener"
+    >https://xlsxwriter.readthedocs.io/worksheet.html</a></p>
+<p><a class="link" href="https://xlsxwriter.readthedocs.io/format.html"  target="_blank" rel="noopener"
+    >https://xlsxwriter.readthedocs.io/format.html</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97%E4%BD%BF%E7%94%A8-os-%E6%88%90%E7%82%BA%E7%B3%BB%E7%B5%B1%E6%93%8D%E4%BD%9C%E5%A4%A7%E5%B8%AB/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-os/20240307_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-os/20240307_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列：使用 os 成為系統操作大師</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97subprocess%E6%A8%A1%E7%B5%84%E7%AE%A1%E7%90%86%E5%AD%90%E9%80%B2%E7%A8%8B/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-subprocess/20240222_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-subprocess/20240222_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列：subprocess模組管理子進程</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97-%E4%B8%89%E7%A8%AE%E5%BC%95%E5%85%A5%E5%A4%96%E9%83%A8%E5%8F%83%E6%95%B8%E7%9A%84%E6%96%B9%E6%B3%95/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-argument-input/20240221_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-argument-input/20240221_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列： 三種引入外部參數的方法</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97-smtplib-%E6%A8%A1%E7%B5%84%E5%AF%A6%E7%8F%BE%E8%87%AA%E5%8B%95%E5%AF%84%E4%BF%A1/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-smtplib/20240215_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-smtplib/20240215_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列： smtplib 模組實現自動寄信</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "pxchen110-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 pxchen
+
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
