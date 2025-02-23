@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Xuan&#39;s Blog</title>
-        <link>https://pxchen110.github.io/</link>
+        <link>http://localhost:1313/</link>
         <description>Recent content on Xuan&#39;s Blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en</language>
         <copyright>pxchen</copyright>
-        <lastBuildDate>Sat, 08 Feb 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://pxchen110.github.io/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Sat, 08 Feb 2025 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>用Github&#43;Hexo建立個人部落格：方法與問題紀錄</title>
-        <link>https://pxchen110.github.io/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/</link>
+        <link>http://localhost:1313/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/</link>
         <pubDate>Wed, 21 Feb 2024 00:00:00 +0000</pubDate>
         
-        <guid>https://pxchen110.github.io/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/</guid>
-        <description>&lt;img src="https://pxchen110.github.io/20240201_img5.jpg" alt="Featured image of post 用Github&#43;Hexo建立個人部落格：方法與問題紀錄" /&gt;&lt;p&gt;決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。&lt;/p&gt;
+        <guid>http://localhost:1313/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/</guid>
+        <description>&lt;img src="http://localhost:1313/post/hexo-blog/20240201_img5.png" alt="Featured image of post 用Github&#43;Hexo建立個人部落格：方法與問題紀錄" /&gt;&lt;p&gt;決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。&lt;/p&gt;
 &lt;!-- more --&gt;
 &lt;p&gt;本機環境: MacOS Sonoma&lt;/p&gt;
 &lt;!-- toc --&gt;
@@ -98,7 +98,7 @@
 &lt;li&gt;&lt;code&gt;_config.yml&lt;/code&gt; 是設定網站的配置檔案&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;theme/&lt;/code&gt; 客製化主題存放的地方&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;source/_post/&lt;/code&gt; 放置發布文章(&lt;code&gt;.md&lt;/code&gt;)的地方
-&lt;img src=&#34;https://pxchen110.github.io/20240201_img1.png&#34;
+&lt;img src=&#34;http://localhost:1313/post/hexo-blog/20240201_img1.png&#34;
 	
 	
 	
@@ -116,7 +116,7 @@
     &gt;官方文件&lt;/a&gt;。我編輯過的部分包含：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;網站標題、作者、網址：
-&lt;img src=&#34;https://pxchen110.github.io/20240201_img2.png&#34;
+&lt;img src=&#34;http://localhost:1313/post/hexo-blog/20240201_img2.png&#34;
 	
 	
 	
@@ -125,7 +125,7 @@
 	
 &gt;&lt;/li&gt;
 &lt;li&gt;deploy 來源：&lt;strong&gt;特別注意 push branch&lt;/strong&gt;，由於 Github 目前 default branch 是 main，&lt;strong&gt;config 內要設定 push 到 main branch 才有效&lt;/strong&gt;，當時我沒注意順手設 master，直接讓文章與主題樣式分離&amp;hellip; repo 就貼上 ssh clone 的網址
-&lt;img src=&#34;https://pxchen110.github.io/20240201_img3.png&#34;
+&lt;img src=&#34;http://localhost:1313/post/hexo-blog/20240201_img3.png&#34;
 	
 	
 	
@@ -185,7 +185,7 @@
 &lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git clone ${theme_repository_url} /path/to/${username}.github.io/themes/theme_name
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://pxchen110.github.io/20240201_img4.png&#34;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/post/hexo-blog/20240201_img4.png&#34;
 	
 	
 	
@@ -202,7 +202,7 @@
     &gt;Demo Link&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;目前做了基礎設定和更改背景，官方文件還有很多功能沒測試，持續摸索～&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://pxchen110.github.io/20240201_img5.png&#34;
+&lt;p&gt;&lt;img src=&#34;http://localhost:1313/post/hexo-blog/20240201_img5.png&#34;
 	
 	
 	
@@ -241,11 +241,11 @@
         </item>
         <item>
         <title>Chinese Test</title>
-        <link>https://pxchen110.github.io/p/test-chinese/</link>
+        <link>http://localhost:1313/p/test-chinese/</link>
         <pubDate>Wed, 09 Sep 2020 00:00:00 +0000</pubDate>
         
-        <guid>https://pxchen110.github.io/p/test-chinese/</guid>
-        <description>&lt;img src="https://pxchen110.github.io/helena-hertz-wWZzXlDpMog-unsplash.jpg" alt="Featured image of post Chinese Test" /&gt;&lt;h2 id=&#34;正文测试&#34;&gt;正文测试
+        <guid>http://localhost:1313/p/test-chinese/</guid>
+        <description>&lt;img src="http://localhost:1313/helena-hertz-wWZzXlDpMog-unsplash.jpg" alt="Featured image of post Chinese Test" /&gt;&lt;h2 id=&#34;正文测试&#34;&gt;正文测试
 &lt;/h2&gt;&lt;p&gt;而这些并不是完全重要，更加重要的问题是， 带着这些问题，我们来审视一下学生会退会。 既然如何， 对我个人而言，学生会退会不仅仅是一个重大的事件，还可能会改变我的人生。 我们不得不面对一个非常尴尬的事实，那就是， 可是，即使是这样，学生会退会的出现仍然代表了一定的意义。 学生会退会，发生了会如何，不发生又会如何。 经过上述讨论， 生活中，若学生会退会出现了，我们就不得不考虑它出现了的事实。 学生会退会，到底应该如何实现。 这样看来， 在这种困难的抉择下，本人思来想去，寝食难安。 对我个人而言，学生会退会不仅仅是一个重大的事件，还可能会改变我的人生。 就我个人来说，学生会退会对我的意义，不能不说非常重大。 莎士比亚曾经提到过，人的一生是短的，但如果卑劣地过这一生，就太长了。这似乎解答了我的疑惑。 莫扎特说过一句富有哲理的话，谁和我一样用功，谁就会和我一样成功。这启发了我， 对我个人而言，学生会退会不仅仅是一个重大的事件，还可能会改变我的人生。 学生会退会，到底应该如何实现。 一般来说， 从这个角度来看， 这种事实对本人来说意义重大，相信对这个世界也是有一定意义的。 在这种困难的抉择下，本人思来想去，寝食难安。 了解清楚学生会退会到底是一种怎么样的存在，是解决一切问题的关键。 一般来说， 生活中，若学生会退会出现了，我们就不得不考虑它出现了的事实。 问题的关键究竟为何？ 而这些并不是完全重要，更加重要的问题是。&lt;/p&gt;
 &lt;p&gt;奥斯特洛夫斯基曾经说过，共同的事业，共同的斗争，可以使人们产生忍受一切的力量。　带着这句话，我们还要更加慎重的审视这个问题： 一般来讲，我们都必须务必慎重的考虑考虑。 既然如此， 这种事实对本人来说意义重大，相信对这个世界也是有一定意义的。 带着这些问题，我们来审视一下学生会退会。 我认为， 我认为， 在这种困难的抉择下，本人思来想去，寝食难安。 问题的关键究竟为何？ 每个人都不得不面对这些问题。 在面对这种问题时， 要想清楚，学生会退会，到底是一种怎么样的存在。 我认为， 既然如此， 每个人都不得不面对这些问题。 在面对这种问题时， 那么， 我认为， 学生会退会因何而发生。&lt;/p&gt;
 &lt;h2 id=&#34;引用&#34;&gt;引用
@@ -257,7 +257,7 @@
 &lt;p&gt;&lt;em&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.youtube.com/watch?v=3aypp_YlBzI&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;最暖的憂傷 - 田馥甄&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;&lt;/blockquote&gt;
 &lt;h2 id=&#34;图片&#34;&gt;图片
-&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://pxchen110.github.io/florian-klauer-nptLmg6jqDo-unsplash.jpg&#34;
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/florian-klauer-nptLmg6jqDo-unsplash.jpg&#34;
 	
 	
 	
@@ -266,7 +266,7 @@
 		alt=&#34;Photo by Florian Klauer on Unsplash&#34;
 	
 	
-&gt;  &lt;img src=&#34;https://pxchen110.github.io/luca-bravo-alS7ewQ41M8-unsplash.jpg&#34;
+&gt;  &lt;img src=&#34;http://localhost:1313/luca-bravo-alS7ewQ41M8-unsplash.jpg&#34;
 	
 	
 	
@@ -276,7 +276,7 @@
 	
 	
 &gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://pxchen110.github.io/helena-hertz-wWZzXlDpMog-unsplash.jpg&#34;
+&lt;p&gt;&lt;img src=&#34;http://localhost:1313/helena-hertz-wWZzXlDpMog-unsplash.jpg&#34;
 	
 	
 	
@@ -285,7 +285,7 @@
 		alt=&#34;Photo by Helena Hertz on Unsplash&#34;
 	
 	
-&gt;  &lt;img src=&#34;https://pxchen110.github.io/hudai-gayiran-3Od_VKcDEAA-unsplash.jpg&#34;
+&gt;  &lt;img src=&#34;http://localhost:1313/hudai-gayiran-3Od_VKcDEAA-unsplash.jpg&#34;
 	
 	
 	
@@ -313,18 +313,18 @@
         </item>
         <item>
         <title>Archives</title>
-        <link>https://pxchen110.github.io/archives/</link>
+        <link>http://localhost:1313/archives/</link>
         <pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate>
         
-        <guid>https://pxchen110.github.io/archives/</guid>
+        <guid>http://localhost:1313/archives/</guid>
         <description></description>
         </item>
         <item>
         <title>About</title>
-        <link>https://pxchen110.github.io/about/</link>
+        <link>http://localhost:1313/about/</link>
         <pubDate>Mon, 20 Jan 2014 00:00:00 +0000</pubDate>
         
-        <guid>https://pxchen110.github.io/about/</guid>
+        <guid>http://localhost:1313/about/</guid>
         <description>&lt;p&gt;Hello World!&lt;/p&gt;
 &lt;p&gt;我是 Xuan（瑄），很高興能在如銀河系般廣闊的網路世界遇見你/妳&lt;br&gt;
 生物資訊背景，主要使用語言／系統有 Linux, Python, R, HTML, CSS, JavaScript，對機器學習和後端感興趣，並自學擴列其他程式語言 &lt;br&gt;
@@ -339,10 +339,10 @@
         </item>
         <item>
         <title>Links</title>
-        <link>https://pxchen110.github.io/links/</link>
+        <link>http://localhost:1313/links/</link>
         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
-        <guid>https://pxchen110.github.io/links/</guid>
+        <guid>http://localhost:1313/links/</guid>
         <description>&lt;p&gt;To use this feature, add &lt;code&gt;links&lt;/code&gt; section to frontmatter.&lt;/p&gt;
 &lt;p&gt;This page&amp;rsquo;s frontmatter:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -374,10 +374,10 @@
         </item>
         <item>
         <title>Search</title>
-        <link>https://pxchen110.github.io/search/</link>
+        <link>http://localhost:1313/search/</link>
         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
-        <guid>https://pxchen110.github.io/search/</guid>
+        <guid>http://localhost:1313/search/</guid>
         <description></description>
         </item>
         

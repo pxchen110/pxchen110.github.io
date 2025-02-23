@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-    <head><meta charset='utf-8'>
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。\n本機環境: MacOS Sonoma\nPart1: Github 創建倉庫專案 首先要創建GitHub帳號，Github是提供開發者存放專案、進行版本控制的好平台，大部分開源工具會將source code放在Github提供下載使用 選擇 Create a new repository 建立新專案，以 ${username}.github.io 來命名並以Public形式發表，初始狀態會產生一個空的reposiroty 回到本機端，以 git clone ${repository_url} 將專案載到本機端；完成後會在當前目錄找到和專案同名 ${username}.github.io 的資料夾 注意：由於之後我們會在這個資料夾下新增檔案，並推送回Github(git push)，過程牽涉authorization問題，可以先建立ssh-key 或 token 授權 Part2: 透過 npm 下載 Node.js 函式庫 Hexo 來推送管理Blog 在本機端安裝npm（Node.js的套件管理系統） 不同作業系統的安裝可參考 Node.js社群文件 我選擇透過Macport安裝： 先下載Macport 安裝 Node.js 和 npm 1 2 3 4 5 sudo port install nodejs10 sudo port -d selfupdate sudo port install npm npm -v #測試安裝是否成功 透過 npm 安裝 Hexo 並初始化，完成後會產生名為 blog 的資料夾 1 2 3 4 5 6 #install hexo (sudo) npm install hexo-cli -g # Blog initialization hexo init blog cd blog 將 blog/ 下的所有檔案複製到剛才clone回來的github repository 資料夾下，再執行npm 安裝 hexo 需要的套件 1 2 cp -R * /path/to/${username}.github.io (sudo) npm install 指令完成後將會看到以下檔案和資料夾，介紹我目前有編輯過的部分： _config.yml 是設定網站的配置檔案 theme/ 客製化主題存放的地方 source/_post/ 放置發布文章(.md)的地方 Part3: 編輯 configuration 並推回 Github 設定blog相關內容，keyword 解釋可參考官方文件。我編輯過的部分包含：\n">
 <title>用Github&#43;Hexo建立個人部落格：方法與問題紀錄</title>
 
-<link rel='canonical' href='https://pxchen110.github.io/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/'>
+<link rel='canonical' href='http://localhost:1313/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/'>
 
 <link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="用Github+Hexo建立個人部落格：方法與問題紀錄">
 <meta property='og:description' content="決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。\n本機環境: MacOS Sonoma\nPart1: Github 創建倉庫專案 首先要創建GitHub帳號，Github是提供開發者存放專案、進行版本控制的好平台，大部分開源工具會將source code放在Github提供下載使用 選擇 Create a new repository 建立新專案，以 ${username}.github.io 來命名並以Public形式發表，初始狀態會產生一個空的reposiroty 回到本機端，以 git clone ${repository_url} 將專案載到本機端；完成後會在當前目錄找到和專案同名 ${username}.github.io 的資料夾 注意：由於之後我們會在這個資料夾下新增檔案，並推送回Github(git push)，過程牽涉authorization問題，可以先建立ssh-key 或 token 授權 Part2: 透過 npm 下載 Node.js 函式庫 Hexo 來推送管理Blog 在本機端安裝npm（Node.js的套件管理系統） 不同作業系統的安裝可參考 Node.js社群文件 我選擇透過Macport安裝： 先下載Macport 安裝 Node.js 和 npm 1 2 3 4 5 sudo port install nodejs10 sudo port -d selfupdate sudo port install npm npm -v #測試安裝是否成功 透過 npm 安裝 Hexo 並初始化，完成後會產生名為 blog 的資料夾 1 2 3 4 5 6 #install hexo (sudo) npm install hexo-cli -g # Blog initialization hexo init blog cd blog 將 blog/ 下的所有檔案複製到剛才clone回來的github repository 資料夾下，再執行npm 安裝 hexo 需要的套件 1 2 cp -R * /path/to/${username}.github.io (sudo) npm install 指令完成後將會看到以下檔案和資料夾，介紹我目前有編輯過的部分： _config.yml 是設定網站的配置檔案 theme/ 客製化主題存放的地方 source/_post/ 放置發布文章(.md)的地方 Part3: 編輯 configuration 並推回 Github 設定blog相關內容，keyword 解釋可參考官方文件。我編輯過的部分包含：\n">
-<meta property='og:url' content='https://pxchen110.github.io/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/'>
+<meta property='og:url' content='http://localhost:1313/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/'>
 <meta property='og:site_name' content='Xuan&#39;s Blog'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Github' /><meta property='article:tag' content='Hexo' /><meta property='article:tag' content='Linux' /><meta property='article:published_time' content='2024-02-21T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-02-21T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/20240201_img5.jpg' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Github' /><meta property='article:tag' content='Hexo' /><meta property='article:tag' content='Linux' /><meta property='article:published_time' content='2024-02-21T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-02-21T00:00:00&#43;00:00'/><meta property='og:image' content='http://localhost:1313/post/hexo-blog/20240201_img5.png' />
 <meta name="twitter:title" content="用Github+Hexo建立個人部落格：方法與問題紀錄">
 <meta name="twitter:description" content="決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。\n本機環境: MacOS Sonoma\nPart1: Github 創建倉庫專案 首先要創建GitHub帳號，Github是提供開發者存放專案、進行版本控制的好平台，大部分開源工具會將source code放在Github提供下載使用 選擇 Create a new repository 建立新專案，以 ${username}.github.io 來命名並以Public形式發表，初始狀態會產生一個空的reposiroty 回到本機端，以 git clone ${repository_url} 將專案載到本機端；完成後會在當前目錄找到和專案同名 ${username}.github.io 的資料夾 注意：由於之後我們會在這個資料夾下新增檔案，並推送回Github(git push)，過程牽涉authorization問題，可以先建立ssh-key 或 token 授權 Part2: 透過 npm 下載 Node.js 函式庫 Hexo 來推送管理Blog 在本機端安裝npm（Node.js的套件管理系統） 不同作業系統的安裝可參考 Node.js社群文件 我選擇透過Macport安裝： 先下載Macport 安裝 Node.js 和 npm 1 2 3 4 5 sudo port install nodejs10 sudo port -d selfupdate sudo port install npm npm -v #測試安裝是否成功 透過 npm 安裝 Hexo 並初始化，完成後會產生名為 blog 的資料夾 1 2 3 4 5 6 #install hexo (sudo) npm install hexo-cli -g # Blog initialization hexo init blog cd blog 將 blog/ 下的所有檔案複製到剛才clone回來的github repository 資料夾下，再執行npm 安裝 hexo 需要的套件 1 2 cp -R * /path/to/${username}.github.io (sudo) npm install 指令完成後將會看到以下檔案和資料夾，介紹我目前有編輯過的部分： _config.yml 是設定網站的配置檔案 theme/ 客製化主題存放的地方 source/_post/ 放置發布文章(.md)的地方 Part3: 編輯 configuration 並推回 Github 設定blog相關內容，keyword 解釋可參考官方文件。我編輯過的部分包含：\n"><meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content='https://pxchen110.github.io/20240201_img5.jpg' />
+    <meta name="twitter:image" content='http://localhost:1313/post/hexo-blog/20240201_img5.png' />
     </head>
     <body class="
     article-page
@@ -266,7 +266,7 @@
         <div class="article-image">
             <a href="/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/">
                 
-                    <img src="/20240201_img5.jpg" loading="lazy" alt="Featured image of post 用Github&#43;Hexo建立個人部落格：方法與問題紀錄" />
+                    <img src="/post/hexo-blog/20240201_img5.png" loading="lazy" alt="Featured image of post 用Github&#43;Hexo建立個人部落格：方法與問題紀錄" />
                 
             </a>
         </div>
@@ -426,7 +426,7 @@
 <li><code>_config.yml</code> 是設定網站的配置檔案</li>
 <li><code>theme/</code> 客製化主題存放的地方</li>
 <li><code>source/_post/</code> 放置發布文章(<code>.md</code>)的地方
-<img src="/20240201_img1.png"
+<img src="/post/hexo-blog/20240201_img1.png"
 	
 	
 	
@@ -444,7 +444,7 @@
     >官方文件</a>。我編輯過的部分包含：</p>
 <ul>
 <li>網站標題、作者、網址：
-<img src="/20240201_img2.png"
+<img src="/post/hexo-blog/20240201_img2.png"
 	
 	
 	
@@ -453,7 +453,7 @@
 	
 ></li>
 <li>deploy 來源：<strong>特別注意 push branch</strong>，由於 Github 目前 default branch 是 main，<strong>config 內要設定 push 到 main branch 才有效</strong>，當時我沒注意順手設 master，直接讓文章與主題樣式分離&hellip; repo 就貼上 ssh clone 的網址
-<img src="/20240201_img3.png"
+<img src="/post/hexo-blog/20240201_img3.png"
 	
 	
 	
@@ -513,7 +513,7 @@
 <pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">git clone ${theme_repository_url} /path/to/${username}.github.io/themes/theme_name
 </span></span></code></pre></td></tr></table>
 </div>
-</div><p><img src="/20240201_img4.png"
+</div><p><img src="/post/hexo-blog/20240201_img4.png"
 	
 	
 	
@@ -530,7 +530,7 @@
     >Demo Link</a></li>
 </ul>
 <p>目前做了基礎設定和更改背景，官方文件還有很多功能沒測試，持續摸索～</p>
-<p><img src="/20240201_img5.png"
+<p><img src="/post/hexo-blog/20240201_img5.png"
 	
 	
 	
@@ -752,7 +752,7 @@
                 src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
                 
                 >
-            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+            </script><script type="text/javascript" src="/ts/main.ce112b92e2539446c52e19f233321d31e001a69a3cb74d4a7af77be8ab73a636.js" defer></script>
 <script>
     (function () {
         const customFont = document.createElement('link');

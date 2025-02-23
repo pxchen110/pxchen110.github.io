@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Github on Xuan&#39;s Blog</title>
-        <link>https://pxchen110.github.io/tags/github/</link>
+        <link>http://localhost:1313/tags/github/</link>
         <description>Recent content in Github on Xuan&#39;s Blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en</language>
         <copyright>pxchen</copyright>
-        <lastBuildDate>Wed, 21 Feb 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://pxchen110.github.io/tags/github/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Wed, 21 Feb 2024 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/github/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>用Github&#43;Hexo建立個人部落格：方法與問題紀錄</title>
-        <link>https://pxchen110.github.io/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/</link>
+        <link>http://localhost:1313/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/</link>
         <pubDate>Wed, 21 Feb 2024 00:00:00 +0000</pubDate>
         
-        <guid>https://pxchen110.github.io/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/</guid>
-        <description>&lt;img src="https://pxchen110.github.io/20240201_img5.jpg" alt="Featured image of post 用Github&#43;Hexo建立個人部落格：方法與問題紀錄" /&gt;&lt;p&gt;決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。&lt;/p&gt;
+        <guid>http://localhost:1313/p/%E7%94%A8github-hexo%E5%BB%BA%E7%AB%8B%E5%80%8B%E4%BA%BA%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%B9%E6%B3%95%E8%88%87%E5%95%8F%E9%A1%8C%E7%B4%80%E9%8C%84/</guid>
+        <description>&lt;img src="http://localhost:1313/post/hexo-blog/20240201_img5.png" alt="Featured image of post 用Github&#43;Hexo建立個人部落格：方法與問題紀錄" /&gt;&lt;p&gt;決定撰寫個人部落格後，參考許多網友的平台推薦，最終決定選擇免付費和客製化自由度高的Github，同時練習 markdown語法, git 管理部分。本篇文章記錄我建立網站的步驟和遇到的問題，避坑避雷你我有責。&lt;/p&gt;
 &lt;!-- more --&gt;
 &lt;p&gt;本機環境: MacOS Sonoma&lt;/p&gt;
 &lt;!-- toc --&gt;
@@ -98,7 +98,7 @@
 &lt;li&gt;&lt;code&gt;_config.yml&lt;/code&gt; 是設定網站的配置檔案&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;theme/&lt;/code&gt; 客製化主題存放的地方&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;source/_post/&lt;/code&gt; 放置發布文章(&lt;code&gt;.md&lt;/code&gt;)的地方
-&lt;img src=&#34;https://pxchen110.github.io/20240201_img1.png&#34;
+&lt;img src=&#34;http://localhost:1313/post/hexo-blog/20240201_img1.png&#34;
 	
 	
 	
@@ -116,7 +116,7 @@
     &gt;官方文件&lt;/a&gt;。我編輯過的部分包含：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;網站標題、作者、網址：
-&lt;img src=&#34;https://pxchen110.github.io/20240201_img2.png&#34;
+&lt;img src=&#34;http://localhost:1313/post/hexo-blog/20240201_img2.png&#34;
 	
 	
 	
@@ -125,7 +125,7 @@
 	
 &gt;&lt;/li&gt;
 &lt;li&gt;deploy 來源：&lt;strong&gt;特別注意 push branch&lt;/strong&gt;，由於 Github 目前 default branch 是 main，&lt;strong&gt;config 內要設定 push 到 main branch 才有效&lt;/strong&gt;，當時我沒注意順手設 master，直接讓文章與主題樣式分離&amp;hellip; repo 就貼上 ssh clone 的網址
-&lt;img src=&#34;https://pxchen110.github.io/20240201_img3.png&#34;
+&lt;img src=&#34;http://localhost:1313/post/hexo-blog/20240201_img3.png&#34;
 	
 	
 	
@@ -185,7 +185,7 @@
 &lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git clone ${theme_repository_url} /path/to/${username}.github.io/themes/theme_name
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://pxchen110.github.io/20240201_img4.png&#34;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/post/hexo-blog/20240201_img4.png&#34;
 	
 	
 	
@@ -202,7 +202,7 @@
     &gt;Demo Link&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;目前做了基礎設定和更改背景，官方文件還有很多功能沒測試，持續摸索～&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://pxchen110.github.io/20240201_img5.png&#34;
+&lt;p&gt;&lt;img src=&#34;http://localhost:1313/post/hexo-blog/20240201_img5.png&#34;
 	
 	
 	
