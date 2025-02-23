@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="(Image from gnomAD website)\n上一篇文章著重討論 The Genome Aggregation Database (gnomAD) v3 版內容介紹，本文將介紹去年11月更新之gnomAD v4 (以及部分今年4月更新之 v4.1)。\n樣本收集 下表整理不同版本間使用的樣本數與參考序列，最大的更新為: v4 增收 416,555 UK Biobank WES data\nversion reference (type)sample size gnomAD v2.1 GRCh37 (WES) 125,748 ; (WGS) 15,708 gnomAD-SV v2.1 GRCh37 (WGS) 10,847 gnomAD v3.1 GRCh38 (WGS) 76,156 gnomAD v4.0 GRCh38 (WES) 730,947 ; (WGS) 76,215 gnomAD-SV v4.0 GRCh38 (WGS) 63,046 gnomAD-CNV v4.0 GRCh38 (WES) 464,297 從官網的統計圖表可清楚了解族群數量分布，由於UK Biobank 樣本以 European 為大宗，合併至 v4 使 European Ancestry比例偏高接近80% 另外值得注意的是 EAS 樣本數有大進展，從前幾版的不到萬人增至2萬初，能協助修正 allele frequency 的預估結果\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="(Image from gnomAD website)\n計畫簡介 The Genome Aggregation Database (gnomAD) 前身為 2014 年發起之 Exome Aggregation Consortium (ExAC)，計畫主旨為收集外顯子定序資料(WES)進行大規模樣本分析；而 gnomAD 資料庫不僅涵蓋外顯子資料(WES)也致力於收集全基因定序(WGS)進行族群性分析，本文將介紹 gnomAD v3, v2 版的樣本收集與分析流程，並閱讀2020 年發表之 gnomAD SV 文章。\n樣本收集 下表整理 gnomAD 兩種版本資料庫：\nMost of the genomes from v2 are included in v3.1.\nversion reference (type)sample size gnomAD v2.1 GRCh37 (WES) 125,748 ; (WGS) 15,708 gnomAD-SV v2.1 GRCh37 (WGS) 10,847 gnomAD v3.1 GRCh38 (WGS) 76,156 資料庫的樣本由不同cohort study以及大規模基因體計畫組成，像官網提到gnomAD有部分樣本來自1000 Genome Project:\n">
 <title>生資系列： gnomAD v3 database 介紹</title>
 
 <link rel='canonical' href='https://pxchen110.github.io/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/'>
 
 <link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="生資系列： gnomAD v3 database 介紹">
-<meta property='og:description' content="(Image from gnomAD website)\n上一篇文章著重討論 The Genome Aggregation Database (gnomAD) v3 版內容介紹，本文將介紹去年11月更新之gnomAD v4 (以及部分今年4月更新之 v4.1)。\n樣本收集 下表整理不同版本間使用的樣本數與參考序列，最大的更新為: v4 增收 416,555 UK Biobank WES data\nversion reference (type)sample size gnomAD v2.1 GRCh37 (WES) 125,748 ; (WGS) 15,708 gnomAD-SV v2.1 GRCh37 (WGS) 10,847 gnomAD v3.1 GRCh38 (WGS) 76,156 gnomAD v4.0 GRCh38 (WES) 730,947 ; (WGS) 76,215 gnomAD-SV v4.0 GRCh38 (WGS) 63,046 gnomAD-CNV v4.0 GRCh38 (WES) 464,297 從官網的統計圖表可清楚了解族群數量分布，由於UK Biobank 樣本以 European 為大宗，合併至 v4 使 European Ancestry比例偏高接近80% 另外值得注意的是 EAS 樣本數有大進展，從前幾版的不到萬人增至2萬初，能協助修正 allele frequency 的預估結果\n">
+<meta property='og:description' content="(Image from gnomAD website)\n計畫簡介 The Genome Aggregation Database (gnomAD) 前身為 2014 年發起之 Exome Aggregation Consortium (ExAC)，計畫主旨為收集外顯子定序資料(WES)進行大規模樣本分析；而 gnomAD 資料庫不僅涵蓋外顯子資料(WES)也致力於收集全基因定序(WGS)進行族群性分析，本文將介紹 gnomAD v3, v2 版的樣本收集與分析流程，並閱讀2020 年發表之 gnomAD SV 文章。\n樣本收集 下表整理 gnomAD 兩種版本資料庫：\nMost of the genomes from v2 are included in v3.1.\nversion reference (type)sample size gnomAD v2.1 GRCh37 (WES) 125,748 ; (WGS) 15,708 gnomAD-SV v2.1 GRCh37 (WGS) 10,847 gnomAD v3.1 GRCh38 (WGS) 76,156 資料庫的樣本由不同cohort study以及大規模基因體計畫組成，像官網提到gnomAD有部分樣本來自1000 Genome Project:\n">
 <meta property='og:url' content='https://pxchen110.github.io/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/'>
 <meta property='og:site_name' content='Xuan&#39;s Blog'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Bioinformatics' /><meta property='article:tag' content='Database' /><meta property='article:published_time' content='2024-05-16T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-05-16T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/bioinfo-gnomad-v4/20240523_img1.png' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Bioinformatics' /><meta property='article:tag' content='Database' /><meta property='article:published_time' content='2024-05-23T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-05-23T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/bioinfo-gnomad-v3/20240516_img1.png' />
 <meta name="twitter:title" content="生資系列： gnomAD v3 database 介紹">
-<meta name="twitter:description" content="(Image from gnomAD website)\n上一篇文章著重討論 The Genome Aggregation Database (gnomAD) v3 版內容介紹，本文將介紹去年11月更新之gnomAD v4 (以及部分今年4月更新之 v4.1)。\n樣本收集 下表整理不同版本間使用的樣本數與參考序列，最大的更新為: v4 增收 416,555 UK Biobank WES data\nversion reference (type)sample size gnomAD v2.1 GRCh37 (WES) 125,748 ; (WGS) 15,708 gnomAD-SV v2.1 GRCh37 (WGS) 10,847 gnomAD v3.1 GRCh38 (WGS) 76,156 gnomAD v4.0 GRCh38 (WES) 730,947 ; (WGS) 76,215 gnomAD-SV v4.0 GRCh38 (WGS) 63,046 gnomAD-CNV v4.0 GRCh38 (WES) 464,297 從官網的統計圖表可清楚了解族群數量分布，由於UK Biobank 樣本以 European 為大宗，合併至 v4 使 European Ancestry比例偏高接近80% 另外值得注意的是 EAS 樣本數有大進展，從前幾版的不到萬人增至2萬初，能協助修正 allele frequency 的預估結果\n"><meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content='https://pxchen110.github.io/post/bioinfo-gnomad-v4/20240523_img1.png' />
+<meta name="twitter:description" content="(Image from gnomAD website)\n計畫簡介 The Genome Aggregation Database (gnomAD) 前身為 2014 年發起之 Exome Aggregation Consortium (ExAC)，計畫主旨為收集外顯子定序資料(WES)進行大規模樣本分析；而 gnomAD 資料庫不僅涵蓋外顯子資料(WES)也致力於收集全基因定序(WGS)進行族群性分析，本文將介紹 gnomAD v3, v2 版的樣本收集與分析流程，並閱讀2020 年發表之 gnomAD SV 文章。\n樣本收集 下表整理 gnomAD 兩種版本資料庫：\nMost of the genomes from v2 are included in v3.1.\nversion reference (type)sample size gnomAD v2.1 GRCh37 (WES) 125,748 ; (WGS) 15,708 gnomAD-SV v2.1 GRCh37 (WGS) 10,847 gnomAD v3.1 GRCh38 (WGS) 76,156 資料庫的樣本由不同cohort study以及大規模基因體計畫組成，像官網提到gnomAD有部分樣本來自1000 Genome Project:\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/post/bioinfo-gnomad-v3/20240516_img1.png' />
     </head>
     <body class="
     article-page
@@ -244,21 +244,19 @@
         <div class="widget--toc">
             <nav id="TableOfContents">
   <ol>
-    <li><a href="#計畫簡介">計畫簡介</a></li>
     <li><a href="#樣本收集">樣本收集</a></li>
-    <li><a href="#分析流程">分析流程</a>
+    <li><a href="#v4-與-v3-差異">v4 與 v3 差異</a>
       <ol>
-        <li><a href="#sample-qc">Sample QC</a></li>
-        <li><a href="#variant-qc">Variant QC</a></li>
+        <li><a href="#取消-subset-釋出">取消 subset 釋出</a></li>
+        <li><a href="#filtering-allele-frequency-faf">filtering allele frequency (FAF)</a></li>
       </ol>
     </li>
-    <li><a href="#gnomad-sv-v21-文獻選讀">gnomAD-SV v2.1 文獻選讀</a>
+    <li><a href="#v4-exome-分析流程">v4 exome 分析流程</a></li>
+    <li><a href="#v4-sv">v4 SV</a></li>
+    <li><a href="#v4-cnv">v4 CNV</a>
       <ol>
-        <li><a href="#sample-size-and-population">Sample size and population</a></li>
-        <li><a href="#sv-discovery-and-genotyping">SV discovery and genotyping</a></li>
-        <li><a href="#population-genetics-and-genome-biology">Population genetics and genome biology</a></li>
-        <li><a href="#dosage-sensivity-on-coding-and-non-coding-loci">Dosage sensivity on coding and non-coding loci</a></li>
-        <li><a href="#remarks">Remarks</a></li>
+        <li><a href="#cnv-註釋">CNV 註釋</a></li>
+        <li><a href="#cnv-subsets">CNV subsets</a></li>
       </ol>
     </li>
     <li><a href="#references">References</a></li>
@@ -278,7 +276,7 @@
         <div class="article-image">
             <a href="/p/%E7%94%9F%E8%B3%87%E7%B3%BB%E5%88%97-gnomad-v3-database-%E4%BB%8B%E7%B4%B9/">
                 
-                    <img src="/post/bioinfo-gnomad-v4/20240523_img1.png" loading="lazy" alt="Featured image of post 生資系列： gnomAD v3 database 介紹" />
+                    <img src="/post/bioinfo-gnomad-v3/20240516_img1.png" loading="lazy" alt="Featured image of post 生資系列： gnomAD v3 database 介紹" />
                 
             </a>
         </div>
@@ -319,7 +317,7 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">May 23, 2024</time>
+                <time class="article-time--published">May 16, 2024</time>
             </div>
         
 
@@ -351,13 +349,11 @@
     
     <p>(Image from <a class="link" href="https://gnomad.broadinstitute.org/"  target="_blank" rel="noopener"
     >gnomAD</a> website)</p>
+<p>上一篇文章著重討論 The Genome Aggregation Database (gnomAD) v3 版內容介紹，本文將介紹去年11月更新之<strong>gnomAD v4</strong> (以及部分今年4月更新之 <strong>v4.1</strong>)。</p>
 <!-- more -->
 <!-- toc -->
-<h2 id="計畫簡介">計畫簡介
-</h2><p>The Genome Aggregation Database (gnomAD) 前身為 2014 年發起之 Exome Aggregation Consortium (ExAC)，計畫主旨為收集外顯子定序資料(WES)進行大規模樣本分析；而 gnomAD 資料庫不僅涵蓋外顯子資料(WES)也致力於收集全基因定序(WGS)進行族群性分析，本文將介紹 gnomAD v3, v2 版的樣本收集與分析流程，並閱讀2020 年發表之 gnomAD SV 文章。</p>
 <h2 id="樣本收集">樣本收集
-</h2><p>下表整理 gnomAD 兩種版本資料庫：</p>
-<p><strong>Most of the genomes from v2 are included in v3.1.</strong></p>
+</h2><p>下表整理不同版本間使用的樣本數與參考序列，最大的更新為: <strong>v4 增收 416,555 UK Biobank WES data</strong></p>
 <div class="table-wrapper"><table>
   <thead>
       <tr>
@@ -382,131 +378,112 @@
           <td style="text-align: left">GRCh38</td>
           <td style="text-align: left">(WGS) 76,156</td>
       </tr>
+      <tr>
+          <td style="text-align: left">gnomAD v4.0</td>
+          <td style="text-align: left">GRCh38</td>
+          <td style="text-align: left">(WES) 730,947 ; (WGS) 76,215</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">gnomAD-SV v4.0</td>
+          <td style="text-align: left">GRCh38</td>
+          <td style="text-align: left">(WGS) 63,046</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">gnomAD-CNV v4.0</td>
+          <td style="text-align: left">GRCh38</td>
+          <td style="text-align: left">(WES) 464,297</td>
+      </tr>
   </tbody>
 </table></div>
-<p>資料庫的樣本由不同cohort study以及大規模基因體計畫組成，像官網提到gnomAD有部分樣本來自1000 Genome Project:</p>
-<blockquote>
-<p>The majority of samples from the 1000 Genomes Project for which exome sequencing is available were included in v2. Whole genome sequencing from 3,202 subjects from the 1000 Genomes Project was included in gnomAD v3.1, though some were filtered out by our QC pipeline.</p></blockquote>
-<p>樣本來源包含以下特性：</p>
+<p>從官網的統計圖表可清楚了解族群數量分布，由於UK Biobank 樣本以 European 為大宗，合併至 v4 使 European Ancestry比例偏高接近80%
+另外值得注意的是 EAS 樣本數有大進展，從前幾版的不到萬人增至2萬初，能協助修正 allele frequency 的預估結果</p>
+<img src="/post/bioinfo-gnomad-v4/20240523_img2.jpg"  width="600">
+<h2 id="v4-與-v3-差異">v4 與 v3 差異
+</h2><h3 id="取消-subset-釋出">取消 subset 釋出
+</h3><p>過去v3樣本來自多種cohort，為提供研究者作為疾病研究的control，gnomAD v3 有釋出多種subsets，如: non-cancer subset 為排除罹患癌症或從相關 cohort study收集來的樣本群(更多介紹可參考前篇文章)。
+<strong>在v4版本僅有釋出non-UKBB subset</strong>，且僅提供allele frequency資訊給研究者做累加使用。下面文字截自gnomAD v4 SNV chrY VCF檔的INFO field，可以看到<strong>每個population都有拆分另外一組non-UKB的(prefix: non_ukb) 數據:</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">AC_afr_XY=0;AN_afr_XY=0;nhomalt_afr_XY=0;AC_afr=0;AN_afr=0;nhomalt_afr=0;...
+</span></span><span class="line"><span class="cl">AC_eas_XY=0;AN_eas_XY=0;nhomalt_eas_XY=0;...
+</span></span><span class="line"><span class="cl">AC_non_ukb_afr_XY=0;AN_non_ukb_afr_XY=0;nhomalt_non_ukb_afr_XY=0;AC_non_ukb_afr=0;AN_non_ukb_afr=0;nhomalt_non_ukb_afr=0;...
+</span></span><span class="line"><span class="cl">AC_non_ukb_eas_XY=0;AN_non_ukb_eas_XY=0;nhomalt_non_ukb_eas_XY=0;AC_non_ukb_eas=0;AN_non_ukb_eas=0;nhomalt_non_ukb_eas=0;...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此外若有使用註解 gnomAD 資料庫的工具如 dbnsfp，則可以明顯看到在資料庫版本更新後，就不會有  <code>gnomAD_exomes_non_cancer</code> 類似欄位產生，只會剩下 <code>gnomAD_exomes_non_ukb</code> 等欄位</p>
+<p>而v4取消製作subset原因包含:</p>
 <ul>
-<li>
-<p>近親樣本可同時被收錄：族群基因體學建議排除有親屬關係的樣本(如使用kinship等方式鑑定親屬關係)，而收錄家族樣本可用於驗證變異是否符合遺傳定律、並計算新發突變綠，如在面gnomAD-SV文章，就有提到使用970個<strong>family trio</strong>(父母加一位小孩的族譜)來驗證<em>de novo</em> mutation的比例。不過gnomAD在主要數值統計部分，為減少某allele因親緣關係干擾有先做樣本品質校正(sample QC)來排除二等親內的樣本共同被納入分析。</p>
-</li>
-<li>
-<p>統計樣本的族群來源：先前大規模基因定序計畫常有族群偏頗(population bias)的情況，而gnomAD致力於擴充非歐裔族群的樣本。</p>
-</li>
-<li>
-<p>樣本的健康狀況：資料庫的價值之一是作為不同研究的control，而control的特性就是相對於case(有特殊疾病或性狀者)、屬於沒有罹病或表現性狀的群體。gnomAD收集樣本會先將罹患罕病 (variant AF &lt; 1% ) 或因單基因造成嚴重遺傳疾病者排除。但也要注意，樣本收集當下的狀態，不代表未來的健康狀態，部分樣本可能帶有晚發性疾病(age onset disease, mostly relate to me)或常見疾病(common disease, associated with multi-variant loci)的變異。<strong>因此gnomAD較適合作為罕病的control，但不適合作為常見疾病的control</strong>。</p>
-</li>
+<li>研究特定疾病如cancer、neuro-disease等，這些疾病的盛行率並不會過高到需要透過(乾淨的?) subsets 來做比對與分析，建議直接使用 gnomAD metadata 來協助研究</li>
+<li>新加入的 UK Biobank 或是部分 cohort samples 並沒有完整 phenotype 資料，無法明確的區分樣本的疾病狀態</li>
 </ul>
-<p>樣本會依據以下條件分類：</p>
+<h3 id="filtering-allele-frequency-faf">filtering allele frequency (FAF)
+</h3><p>將 WES 和 WGS 的 allele count 合併計算之 allele frequency，稱作 filtering allele frequency</p>
+<h2 id="v4-exome-分析流程">v4 exome 分析流程
+</h2><p>(WGS 流程可參照 gnomAD v3版作法)
+由於 v4 最大進展在於 exome callset 樣本數的提升，因此後續分析流程也有些更新:</p>
 <ul>
-<li>族群來源
+<li>joint callset 由原本的 gVCF 格式轉為 VariantDataset (VDS) 格式儲存</li>
+<li>增加 <strong>interval QC</strong> 以確保目標區段擁有足夠的<strong>深度</strong>判別變異: 官網提供一組 <a class="link" href="https://gnomad.broadinstitute.org/help/what-are-your-calling-intervals-what-intervals-are-used-for-the-genomes-coding-only-files"  target="_blank" rel="noopener"
+    >interval list</a>，左右延伸(padding) 50bp 後計算每個樣本在這些區段的平均深度。最後將 &gt;85% 樣本擁有 &gt;20X 深度的區段定義為 high coverage intervals</li>
+<li>為 sample QC 定義 <strong>high qulaity site</strong>:為判斷樣本族群來源、親緣關係或定序品質，gnomAD v4從幾個資料集挑選 high quality sites (n = 175,043) 協助樣本QC:
 <ul>
-<li>族群可分成super population和sub-population(只有v2版有)兩種</li>
-<li>族群以genetic similarity 分群，使用 <a class="link" href="https://hail.is/docs/0.2/methods/genetics.html"  target="_blank" rel="noopener"
-    >hwe_normalized_pca function in Hail</a> principal component analysis (PCA) 分群並取前 10PC 當作 model feature</li>
+<li>屬於 autosomal, biallelic, single nucleotide variants (SNVs)</li>
+<li>位於 gnomAD v3, CCDG, 以及 UK Biobank dataset 的位點紀錄</li>
 </ul>
 </li>
-<li>性別(XX, XY)</li>
-<li>資料型態(WES, WGS)</li>
-<li>特性篩選
+<li>sample QC: 使用上面這些high quality site進行以下幾個重點QC
 <ul>
-<li>non-cancer:排除罹患癌症或從相關cohort study收集來的樣本群</li>
-<li>non-neuro:排除罹患精神性疾病、或從相關cohort study收集來的樣本群</li>
-<li>no-TOPMed:沒有出現在TOPMed/BRAVO資料庫的樣本群，好處是計算出的allele count可直接和TOPMed合併而不用做樣本對照</li>
-<li>control(v2.1):排除掉曾經出現在常見疾病研究中、被歸類為case的樣本</li>
-<li>controls/biobanks(v3.1):在不同研究中屬於control sample、或是收錄在biobank、大規模基因體計畫(1000 Genome, HGDP, PAGE)等的樣本</li>
-<li>non-v2(v3.1):排除曾收錄在v2.1版的樣本</li>
-</ul>
-</li>
-</ul>
-<p>目前兩版的subsets統計如下表:</p>
-<img src="/post/bioinfo-gnomad-v3/20240516_img2.jpg"  width="600">
-<img src="/post/bioinfo-gnomad-v3/20240516_img3.jpg"  width="600">
-<h2 id="分析流程">分析流程
-</h2><p>gnomAD的主要利用雲端平台<a class="link" href="https://support.terra.bio/hc/en-us/sections/360007274612"  target="_blank" rel="noopener"
-    >Terra</a> 進行分析，前部分的處理依照<a class="link" href="https://gatk.broadinstitute.org/hc/en-us/sections/360007226651-Best-Practices-Workflows"  target="_blank" rel="noopener"
-    >GATK best practice</a>；分析的最小單位是 sample，中間會將幾百個樣本合併為一批次(batch)進行分析，最終合併成 joint callset。</p>
-<p>由於資料量龐大，為確保最終釋出的變異集有高特異性（specificity，即記載的都為真），分析過程使用嚴謹的校正(variant QC)，下部分介紹這些QC內容。</p>
-<h3 id="sample-qc">Sample QC
-</h3><ul>
-<li>Hard filters: filter by civerage(&gt;18X), Het/Hom ratio</li>
-<li>inferring sex using normalized coverage on chromosome X and Y</li>
-<li>relatedness and ancestry assignments</li>
+<li>hard filters: 使用新工具從 genotype data 預估 contamination 而非重新拿raw read 分析。其他也用DP, Het/Hom ratio 等數值去篩</li>
+<li>PCA clustering for exome capture platform: 由於樣本來源多樣，使用PCA區分出20種定序平台，label上潛在差異</li>
+<li>sex karyotypes</li>
+<li>relatedness between v4 exomes and genomes, and identified pairs of first and second degree relatives</li>
+<li>genetic ancestry groups</li>
 <li>QC metrics</li>
 </ul>
-<h3 id="variant-qc">Variant QC
-</h3><p>進行variant QC的變異是從141,456個通過sample QC的樣本所偵測到的，WES和WGS的校正會使用相同pipeline分別進行，校正最重要的部分是使用隨機森林(Random Forest model) 選擇allele-specific annotations作為特徵值(feature)進行模型訓練，此外也會特別排除以下條件的變異：</p>
-<ul>
-<li>
-<p>InbreedingCoeff: Excess heterozygotes defined by an inbreeding coefficient &lt; -0.3 觀測變異的異型合子比例是否正常，若同型合子(homozygote)比例過高，則可能是近親種族多造成的，需要等樣本增加或排除更多sample後再被列入資料庫。</p>
 </li>
-<li>
-<p>AC0: No sample had a high quality genotype (depth &gt;= 10, genotype quality &gt;= 20 and minor allele balance &gt; 0.2 for heterozygous genotypes) 變異位點的品質本身較差，因此大部分樣本在此位置的品質都不好，須用更嚴謹的分析技術後，才能得到品質較高較可信的變異回報。</p>
-</li>
-<li>
-<p>random forest selected feature:
-<img src="/post/bioinfo-gnomad-v3/20240516_img4.jpg"  width="600"></p>
-</li>
-<li>
-<p>進行模型訓練的資料集來自過往的大規模計畫如1000 Genome Project，或是其他資料庫如Omni, Mills等，再來應用至gnomAD資料庫。</p>
-</li>
+<li>variant QC by VQSR (和 v3 一樣拿大型計劃的位點做模型訓練並應用類似的篩選條件)</li>
 </ul>
 <hr>
-<h2 id="gnomad-sv-v21-文獻選讀">gnomAD-SV v2.1 文獻選讀
-</h2><h3 id="sample-size-and-population">Sample size and population
-</h3><p>共 14,891 個樣本 (14,237 are high QC)，族群分布比例: 46.1% European, 34.9% African or African American, <strong>9.2% East Asian</strong>, and 8.7% Latino samples, as well as 1.2% samples from admixed or other populations</p>
-<h3 id="sv-discovery-and-genotyping">SV discovery and genotyping
-</h3><p>gnomAD-SV從14,891個WGS樣本中找到433,371 SVs，其中335,470 SVs是高品質的變異位點；如下圖所示，相比於過去針對SVs定序分析的計畫，其所使用的樣本數、樣本族群豐富度及偵測的變異總數都有所突破。
-首先是研究的族群來源</p>
-<img src="/post/bioinfo-gnomad-v3/20240516_img5.jpg"  width="600">
-<p>可以看到仍以歐洲、非裔每週或非洲族群佔大宗，亞洲樣本數約一千多人</p>
-<img src="/post/bioinfo-gnomad-v3/20240516_img6.jpg"  width="600">
-<p>偵測與過濾變異的流程圖如上圖所示，左上角簡介分析的所有大流程，共有8大步驟，右下角顯示每個工具分析所使用的樣本大小，包含每個人都會跑的Picard QC, variant caller外，也有整合300-400人左右的批次樣本(batch)，進行joint-calling的步驟，最後將所有batch利用clustering聚集後，將會形成龐大的cohort-wide sample set；接著簡介以下流程：</p>
+<h2 id="v4-sv">v4 SV
+</h2><p>和前版 v2.1相比，除了<strong>樣本數</strong>從一萬初<strong>增加至超過六萬</strong>、偵測位點數增加，參考序列也從 hg19/GRCh37 改成擁有 alternative contigs 的 <strong>GRCh38做為參考序列</strong>。
+偵測流程使用相同的 GATK-SV pipeline，並增進變異註解(annotation)的結果。gnomAD-SV v4 從63,046個WGS樣本中找到超過一百萬個 high-quality SVs，SV特徵的趨勢與前版本相同，多為短片段(median size 360bp)的罕見位點(96% SVs AF &lt; 1%)。</p>
+<p>gnomAD-SV v4 的結果已公開至網站，可先行查詢利用；至於技術細節等內容，等研究論文發表後再來更新，根據之前使用v2.1版資料的經驗，可以再拿新的East Asian AF 來做 correlation plot，不過中間需要針對變異座標進行liftover轉換，等有空再來嘗試看看。</p>
+<h2 id="v4-cnv">v4 CNV
+</h2><p><strong>gnomAD v4第一次釋出 CNV callset</strong>。也代表未來關於致病位點的研究，可往大片段缺失的偵測目標前進，並擁有 general population 資訊可參考。目前收錄從 464,297 WES data 找到之 rare ( AF &lt;1% ) autosomal coding copy number variants (CNVs)，使用 GATK-gCNV (Babadi et al. Nat Genet, 2023) 流程偵測變異。</p>
+<p>簡單順一下分析流程，主要利用比對至參考序列的BAM/CRAM作為input，並計算每個 protein-coding region (target interval) 的 read count (CNV 主要以深度差異來判斷) 接著使用這些數值做 clustering ，將特徵接近的樣本歸類至同一批次(batch)做後續分析。</p>
+<p>CNV流程需要baseline來比較深度差異，通常來自 panel of normal (PoN，在somatic偵測代表tumor相對應的正常樣本) 的結果，而gnomAD 無針對特殊疾病，所以採隨機挑選200樣本作為Pon，之後經由QC篩選，normalization等等，最終以read depth, read count 等特徵判定基因體內的CNV events。</p>
+<p>CNV偵測流程的可信度，透過一組同時具有WES(default input), WGS (IGV validation) 和 microarray 的樣本來驗證，透過和不同開源工具比較，詳細工具的演算法與使用差異，有機會再細看比較。</p>
+<h3 id="cnv-註釋">CNV 註釋
+</h3><p>在變異註釋方面，現今工具主要在短片段如SNV/indel方面詮釋較佳，如ensembl VEP, AnnotSv等，而CNV宜由於變異跨度大，對於現行臨床ACMG準則來說難以完整判定，且多以基因為單位個別做註釋，整體影響預測尚未完全，而gnomAD作為可能的reference dataset，也針對變異作了以下註釋:</p>
 <ul>
-<li>preprocessing:針對樣本的品質校正，利用Picard可以計算平均深度、高品質的數量等，而ploidy estimation利用序列計算基因倍體是否正常（diploid, triploid&hellip;）完成刪減樣本和組成批次樣本後，便會進行variant calling，使用的工具包含偵測SV的manta, DELLY、偵測跳躍分子(mobile element)的MELT和偵測大片段CNV的cnMOPS。</li>
-<li>clustering:將每個sample vcf將不同的algorithm偵測到的變異分開，並各自使用<a class="link" href="https://github.com/talkowski-lab/svtk"  target="_blank" rel="noopener"
-    >svtk vcfcluster</a> 進行合併</li>
-<li>evidence collection: 針對不同algorithm所進行的驗證也不一樣
+<li>基本的GENCODE 註釋，並以overlap的比例判斷是否給註釋</li>
+<li>長度與exon, interval範圍跨度</li>
+<li>集合與分族群統計的AF: site count (SC), site number (SN), and site frequency (SF)</li>
+</ul>
+<h3 id="cnv-subsets">CNV subsets
+</h3><p>和 gnomADv4 不同，由於大片段的罕見CNV位點與精神疾病有關連性，<strong>gnomAD CNV 有釋出兩組subsets</strong>:</p>
+<blockquote>
+<p>Due to the known enrichment of large, rare CNVs that confer substantial relative risk in neuropsychiatric phenotype
+neuropsychiatric conditions: bipolar, epilepsy, schizophrenia, psychosis, and general psychiatric conditions</p></blockquote>
 <ul>
-<li>PETest &amp; SRTest: 若使用split-read或pair-end偵測，將會測試number of discordant來確認變異的存在</li>
-<li>RDTest: 會計算帶有變異和沒帶有變異之兩樣本、在某區域所具有的平均深度，已確認變異真實存在（顯著性差異以two-sample t test /one sample Z-test計算）</li>
-<li>BAFTest: 主要是計算變異的來源，一般人有兩條序列，通常將其中一條命名為A、另一條為B，BAF即是計算序列來自兩allele的比例，以確保序列是heterozygous (A/B =0 )或是有一條特別多（CNV）。</li>
-</ul>
-</li>
-<li>variant filtering: 利用random forest test（在前面variant QC提到過）來篩選出變異品質不好的outlier</li>
-<li>genotyping</li>
-<li>batch integration: 前幾個步驟是以幾百個人的批次為單位進行，為了聚集成cohort 大小，會再將批次的結果合併，主要也是使用svtk工具進行合併和過濾品質。</li>
-<li>VCF refinement</li>
-<li>annotation：從其他database或預測變異會對下游蛋白造成的影響，雖沒有像SNV系統完善的ACMG guideline，目前有針對CNV提出的分類指南。</li>
-</ul>
-<p>為了確認此分析流程的可信度，gnomAD使用一些方法來benchmark，主要分為兩大類：</p>
-<ul>
-<li>technology quality: allele frequency of heterozygous rate, hardyy-weingerg equilibrium, LD with neighbor SNV events and AF concordance with 1KGP AF</li>
-<li>consistency in long-read data: using PacBio long read data to sequence same sample (NA12878, CHM1/13 cell line ) and calculate the SV confirmation rate</li>
-</ul>
-<h3 id="population-genetics-and-genome-biology">Population genetics and genome biology
-</h3><p>經由完整的單一樣本定序、批次整合、過濾SV位點和修正gneotype一致性的處理後，定義出這些人身上的SV總數，接著進行了以族群為單位SV總數差異、median SV size、SV AF、SV distribution in genome 和以演化角度的分析（mutation rate prediction）</p>
-<h3 id="dosage-sensivity-on-coding-and-non-coding-loci">Dosage sensivity on coding and non-coding loci
-</h3><p>SV變化對於蛋白質表現也會有影響，作者將這些SV依據對蛋白質的功能改變類型分成：Loss of function / copy gain / exon dupliation 以及inversion這四大類
-為了預測SV發生對於序列的影響是否存在演化上的意義，因此使用和gnomAD SNV database中pLOF定義相似的LOEUF來註解SV</p>
-<h3 id="remarks">Remarks
-</h3><ul>
-<li>使用的樣本數多，和CCDG以及HGSVC(做1KGP的分析)等團隊相比、樣本數最多</li>
-<li>使用的pipeline雖然沒有使用GIAB SV truth set進行表現衡量(2020同年發表)但在有家族關係的資料應用和分析上、可以確保不違背遺傳的genotype annotation，並預測這些SV的新發生率等</li>
-<li>雖說樣本數增加可以找到更多SV，但偵測效率也可能取決於以下幾個因素：sequencing data type, coverage, SV detection pipeline, 以及適合的QC control等</li>
-<li>像是1KGP收錄的樣本其深度最低有&lt; 10x，而本篇樣本WGS的平均深度32x還算深</li>
-<li>另外一個點在於gnomAD收錄的樣本多為health cohort，因此較適合用來評估common population SV allele frequency，對於rare disease-causing SV的應用方式，可能就是幫助他們過濾掉不太可能致病的位點，或是針對某個AR疾病計算其carrier rate</li>
+<li>non-neuro (n = 418,924): 非精神疾病相關cohort樣本(neuropsychiatric conditions)，以及 biobank 樣本</li>
+<li>non-neuro-control(n = 269,919): 不同cohort內標示為control的樣本,或是biobank樣本</li>
 </ul>
 <h2 id="references">References
-</h2><blockquote>
-<p><a class="link" href="https://gnomad.broadinstitute.org"  target="_blank" rel="noopener"
-    >https://gnomad.broadinstitute.org</a>
-<a class="link" href="https://www.nature.com/articles/s41586-020-2287-8"  target="_blank" rel="noopener"
-    >https://www.nature.com/articles/s41586-020-2287-8</a>
-<a class="link" href="https://macarthurlab.org/2019/03/20/structural-variants-in-gnomad/"  target="_blank" rel="noopener"
-    >https://macarthurlab.org/2019/03/20/structural-variants-in-gnomad/</a></p></blockquote>
+</h2><p><a class="link" href="https://gnomad.broadinstitute.org/news/2023-11-gnomad-v4-0/"  target="_blank" rel="noopener"
+    >https://gnomad.broadinstitute.org/news/2023-11-gnomad-v4-0/</a>
+<a class="link" href="https://gnomad.broadinstitute.org/news/2023-11-v4-structural-variants/"  target="_blank" rel="noopener"
+    >https://gnomad.broadinstitute.org/news/2023-11-v4-structural-variants/</a>
+<a class="link" href="https://gnomad.broadinstitute.org/news/2023-11-v4-copy-number-variants/"  target="_blank" rel="noopener"
+    >https://gnomad.broadinstitute.org/news/2023-11-v4-copy-number-variants/</a>
+<a class="link" href="https://gnomad.broadinstitute.org/news/2019-10-gnomad-v3-0/"  target="_blank" rel="noopener"
+    >https://gnomad.broadinstitute.org/news/2019-10-gnomad-v3-0/</a></p>
 
 </section>
 
