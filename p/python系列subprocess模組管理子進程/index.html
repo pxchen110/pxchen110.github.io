@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Background photo by Artturi Jalli on Unsplash\n撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\\輸入檔案的方式，產生目標內容。\n同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。\nPart1: subprocess 套件引入 subprocess 為 Python 內建模組，引入即可使用\n1 2 import subprocess from subprocess import PIPE, Popen Part2: 基本函數: run() and Popen() subprocess 啟動子進程的方式有兩種 subprocess.run() 和 subprocess.Popen 其中run()在大部分情況下都可使用，Popen() 則使用於更進階的底層操作 兩函數的基本參數都一樣，下面以 run() 來做參數介紹:\nsubprocess.run() 外部指令的參數有兩種輸入方式，但建議以list形式輸入: 可以使用 shlex 套件協助將指令 string 切分成 list 注意: shell = True 代表允許系統調用shell執行，如同讓主機門戶大開、容易發生 shell injection 的資安風險，請盡量少用 1 2 3 4 5 6 7 8 9 10 11 12 13 14 # in linux shell ln -s # in python subprocess run ## method1: input as list (recommend!) ## 徒手拆分成list subprocess.run([&#39;ln&#39;, &#39;-s&#39;]) ## 用shlex協助拆分成list cmd_split = shlex.split(&#39;ln -s&#39;) subprocess.run(cmd_split) ## method2: input as string, with shell = True subprocess.run(&#39;ln -s&#39;, shell = True) default 情況下，run() 執行無誤 (returncode = 0) 後會返回 subprocess.CompletedProcess 的實例並印出結果；如果想查看返回狀況，可加上check = True ， 當 returncode != 0 會抛出 CalledProcessError default 情況下，run() 將結果直接印出，若想抓取輸出並存成變數，可使用 capture_output = True default 輸出形式為 bytes，可用 text = True 來更改輸出形式，透過下面例子來比較: 1 2 3 4 5 6 7 a = subprocess.run([&#39;pwd&#39;], capture_output = True) print(a.stdout) &gt; b&#39;/current/working/directory\\n&#39; a = subprocess.run([&#39;pwd&#39;], capture_output = True, text = True) print(a.stdout) &gt; /current/working/directory subprocess.Popen() 大部分的參數跟 run() 相同，特別的是只有 Popen() 可使用 PIPE 在串聯子進程間的 stdout, stdin, stderr，並搭配 communicate()防止死瑣，詳細內容在Part3 注意: run()不能使用 PIPE 和 communicate()\n">
+<title>Python系列：subprocess模組管理子進程</title>
+
+<link rel='canonical' href='https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97subprocess%E6%A8%A1%E7%B5%84%E7%AE%A1%E7%90%86%E5%AD%90%E9%80%B2%E7%A8%8B/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Python系列：subprocess模組管理子進程">
+<meta property='og:description' content="Background photo by Artturi Jalli on Unsplash\n撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\\輸入檔案的方式，產生目標內容。\n同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。\nPart1: subprocess 套件引入 subprocess 為 Python 內建模組，引入即可使用\n1 2 import subprocess from subprocess import PIPE, Popen Part2: 基本函數: run() and Popen() subprocess 啟動子進程的方式有兩種 subprocess.run() 和 subprocess.Popen 其中run()在大部分情況下都可使用，Popen() 則使用於更進階的底層操作 兩函數的基本參數都一樣，下面以 run() 來做參數介紹:\nsubprocess.run() 外部指令的參數有兩種輸入方式，但建議以list形式輸入: 可以使用 shlex 套件協助將指令 string 切分成 list 注意: shell = True 代表允許系統調用shell執行，如同讓主機門戶大開、容易發生 shell injection 的資安風險，請盡量少用 1 2 3 4 5 6 7 8 9 10 11 12 13 14 # in linux shell ln -s # in python subprocess run ## method1: input as list (recommend!) ## 徒手拆分成list subprocess.run([&#39;ln&#39;, &#39;-s&#39;]) ## 用shlex協助拆分成list cmd_split = shlex.split(&#39;ln -s&#39;) subprocess.run(cmd_split) ## method2: input as string, with shell = True subprocess.run(&#39;ln -s&#39;, shell = True) default 情況下，run() 執行無誤 (returncode = 0) 後會返回 subprocess.CompletedProcess 的實例並印出結果；如果想查看返回狀況，可加上check = True ， 當 returncode != 0 會抛出 CalledProcessError default 情況下，run() 將結果直接印出，若想抓取輸出並存成變數，可使用 capture_output = True default 輸出形式為 bytes，可用 text = True 來更改輸出形式，透過下面例子來比較: 1 2 3 4 5 6 7 a = subprocess.run([&#39;pwd&#39;], capture_output = True) print(a.stdout) &gt; b&#39;/current/working/directory\\n&#39; a = subprocess.run([&#39;pwd&#39;], capture_output = True, text = True) print(a.stdout) &gt; /current/working/directory subprocess.Popen() 大部分的參數跟 run() 相同，特別的是只有 Popen() 可使用 PIPE 在串聯子進程間的 stdout, stdin, stderr，並搭配 communicate()防止死瑣，詳細內容在Part3 注意: run()不能使用 PIPE 和 communicate()\n">
+<meta property='og:url' content='https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97subprocess%E6%A8%A1%E7%B5%84%E7%AE%A1%E7%90%86%E5%AD%90%E9%80%B2%E7%A8%8B/'>
+<meta property='og:site_name' content='Xuan&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2024-02-22T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-02-22T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/python-subprocess/20240222_img1.jpg' />
+<meta name="twitter:title" content="Python系列：subprocess模組管理子進程">
+<meta name="twitter:description" content="Background photo by Artturi Jalli on Unsplash\n撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\\輸入檔案的方式，產生目標內容。\n同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。\nPart1: subprocess 套件引入 subprocess 為 Python 內建模組，引入即可使用\n1 2 import subprocess from subprocess import PIPE, Popen Part2: 基本函數: run() and Popen() subprocess 啟動子進程的方式有兩種 subprocess.run() 和 subprocess.Popen 其中run()在大部分情況下都可使用，Popen() 則使用於更進階的底層操作 兩函數的基本參數都一樣，下面以 run() 來做參數介紹:\nsubprocess.run() 外部指令的參數有兩種輸入方式，但建議以list形式輸入: 可以使用 shlex 套件協助將指令 string 切分成 list 注意: shell = True 代表允許系統調用shell執行，如同讓主機門戶大開、容易發生 shell injection 的資安風險，請盡量少用 1 2 3 4 5 6 7 8 9 10 11 12 13 14 # in linux shell ln -s # in python subprocess run ## method1: input as list (recommend!) ## 徒手拆分成list subprocess.run([&#39;ln&#39;, &#39;-s&#39;]) ## 用shlex協助拆分成list cmd_split = shlex.split(&#39;ln -s&#39;) subprocess.run(cmd_split) ## method2: input as string, with shell = True subprocess.run(&#39;ln -s&#39;, shell = True) default 情況下，run() 執行無誤 (returncode = 0) 後會返回 subprocess.CompletedProcess 的實例並印出結果；如果想查看返回狀況，可加上check = True ， 當 returncode != 0 會抛出 CalledProcessError default 情況下，run() 將結果直接印出，若想抓取輸出並存成變數，可使用 capture_output = True default 輸出形式為 bytes，可用 text = True 來更改輸出形式，透過下面例子來比較: 1 2 3 4 5 6 7 a = subprocess.run([&#39;pwd&#39;], capture_output = True) print(a.stdout) &gt; b&#39;/current/working/directory\\n&#39; a = subprocess.run([&#39;pwd&#39;], capture_output = True, text = True) print(a.stdout) &gt; /current/working/directory subprocess.Popen() 大部分的參數跟 run() 相同，特別的是只有 Popen() 可使用 PIPE 在串聯子進程間的 stdout, stdin, stderr，並搭配 communicate()防止死瑣，詳細內容在Part3 注意: run()不能使用 PIPE 和 communicate()\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/post/python-subprocess/20240222_img1.jpg' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/profile_hu_d0d4f9ff9a7faeba.jpg" width="300"
+                            height="299" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Xuan&#39;s Blog</a></h1>
+            <h2 class="site-description">長大以後就是小瑄</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/pxchen110'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#part1-subprocess-套件引入">Part1: subprocess 套件引入</a></li>
+    <li><a href="#part2-基本函數-run-and-popen">Part2: 基本函數: run() and Popen()</a>
+      <ol>
+        <li><a href="#subprocessrun">subprocess.run()</a></li>
+        <li><a href="#subprocesspopen">subprocess.Popen()</a></li>
+      </ol>
+    </li>
+    <li><a href="#part3-以-pipe-串聯進程間的輸入-輸出">Part3: 以 PIPE 串聯進程間的輸入\ 輸出</a></li>
+    <li><a href="#part4-實例應用">Part4: 實例應用</a>
+      <ol>
+        <li><a href="#example1">Example1:</a></li>
+        <li><a href="#example2">Example2:</a></li>
+      </ol>
+    </li>
+    <li><a href="#參考資料">參考資料</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/python%E7%B3%BB%E5%88%97subprocess%E6%A8%A1%E7%B5%84%E7%AE%A1%E7%90%86%E5%AD%90%E9%80%B2%E7%A8%8B/">
+                
+                    <img src="/post/python-subprocess/20240222_img1.jpg" loading="lazy" alt="Featured image of post Python系列：subprocess模組管理子進程" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/python/" >
+                Python
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/python%E7%B3%BB%E5%88%97subprocess%E6%A8%A1%E7%B5%84%E7%AE%A1%E7%90%86%E5%AD%90%E9%80%B2%E7%A8%8B/">Python系列：subprocess模組管理子進程</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Feb 22, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>Background photo by <a class="link" href="https://unsplash.com/@artturijalli"  target="_blank" rel="noopener"
+    >Artturi Jalli</a> on <a class="link" href="https://unsplash.com/"  target="_blank" rel="noopener"
+    >Unsplash</a></p>
+<p>撰寫程式專案時，常需要在父進程下創建子進程進行支線任務，例如在shell script(.sh)中，會在 linux command 的基礎下，包含 python script, R script 的執行，透過串聯輸出\輸入檔案的方式，產生目標內容。</p>
+<p>同理我們也能在以 python 做為父進程的情況下，以 subprocess 模組協助執行外部指令(子進程)、串接資料輸出\輸入的管道、並取得返回值，本文將介紹 subprocess 模組管理子進程的方法與程式碼。</p>
+<!-- more -->
+<!-- toc -->
+<h2 id="part1-subprocess-套件引入">Part1: subprocess 套件引入
+</h2><p>subprocess 為 Python 內建模組，引入即可使用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">import subprocess
+</span></span><span class="line"><span class="cl">from subprocess import PIPE, Popen
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="part2-基本函數-run-and-popen">Part2: 基本函數: run() and Popen()
+</h2><p>subprocess 啟動子進程的方式有兩種 <code>subprocess.run()</code> 和 <code>subprocess.Popen</code>
+其中<code>run()</code>在大部分情況下都可使用，<code>Popen()</code> 則使用於更進階的底層操作
+兩函數的基本參數都一樣，下面以 <code>run()</code> 來做參數介紹:</p>
+<h3 id="subprocessrun">subprocess.run()
+</h3><ol>
+<li>外部指令的參數有兩種輸入方式，但<strong>建議以list形式</strong>輸入:
+可以使用 <code>shlex</code> 套件協助將指令 string 切分成 list
+<strong>注意: <code>shell = True</code> 代表允許系統調用shell執行，如同讓主機門戶大開、容易發生 shell injection 的資安風險</strong>，請盡量少用</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># in linux shell
+</span></span><span class="line"><span class="cl">ln -s
+</span></span><span class="line"><span class="cl"># in python subprocess run
+</span></span><span class="line"><span class="cl">## method1: input as list (recommend!)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## 徒手拆分成list
+</span></span><span class="line"><span class="cl">subprocess.run([&#39;ln&#39;, &#39;-s&#39;])
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## 用shlex協助拆分成list
+</span></span><span class="line"><span class="cl">cmd_split = shlex.split(&#39;ln -s&#39;)
+</span></span><span class="line"><span class="cl">subprocess.run(cmd_split)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">## method2: input as string, with shell = True
+</span></span><span class="line"><span class="cl">subprocess.run(&#39;ln -s&#39;, shell = True)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="2">
+<li>default 情況下，<code>run()</code> 執行無誤 (returncode = 0) 後會返回 <code>subprocess.CompletedProcess</code> 的實例並印出結果；如果想查看返回狀況，可加上<code>check = True</code> ， 當 returncode != 0 會抛出 <code>CalledProcessError</code></li>
+<li>default 情況下，<code>run()</code> 將結果直接印出，若想<strong>抓取輸出並存成變數</strong>，可使用 <code>capture_output = True</code></li>
+<li>default 輸出形式為 bytes，可用 <code>text = True</code> 來更改輸出形式，透過下面例子來比較:</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">a = subprocess.run([&#39;pwd&#39;], capture_output = True)
+</span></span><span class="line"><span class="cl">print(a.stdout)
+</span></span><span class="line"><span class="cl">&gt; b&#39;/current/working/directory\n&#39;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">a = subprocess.run([&#39;pwd&#39;], capture_output = True, text = True)
+</span></span><span class="line"><span class="cl">print(a.stdout)
+</span></span><span class="line"><span class="cl">&gt; /current/working/directory
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="subprocesspopen">subprocess.Popen()
+</h3><p>大部分的參數跟 <code>run()</code> 相同，特別的是<strong>只有 <code>Popen()</code> 可使用 <code>PIPE</code> 在串聯子進程間的 stdout, stdin, stderr，並搭配 <code>communicate()</code>防止死瑣</strong>，詳細內容在Part3
+<strong>注意: run()不能使用 PIPE 和 communicate()</strong></p>
+<h2 id="part3-以-pipe-串聯進程間的輸入-輸出">Part3: 以 PIPE 串聯進程間的輸入\ 輸出
+</h2><p>PIPE 觀念相當於 linux 裡的 piping <code>|</code>，可減少中間檔案儲存的冗餘。
+下面的例子利用 PIPE 將第一個子進程的輸出，當作第二個子進程的輸入</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">cmd1 = subprocess.Popen([&#39;pwd&#39;], stdout = PIPE)
+</span></span><span class="line"><span class="cl">subprocess.Popen([&#39;ls&#39;, &#39;-alh&#39;], stdin = cmd1.stdout)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>PIPE 的實用程度高，但當管道內暫存的資料量過大，會造成子進程卡住，永遠無法結束(稱作死瑣)，使用 communicate() 可即時讀取 PIPE 內容:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">e = subprocess.Popen([&#39;pwd&#39;], stdout = PIPE, stdin = PIPE, text = True)
+</span></span><span class="line"><span class="cl">out, err = e.communicate() 
+</span></span><span class="line"><span class="cl">print(out)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>另外也可將 PIPE 的輸出存進檔案，解決死瑣問題</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">f = open(&#39;save_stdout.txt&#39;, &#39;w&#39;)
+</span></span><span class="line"><span class="cl">subprocess.Popen([&#39;pwd&#39;], stdout = f, text = True)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="part4-實例應用">Part4: 實例應用
+</h2><h3 id="example1">Example1:
+</h3><p>我想檢查幾份log檔<strong>是否有回報錯誤訊息</strong>，利用 <code>PIPE</code> 加上 <code>communicate()</code> 將子進程 grep 到的內容存進 out 變數、並判斷是否有錯誤訊息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">import shlex
+</span></span><span class="line"><span class="cl">import subprocess
+</span></span><span class="line"><span class="cl">from subprocess import PIPE, Popen
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">logs = [&#39;log.1&#39;, &#39;log.2&#39;]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">for i in logs:
+</span></span><span class="line"><span class="cl">    cmd = shlex.split(&#39;grep &#34;terminated with an error exit status&#34; {}&#39;.format(i))
+</span></span><span class="line"><span class="cl">    p = subprocess.Popen(cmd, stdout = PIPE, text = True)
+</span></span><span class="line"><span class="cl">    out,err = p.communicate()
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    if out: ## NOT NULL
+</span></span><span class="line"><span class="cl">    sys.exit(&#39;Error occured, please refer to {} for more detail&#39;.format(i))
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="example2">Example2:
+</h3><p>現在有一份vcf原始檔，需要先以bio-tool(using Singularity)做格式轉換，再用python做資料篩選，但我<strong>不想產生轉換格式的中間檔</strong>，於是寫了以下 python script，以原始vcf做input，先開一個子進程處理vcf，以PIPE儲存輸出，存進 pyton 變數並作後續篩選</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">import sys
+</span></span><span class="line"><span class="cl">import shlex
+</span></span><span class="line"><span class="cl">import subprocess
+</span></span><span class="line"><span class="cl">from subprocess import PIPE, Popen
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">origin_vcf = sys.argv[1]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">cmds = shlex.split(&#39;singularity exec vcflib_1.0.0-rc2.sif vcf2tsv {}&#39;.format(origin_vcf))
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">input_vcf = subprocess.run(cmds, stdout = PIPE).stdout.decode(&#39;utf-8&#39;).splitlines()
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">for lines in input_vcf: #post-filtering in python
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="參考資料">參考資料
+</h2><p><a class="link" href="https://docs.python.org/zh-tw/3/library/subprocess.html#"  target="_blank" rel="noopener"
+    >https://docs.python.org/zh-tw/3/library/subprocess.html#</a>
+<a class="link" href="https://www.aikaiyuan.com/4705.html"  target="_blank" rel="noopener"
+    >https://www.aikaiyuan.com/4705.html</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97-%E4%B8%89%E7%A8%AE%E5%BC%95%E5%85%A5%E5%A4%96%E9%83%A8%E5%8F%83%E6%95%B8%E7%9A%84%E6%96%B9%E6%B3%95/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-argument-input/20240221_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-argument-input/20240221_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列： 三種引入外部參數的方法</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97-smtplib-%E6%A8%A1%E7%B5%84%E5%AF%A6%E7%8F%BE%E8%87%AA%E5%8B%95%E5%AF%84%E4%BF%A1/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-smtplib/20240215_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-smtplib/20240215_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列： smtplib 模組實現自動寄信</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "pxchen110-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 pxchen
+
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

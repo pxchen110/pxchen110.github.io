@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="这是一个副标题">
-<title>Chinese Test</title>
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為要來我家看貓嗎的小網頁\n切版架構 可以分成兩大區塊:\nheader section body section header section html元素: 單純地用h1做大標題\ncss樣式設計:\n整體div固定在最上方，並加上z-index讓body上滑不會蓋住它 1 2 3 4 5 6 7 position: fixed; z-index: 2; top: 0; border: 1px solid lightblue; background-color: lightblue; width: 100%; /*fill all broswer*/ height: 50px; body section body部分以 display:flex 排列，並添加 wrapper 讓每行可以依照視窗大小改變容器數量 每個容器包含img,固定寬度200px 加上一些文字描述，和尚未引入javascript的button，其中有添加cursor樣式以及hover的pseudo element 為了讓文字與圖片置中排列於容器內，以position: relative 定位，使用 left: 50%; margin-left:-(img_width/2); 來置中\n">
+<title>HTML&#43;CSS成果展(1)：可愛貓咪網站</title>
 
-<link rel='canonical' href='http://localhost:1313/p/test-chinese/'>
+<link rel='canonical' href='https://pxchen110.github.io/p/html-css%E6%88%90%E6%9E%9C%E5%B1%951%E5%8F%AF%E6%84%9B%E8%B2%93%E5%92%AA%E7%B6%B2%E7%AB%99/'>
 
-<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Chinese Test">
-<meta property='og:description' content="这是一个副标题">
-<meta property='og:url' content='http://localhost:1313/p/test-chinese/'>
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="HTML+CSS成果展(1)：可愛貓咪網站">
+<meta property='og:description' content="在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為要來我家看貓嗎的小網頁\n切版架構 可以分成兩大區塊:\nheader section body section header section html元素: 單純地用h1做大標題\ncss樣式設計:\n整體div固定在最上方，並加上z-index讓body上滑不會蓋住它 1 2 3 4 5 6 7 position: fixed; z-index: 2; top: 0; border: 1px solid lightblue; background-color: lightblue; width: 100%; /*fill all broswer*/ height: 50px; body section body部分以 display:flex 排列，並添加 wrapper 讓每行可以依照視窗大小改變容器數量 每個容器包含img,固定寬度200px 加上一些文字描述，和尚未引入javascript的button，其中有添加cursor樣式以及hover的pseudo element 為了讓文字與圖片置中排列於容器內，以position: relative 定位，使用 left: 50%; margin-left:-(img_width/2); 來置中\n">
+<meta property='og:url' content='https://pxchen110.github.io/p/html-css%E6%88%90%E6%9E%9C%E5%B1%951%E5%8F%AF%E6%84%9B%E8%B2%93%E5%92%AA%E7%B6%B2%E7%AB%99/'>
 <meta property='og:site_name' content='Xuan&#39;s Blog'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2020-09-09T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2020-09-09T00:00:00&#43;00:00'/><meta property='og:image' content='http://localhost:1313/helena-hertz-wWZzXlDpMog-unsplash.jpg' />
-<meta name="twitter:title" content="Chinese Test">
-<meta name="twitter:description" content="这是一个副标题"><meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content='http://localhost:1313/helena-hertz-wWZzXlDpMog-unsplash.jpg' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='HTML' /><meta property='article:tag' content='CSS' /><meta property='article:published_time' content='2024-02-08T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-02-08T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/html-css-practice1/20240208_img2.png' />
+<meta name="twitter:title" content="HTML+CSS成果展(1)：可愛貓咪網站">
+<meta name="twitter:description" content="在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為要來我家看貓嗎的小網頁\n切版架構 可以分成兩大區塊:\nheader section body section header section html元素: 單純地用h1做大標題\ncss樣式設計:\n整體div固定在最上方，並加上z-index讓body上滑不會蓋住它 1 2 3 4 5 6 7 position: fixed; z-index: 2; top: 0; border: 1px solid lightblue; background-color: lightblue; width: 100%; /*fill all broswer*/ height: 50px; body section body部分以 display:flex 排列，並添加 wrapper 讓每行可以依照視窗大小改變容器數量 每個容器包含img,固定寬度200px 加上一些文字描述，和尚未引入javascript的button，其中有添加cursor樣式以及hover的pseudo element 為了讓文字與圖片置中排列於容器內，以position: relative 定位，使用 left: 50%; margin-left:-(img_width/2); 來置中\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/post/html-css-practice1/20240208_img2.png' />
     </head>
     <body class="
     article-page
@@ -244,9 +244,10 @@
         <div class="widget--toc">
             <nav id="TableOfContents">
   <ol>
-    <li><a href="#正文测试">正文测试</a></li>
-    <li><a href="#引用">引用</a></li>
-    <li><a href="#图片">图片</a></li>
+    <li><a href="#切版架構">切版架構</a></li>
+    <li><a href="#header-section">header section</a></li>
+    <li><a href="#body-section">body section</a></li>
+    <li><a href="#成果展示">成果展示</a></li>
   </ol>
 </nav>
         </div>
@@ -261,9 +262,9 @@
     <article class="has-image main-article">
     <header class="article-header">
         <div class="article-image">
-            <a href="/p/test-chinese/">
+            <a href="/p/html-css%E6%88%90%E6%9E%9C%E5%B1%951%E5%8F%AF%E6%84%9B%E8%B2%93%E5%92%AA%E7%B6%B2%E7%AB%99/">
                 
-                    <img src="/helena-hertz-wWZzXlDpMog-unsplash.jpg" loading="lazy" alt="Featured image of post Chinese Test" />
+                    <img src="/post/html-css-practice1/20240208_img2.png" loading="lazy" alt="Featured image of post HTML&#43;CSS成果展(1)：可愛貓咪網站" />
                 
             </a>
         </div>
@@ -273,12 +274,8 @@
     
     <header class="article-category">
         
-            <a href="/categories/test/" style="background-color: #2a9d8f; color: #fff;">
-                Test
-            </a>
-        
-            <a href="/categories/%E6%B5%8B%E8%AF%95/" >
-                测试
+            <a href="/categories/front-end/" >
+                Front-End
             </a>
         
     </header>
@@ -286,13 +283,9 @@
 
     <div class="article-title-wrapper">
         <h2 class="article-title">
-            <a href="/p/test-chinese/">Chinese Test</a>
+            <a href="/p/html-css%E6%88%90%E6%9E%9C%E5%B1%951%E5%8F%AF%E6%84%9B%E8%B2%93%E5%92%AA%E7%B6%B2%E7%AB%99/">HTML&#43;CSS成果展(1)：可愛貓咪網站</a>
         </h2>
     
-        
-        <h3 class="article-subtitle">
-            这是一个副标题
-        </h3>
         
     </div>
 
@@ -312,7 +305,7 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">Sep 09, 2020</time>
+                <time class="article-time--published">Feb 08, 2024</time>
             </div>
         
 
@@ -342,56 +335,105 @@
     <section class="article-content">
     
     
-    <h2 id="正文测试">正文测试
-</h2><p>而这些并不是完全重要，更加重要的问题是， 带着这些问题，我们来审视一下学生会退会。 既然如何， 对我个人而言，学生会退会不仅仅是一个重大的事件，还可能会改变我的人生。 我们不得不面对一个非常尴尬的事实，那就是， 可是，即使是这样，学生会退会的出现仍然代表了一定的意义。 学生会退会，发生了会如何，不发生又会如何。 经过上述讨论， 生活中，若学生会退会出现了，我们就不得不考虑它出现了的事实。 学生会退会，到底应该如何实现。 这样看来， 在这种困难的抉择下，本人思来想去，寝食难安。 对我个人而言，学生会退会不仅仅是一个重大的事件，还可能会改变我的人生。 就我个人来说，学生会退会对我的意义，不能不说非常重大。 莎士比亚曾经提到过，人的一生是短的，但如果卑劣地过这一生，就太长了。这似乎解答了我的疑惑。 莫扎特说过一句富有哲理的话，谁和我一样用功，谁就会和我一样成功。这启发了我， 对我个人而言，学生会退会不仅仅是一个重大的事件，还可能会改变我的人生。 学生会退会，到底应该如何实现。 一般来说， 从这个角度来看， 这种事实对本人来说意义重大，相信对这个世界也是有一定意义的。 在这种困难的抉择下，本人思来想去，寝食难安。 了解清楚学生会退会到底是一种怎么样的存在，是解决一切问题的关键。 一般来说， 生活中，若学生会退会出现了，我们就不得不考虑它出现了的事实。 问题的关键究竟为何？ 而这些并不是完全重要，更加重要的问题是。</p>
-<p>奥斯特洛夫斯基曾经说过，共同的事业，共同的斗争，可以使人们产生忍受一切的力量。　带着这句话，我们还要更加慎重的审视这个问题： 一般来讲，我们都必须务必慎重的考虑考虑。 既然如此， 这种事实对本人来说意义重大，相信对这个世界也是有一定意义的。 带着这些问题，我们来审视一下学生会退会。 我认为， 我认为， 在这种困难的抉择下，本人思来想去，寝食难安。 问题的关键究竟为何？ 每个人都不得不面对这些问题。 在面对这种问题时， 要想清楚，学生会退会，到底是一种怎么样的存在。 我认为， 既然如此， 每个人都不得不面对这些问题。 在面对这种问题时， 那么， 我认为， 学生会退会因何而发生。</p>
-<h2 id="引用">引用
-</h2><blockquote>
-<p>思念是最暖的忧伤像一双翅膀<br>
-让我停不了飞不远在过往游荡<br>
-不告而别的你 就算为了我着想<br>
-这么沉痛的呵护 我怎么能翱翔</p>
-<p><em><a class="link" href="https://www.youtube.com/watch?v=3aypp_YlBzI"  target="_blank" rel="noopener"
-    >最暖的憂傷 - 田馥甄</a></em></p></blockquote>
-<h2 id="图片">图片
-</h2><p><img src="/florian-klauer-nptLmg6jqDo-unsplash.jpg"
+    <p>在udemy上學了html+css的知識，光看不會進步，動手做一遍才知道不熟的地方，我寫一個標題為<strong>要來我家看貓嗎</strong>的小網頁</p>
+<!-- more -->
+<!-- toc -->
+<h2 id="切版架構">切版架構
+</h2><p><img src="/post/html-css-practice1/20240208_img1.png"
 	
 	
 	
 	loading="lazy"
-	
-		alt="Photo by Florian Klauer on Unsplash"
-	
-	
->  <img src="/luca-bravo-alS7ewQ41M8-unsplash.jpg"
-	
-	
-	
-	loading="lazy"
-	
-		alt="Photo by Luca Bravo on Unsplash"
 	
 	
 ></p>
-<p><img src="/helena-hertz-wWZzXlDpMog-unsplash.jpg"
-	
-	
-	
-	loading="lazy"
-	
-		alt="Photo by Helena Hertz on Unsplash"
-	
-	
->  <img src="/hudai-gayiran-3Od_VKcDEAA-unsplash.jpg"
-	
-	
-	
-	loading="lazy"
-	
-		alt="Photo by Hudai Gayiran on Unsplash"
-	
-	
-></p>
+<p>可以分成兩大區塊:</p>
+<ul>
+<li>header section</li>
+<li>body section</li>
+</ul>
+<h2 id="header-section">header section
+</h2><p>html元素: 單純地用h1做大標題</p>
+<p>css樣式設計:</p>
+<ul>
+<li>整體div固定在最上方，並加上z-index讓body上滑不會蓋住它</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    position: fixed; 
+</span></span><span class="line"><span class="cl">    z-index: 2;
+</span></span><span class="line"><span class="cl">    top: 0;
+</span></span><span class="line"><span class="cl">    border: 1px solid lightblue;
+</span></span><span class="line"><span class="cl">    background-color: lightblue;
+</span></span><span class="line"><span class="cl">    width: 100%; /*fill all broswer*/
+</span></span><span class="line"><span class="cl">    height: 50px;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="body-section">body section
+</h2><p>body部分以 <code>display:flex</code> 排列，並添加 wrapper 讓每行可以依照視窗大小改變容器數量
+每個容器包含img,固定寬度200px
+加上一些文字描述，和尚未引入javascript的button，其中有添加cursor樣式以及hover的pseudo element
+為了讓文字與圖片置中排列於容器內，以position: relative 定位，使用 <code>left: 50%; margin-left:-(img_width/2);</code> 來置中</p>
+<p>html元素:</p>
+<ul>
+<li>區塊模板相同，每個div由上到下依序為標題div、圖檔img、文字div、以及按鈕button</li>
+</ul>
+<p>css樣式設計:</p>
+<ul>
+<li>整體body沒有加定位樣式，因此設margin-top來預防被header遮蓋</li>
+<li>對於內部區塊模板，以flex呈現水平排列，並設定flex-wrap來允許視窗大小改變時，div能變成多行排列</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    display: flex;
+</span></span><span class="line"><span class="cl">    flex-direction: row;
+</span></span><span class="line"><span class="cl">    flex-wrap: wrap; 
+</span></span><span class="line"><span class="cl">    align-content: flex-start;
+</span></span><span class="line"><span class="cl">    margin: 50px;
+</span></span><span class="line"><span class="cl">    margin-top: 200px; /*solving position:fixed covering problem*/
+</span></span><span class="line"><span class="cl">    width:auto;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>針對區塊模板，給予寬度後設定 <code>margin:auto</code> 來均分左右空間，border調整圓弧形</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    margin: auto; /*share left space equally*/
+</span></span><span class="line"><span class="cl">    border: 1px solid lightblue;
+</span></span><span class="line"><span class="cl">    border-radius: 10%;
+</span></span><span class="line"><span class="cl">    width: 300px;
+</span></span><span class="line"><span class="cl">    height: 400px; 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>區塊內部的按鈕，加上鼠標移上去的偽元素樣式</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
@@ -399,19 +441,45 @@
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">![<span class="nt">Photo by Florian Klauer on Unsplash</span>](<span class="na">florian-klauer-nptLmg6jqDo-unsplash.jpg</span>)  ![<span class="nt">Photo by Luca Bravo on Unsplash</span>](<span class="na">luca-bravo-alS7ewQ41M8-unsplash.jpg</span>) 
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">![<span class="nt">Photo by Helena Hertz on Unsplash</span>](<span class="na">helena-hertz-wWZzXlDpMog-unsplash.jpg</span>)  ![<span class="nt">Photo by Hudai Gayiran on Unsplash</span>](<span class="na">hudai-gayiran-3Od_VKcDEAA-unsplash.jpg</span>)
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    .but-class-name:hover {
+</span></span><span class="line"><span class="cl">        background-color: lightcoral;
+</span></span><span class="line"><span class="cl">    } 
 </span></span></code></pre></td></tr></table>
 </div>
-</div><p>相册语法来自 <a class="link" href="https://typlog.com/"  target="_blank" rel="noopener"
-    >Typlog</a></p>
+</div><h2 id="成果展示">成果展示
+</h2><p><a class="link" href="https://github.com/pxchen110/html_case/tree/main/cute_cat_html"  target="_blank" rel="noopener"
+    >Github 原始碼</a></p>
+<p>從下兩張圖比對，可以看到當螢幕尺寸改變，每行可容納的div數量也會彈性調整</p>
+<p><img src="/post/html-css-practice1/20240208_img2.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p><img src="/post/html-css-practice1/20240208_img3.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
 
 </section>
 
 
     <footer class="article-footer">
     
+    <section class="article-tags">
+        
+            <a href="/tags/html/">HTML</a>
+        
+            <a href="/tags/css/">CSS</a>
+        
+    </section>
+
 
     
     <section class="article-copyright">
@@ -434,6 +502,34 @@
     
 
     
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/html-css%E6%88%90%E6%9E%9C%E5%B1%952%E4%BB%BF%E5%AF%AB%E6%8B%BC%E5%A4%9A%E5%A4%9A%E7%B6%B2%E7%AB%99/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/html-css-practice2/20240211_img0.png" loading="lazy" data-key="" data-hash="/post/html-css-practice2/20240211_img0.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">HTML&#43;CSS成果展(2)：仿寫拼多多網站</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
 
      
     
@@ -583,7 +679,7 @@
                 src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
                 
                 >
-            </script><script type="text/javascript" src="/ts/main.ce112b92e2539446c52e19f233321d31e001a69a3cb74d4a7af77be8ab73a636.js" defer></script>
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
 <script>
     (function () {
         const customFont = document.createElement('link');

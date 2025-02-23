@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Background photo by Artturi Jalli on Unsplash\n撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: sys, argparse, 以及 click，文章將介紹模組/套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。\nsys 模組 sys 屬於 python 內建模組，其下的 sys.argv[index] 是最基本的引入方式。\nsys.argv 的運行方式，是把bash command line 中輸入的指令存成一個list，並引入對應index的內容名稱。\nIndex 對照說明 假設撰寫名為 test.py 的 script:\n1 2 3 4 5 6 import sys input_var1 = sys.argv[1] print(&#34;sys index 0 : &#34; + sys.argv[0]) print(&#34;sys index 1 : &#34; + input_var1) 在 linux bash 執行 python script :\n1 python3 test.py apple 注意: sys 會將 script 名稱視為 sys.argv[0] 也就是index 0 不能使用，而外部參數的 index 會從 1 開始\n">
+<title>Python系列： 三種引入外部參數的方法</title>
+
+<link rel='canonical' href='https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97-%E4%B8%89%E7%A8%AE%E5%BC%95%E5%85%A5%E5%A4%96%E9%83%A8%E5%8F%83%E6%95%B8%E7%9A%84%E6%96%B9%E6%B3%95/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Python系列： 三種引入外部參數的方法">
+<meta property='og:description' content="Background photo by Artturi Jalli on Unsplash\n撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: sys, argparse, 以及 click，文章將介紹模組/套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。\nsys 模組 sys 屬於 python 內建模組，其下的 sys.argv[index] 是最基本的引入方式。\nsys.argv 的運行方式，是把bash command line 中輸入的指令存成一個list，並引入對應index的內容名稱。\nIndex 對照說明 假設撰寫名為 test.py 的 script:\n1 2 3 4 5 6 import sys input_var1 = sys.argv[1] print(&#34;sys index 0 : &#34; + sys.argv[0]) print(&#34;sys index 1 : &#34; + input_var1) 在 linux bash 執行 python script :\n1 python3 test.py apple 注意: sys 會將 script 名稱視為 sys.argv[0] 也就是index 0 不能使用，而外部參數的 index 會從 1 開始\n">
+<meta property='og:url' content='https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97-%E4%B8%89%E7%A8%AE%E5%BC%95%E5%85%A5%E5%A4%96%E9%83%A8%E5%8F%83%E6%95%B8%E7%9A%84%E6%96%B9%E6%B3%95/'>
+<meta property='og:site_name' content='Xuan&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2024-02-21T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-02-21T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/python-argument-input/20240221_img1.jpg' />
+<meta name="twitter:title" content="Python系列： 三種引入外部參數的方法">
+<meta name="twitter:description" content="Background photo by Artturi Jalli on Unsplash\n撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: sys, argparse, 以及 click，文章將介紹模組/套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。\nsys 模組 sys 屬於 python 內建模組，其下的 sys.argv[index] 是最基本的引入方式。\nsys.argv 的運行方式，是把bash command line 中輸入的指令存成一個list，並引入對應index的內容名稱。\nIndex 對照說明 假設撰寫名為 test.py 的 script:\n1 2 3 4 5 6 import sys input_var1 = sys.argv[1] print(&#34;sys index 0 : &#34; + sys.argv[0]) print(&#34;sys index 1 : &#34; + input_var1) 在 linux bash 執行 python script :\n1 python3 test.py apple 注意: sys 會將 script 名稱視為 sys.argv[0] 也就是index 0 不能使用，而外部參數的 index 會從 1 開始\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/post/python-argument-input/20240221_img1.jpg' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/profile_hu_d0d4f9ff9a7faeba.jpg" width="300"
+                            height="299" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Xuan&#39;s Blog</a></h1>
+            <h2 class="site-description">長大以後就是小瑄</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/pxchen110'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#sys-模組">sys 模組</a>
+      <ol>
+        <li><a href="#index-對照說明">Index 對照說明</a></li>
+        <li><a href="#實例">實例</a></li>
+        <li><a href="#comments">Comments</a></li>
+      </ol>
+    </li>
+    <li><a href="#argparse-模組">argparse 模組</a>
+      <ol>
+        <li><a href="#引入模組">引入模組</a></li>
+        <li><a href="#添加參數名稱">添加參數名稱</a></li>
+        <li><a href="#將參數後的內容引入變數">將參數後的內容引入變數</a></li>
+        <li><a href="#實例-1">實例</a></li>
+        <li><a href="#comments-1">Comments</a></li>
+      </ol>
+    </li>
+    <li><a href="#click-套件">click 套件</a>
+      <ol>
+        <li><a href="#實例-2">實例</a></li>
+        <li><a href="#comments-2">Comments</a></li>
+      </ol>
+    </li>
+    <li><a href="#參考資料">參考資料</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/python%E7%B3%BB%E5%88%97-%E4%B8%89%E7%A8%AE%E5%BC%95%E5%85%A5%E5%A4%96%E9%83%A8%E5%8F%83%E6%95%B8%E7%9A%84%E6%96%B9%E6%B3%95/">
+                
+                    <img src="/post/python-argument-input/20240221_img1.jpg" loading="lazy" alt="Featured image of post Python系列： 三種引入外部參數的方法" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/python/" >
+                Python
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/python%E7%B3%BB%E5%88%97-%E4%B8%89%E7%A8%AE%E5%BC%95%E5%85%A5%E5%A4%96%E9%83%A8%E5%8F%83%E6%95%B8%E7%9A%84%E6%96%B9%E6%B3%95/">Python系列： 三種引入外部參數的方法</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Feb 21, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>Background photo by <a class="link" href="https://unsplash.com/@artturijalli"  target="_blank" rel="noopener"
+    >Artturi Jalli</a> on <a class="link" href="https://unsplash.com/"  target="_blank" rel="noopener"
+    >Unsplash</a></p>
+<p>撰寫python script時，變數內容若能隨使用者彈性更改，可提升程式實用性；本文介紹三種常用的引入外部參數模組: <code>sys</code>, <code>argparse</code>, 以及 <code>click</code>，文章將介紹模組/套件的使用方式，撰寫相同輸出的實例，並分析優缺點以供讀者參考。</p>
+<!-- more -->
+<!-- toc -->
+<h2 id="sys-模組">sys 模組
+</h2><p><code>sys</code> 屬於 python 內建模組，其下的 <code>sys.argv[index]</code> 是最基本的引入方式。</p>
+<p><code>sys.argv</code> 的運行方式，是把bash command line 中輸入的指令存成一個list，並引入對應index的內容名稱。</p>
+<h3 id="index-對照說明">Index 對照說明
+</h3><p>假設撰寫名為 <code>test.py</code> 的 script:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">import</span> <span class="n">sys</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">input_var1</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;sys index 0 : &#34;</span> <span class="o">+</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;sys index 1 : &#34;</span> <span class="o">+</span> <span class="n">input_var1</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在 linux bash 執行 python script :</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">python3 test.py apple
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>注意: <code>sys</code> 會將 script 名稱視為 <code>sys.argv[0]</code> 也就是index 0 不能使用</strong>，而外部參數的 index 會從 <strong>1</strong> 開始</p>
+<p>綜合上述觀念，bash 輸出:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">sys index 0 : test.py
+</span></span><span class="line"><span class="cl">sys index 1 : apple
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="實例">實例
+</h3><p>撰寫名為 <code>test.py</code> 的 script:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">import sys
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">fruit = sys.argv[1]
+</span></span><span class="line"><span class="cl">price = sys.argv[2]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">print(&#34;The price of &#34; + fruit + &#34; is &#34; + price)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>bash 輸入參數 <code>python3 test.py apple 20</code> 得到</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">The price of apple is 20
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="comments">Comments
+</h3><p>sys 方式多用於測試階段，或是簡單的個人專案上，若需要<strong>引入多個參數，或是有協作專案的需求</strong>，sys會面臨以下缺點:</p>
+<ul>
+<li>index 引入很看重順序，參數太多增加錯誤機會</li>
+<li>且無法為下一個使用者<strong>解釋輸入參數的內容</strong>，降低推廣性</li>
+</ul>
+<p>接下來要介紹的兩個模組，都是針對不同參數給予特定名稱，並說明參數要求，提高script的實用性。</p>
+<h2 id="argparse-模組">argparse 模組
+</h2><p><code>argparse</code> 同屬於 python 內建模組，用於命令列剖析</p>
+<h3 id="引入模組">引入模組
+</h3><p>引入模組後先創建 <code>ArgumentParser</code> 物件以及設定參數</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">import argparse
+</span></span><span class="line"><span class="cl">parser = argparse.ArgumentParser(prog=None, usage=None, description=None, epilog=None)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>prog</code>: program 名稱，不指定寫 None，default 會帶入 python script 名稱
+<code>usage</code>: 告知使用者說應該怎麼使用 program，default 會帶入 script 名稱加上所有參數
+<code>description</code>: 一段文字說明程式功能
+<code>epilog</code>: 添加在 <code>--help</code> 訊息後的補充文字</p>
+<p>例子:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">## 撰寫 test.py
+</span></span><span class="line"><span class="cl">import argparse
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">parser = argparse.ArgumentParser(prog = None,
+</span></span><span class="line"><span class="cl">usage = None, description = &#39;this is description&#39;, 
+</span></span><span class="line"><span class="cl">epilog = &#39;this is eliog&#39;)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">## 在 bash 輸入 python3 test.py --help 會產生以下內容
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">usage: test.py [-h] --anno ANNO
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">this is description
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">options:
+</span></span><span class="line"><span class="cl">  -h, --help   show this help message and exit
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">this is eliog
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="添加參數名稱">添加參數名稱
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">parser.add_argument(&#34;--anno&#34;, required = T, help = &#34;required arguments&#34;)
+</span></span><span class="line"><span class="cl">parser.add_argument(&#34;--input&#34;, default =&#34;none&#34;)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>-a / --anno</code> 為自定義的參數flag，以將參數引入特殊變數內
+<code>required</code> 執行script 必須要有的參數，default = False
+<code>default</code> 當使用者沒給此項參數，則引入預先設定的default值
+<code>help</code> 針對參數的說明文字，使用 <code>--help</code> 後會顯示</p>
+<h3 id="將參數後的內容引入變數">將參數後的內容引入變數
+</h3><p>以 <code>args.parameter_flag</code> 的形式引入特定參數下的內容</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">args = parser.parse_args()
+</span></span><span class="line"><span class="cl">a = str(args.anno)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="實例-1">實例
+</h3><p>撰寫名為 <code>test.py</code> 的 script:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">import argparse
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">parser = argparse.ArgumentParser(description = &#34;print input friut type and their price&#34;)
+</span></span><span class="line"><span class="cl">parser.add_argument(&#39;-f&#39;, &#39;--fruit&#39;, required=True, help= &#34;name of fruit&#34;)
+</span></span><span class="line"><span class="cl">parser.add_argument(&#39;-p&#39;, &#39;--price&#39;, default = 20, help = &#34;price of item&#34;)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">args = parser.parse_args()
+</span></span><span class="line"><span class="cl">print(&#34;The price of &#34; + args.fruit + &#34; is &#34; + args.price)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>bash 輸入 <code>python3 test.py --help</code> 查看訊息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">usage: test.py [-h] -f FRUIT [-p PRICE]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">print input friut type and their price
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">options:
+</span></span><span class="line"><span class="cl">  -h, --help               show this help message and exit
+</span></span><span class="line"><span class="cl">  -f FRUIT, --fruit FRUIT  name of fruit
+</span></span><span class="line"><span class="cl">  -p PRICE, --price PRICE  price of item
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>bash 輸入參數 <code>python3 test.py --fruit apple --price 20</code> 得到</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">The price of apple is 20
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="comments-1">Comments
+</h3><p><code>argparse</code> 模組提升參數引入的複雜性與數量，增加在真實世界的使用機會；<strong>但複雜的步驟</strong>轉換（建立物件 &gt; add_args &gt; parse_args）讓人頭昏眼花，若能有更簡單的參數設定機制，可以減低程式撰寫的難易度</p>
+<h2 id="click-套件">click 套件
+</h2><p>click 官網以 <strong>creating beautiful command line interfaces</strong> 形容套件的核心功能</p>
+<p>下載並引入套件後，只需利用 <code>@click.command</code> 和 <code>@click_option</code> 即可產生和<code>argparse</code>等價的結果</p>
+<h3 id="實例-2">實例
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">import click
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">@click.command
+</span></span><span class="line"><span class="cl">@click.option(&#39;-f&#39;, &#39;--fruit&#39;,&#39;fruit&#39;, required=True, help= &#34;name of fruit&#34;)
+</span></span><span class="line"><span class="cl">@click.option(&#39;-p&#39;, &#39;--price&#39;, &#39;price&#39;, default = 20, help = &#34;price of item&#34;)
+</span></span><span class="line"><span class="cl">def main(fruit, price):
+</span></span><span class="line"><span class="cl">    print(&#34;The price of &#34; + fruit + &#34; is &#34; + str(price))
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">if __name__ == &#39;__main__&#39;:
+</span></span><span class="line"><span class="cl">    main()
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>bash 輸入參數 <code>python3 test.py --fruit apple --price 20</code>  得到相同console:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">The price of apple is 20
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="comments-2">Comments
+</h3><p>和 <code>argparse</code> 相比 <code>click</code> 語法更加簡潔，許多參數都相容，推薦新手可以直接使用click建立參數指令，但請注意 python 版本相容性，詳細可參考官網說明。</p>
+<h2 id="參考資料">參考資料
+</h2><blockquote>
+<p><a class="link" href="https://docs.python.org/zh-tw/3/library/sys.html#sys.argv"  target="_blank" rel="noopener"
+    >https://docs.python.org/zh-tw/3/library/sys.html#sys.argv</a>
+<a class="link" href="https://docs.python.org/zh-tw/3/howto/argparse.html"  target="_blank" rel="noopener"
+    >https://docs.python.org/zh-tw/3/howto/argparse.html</a>
+<a class="link" href="https://click.palletsprojects.com/en/8.1.x/"  target="_blank" rel="noopener"
+    >https://click.palletsprojects.com/en/8.1.x/</a>
+<a class="link" href="https://myapollo.com.tw/blog/python-click/"  target="_blank" rel="noopener"
+    >https://myapollo.com.tw/blog/python-click/</a></p></blockquote>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97subprocess%E6%A8%A1%E7%B5%84%E7%AE%A1%E7%90%86%E5%AD%90%E9%80%B2%E7%A8%8B/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-subprocess/20240222_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-subprocess/20240222_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列：subprocess模組管理子進程</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97-smtplib-%E6%A8%A1%E7%B5%84%E5%AF%A6%E7%8F%BE%E8%87%AA%E5%8B%95%E5%AF%84%E4%BF%A1/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-smtplib/20240215_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-smtplib/20240215_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列： smtplib 模組實現自動寄信</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "pxchen110-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 pxchen
+
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

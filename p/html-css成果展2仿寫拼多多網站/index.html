@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="參考資料來源：udemy 課程\n從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。\n學習流程：將影片要仿寫的部份截圖-&gt;自己寫看看-&gt;觀看課程影片比對老師和我的作法差異-&gt;改善程式-&gt;完成！\n大致的切版規劃: 切版成三區塊，以及一個固定於網頁左下方的qrcode，在html會分成四個&lt;div&gt;&lt;/div&gt;撰寫\nheader+nav(嚴格來說只有navigation bar) body(以相同模板套用內容並垂直排列) footer(下方聯絡資訊等樣式) qrcode banner Header+nav section 切版設計: html元素:\n圖片和nav文字都是 &lt;a&gt;&lt;/a&gt; 元素 css樣式重點:\n網頁滑動仍固定於上方: 1 2 3 4 position: fixed; /*固定在最上面*/ top: 0; /*定位*/ left: 0; /*定位*/ z-index: 999; /*滑動時不會被上來的div蓋住*/ nav的div以flex呈現水平排列，以border作為間隔，並清除尾端div的border 1 2 display: flex; /*將div以flex規劃排列方式，呈現清單*/ flex-direction: row; nav 下面的小div以border作為間隔 在倒數個div加上class name(.g-header-list-re)，練習以+方式清除最後一個div元素的border 1 2 3 4 5 border-right: 1px solid gray; .g-header-list-re + div { /*清除最後一個元素的border*/ border-right: none; } body section 切版設計: ">
+<title>HTML&#43;CSS成果展(2)：仿寫拼多多網站</title>
+
+<link rel='canonical' href='https://pxchen110.github.io/p/html-css%E6%88%90%E6%9E%9C%E5%B1%952%E4%BB%BF%E5%AF%AB%E6%8B%BC%E5%A4%9A%E5%A4%9A%E7%B6%B2%E7%AB%99/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="HTML+CSS成果展(2)：仿寫拼多多網站">
+<meta property='og:description' content="參考資料來源：udemy 課程\n從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。\n學習流程：將影片要仿寫的部份截圖-&gt;自己寫看看-&gt;觀看課程影片比對老師和我的作法差異-&gt;改善程式-&gt;完成！\n大致的切版規劃: 切版成三區塊，以及一個固定於網頁左下方的qrcode，在html會分成四個&lt;div&gt;&lt;/div&gt;撰寫\nheader+nav(嚴格來說只有navigation bar) body(以相同模板套用內容並垂直排列) footer(下方聯絡資訊等樣式) qrcode banner Header+nav section 切版設計: html元素:\n圖片和nav文字都是 &lt;a&gt;&lt;/a&gt; 元素 css樣式重點:\n網頁滑動仍固定於上方: 1 2 3 4 position: fixed; /*固定在最上面*/ top: 0; /*定位*/ left: 0; /*定位*/ z-index: 999; /*滑動時不會被上來的div蓋住*/ nav的div以flex呈現水平排列，以border作為間隔，並清除尾端div的border 1 2 display: flex; /*將div以flex規劃排列方式，呈現清單*/ flex-direction: row; nav 下面的小div以border作為間隔 在倒數個div加上class name(.g-header-list-re)，練習以+方式清除最後一個div元素的border 1 2 3 4 5 border-right: 1px solid gray; .g-header-list-re + div { /*清除最後一個元素的border*/ border-right: none; } body section 切版設計: ">
+<meta property='og:url' content='https://pxchen110.github.io/p/html-css%E6%88%90%E6%9E%9C%E5%B1%952%E4%BB%BF%E5%AF%AB%E6%8B%BC%E5%A4%9A%E5%A4%9A%E7%B6%B2%E7%AB%99/'>
+<meta property='og:site_name' content='Xuan&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='HTML' /><meta property='article:tag' content='CSS' /><meta property='article:published_time' content='2024-02-11T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-02-11T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/html-css-practice2/20240211_img0.png' />
+<meta name="twitter:title" content="HTML+CSS成果展(2)：仿寫拼多多網站">
+<meta name="twitter:description" content="參考資料來源：udemy 課程\n從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。\n學習流程：將影片要仿寫的部份截圖-&gt;自己寫看看-&gt;觀看課程影片比對老師和我的作法差異-&gt;改善程式-&gt;完成！\n大致的切版規劃: 切版成三區塊，以及一個固定於網頁左下方的qrcode，在html會分成四個&lt;div&gt;&lt;/div&gt;撰寫\nheader+nav(嚴格來說只有navigation bar) body(以相同模板套用內容並垂直排列) footer(下方聯絡資訊等樣式) qrcode banner Header+nav section 切版設計: html元素:\n圖片和nav文字都是 &lt;a&gt;&lt;/a&gt; 元素 css樣式重點:\n網頁滑動仍固定於上方: 1 2 3 4 position: fixed; /*固定在最上面*/ top: 0; /*定位*/ left: 0; /*定位*/ z-index: 999; /*滑動時不會被上來的div蓋住*/ nav的div以flex呈現水平排列，以border作為間隔，並清除尾端div的border 1 2 display: flex; /*將div以flex規劃排列方式，呈現清單*/ flex-direction: row; nav 下面的小div以border作為間隔 在倒數個div加上class name(.g-header-list-re)，練習以+方式清除最後一個div元素的border 1 2 3 4 5 border-right: 1px solid gray; .g-header-list-re + div { /*清除最後一個元素的border*/ border-right: none; } body section 切版設計: "><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/post/html-css-practice2/20240211_img0.png' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/profile_hu_d0d4f9ff9a7faeba.jpg" width="300"
+                            height="299" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Xuan&#39;s Blog</a></h1>
+            <h2 class="site-description">長大以後就是小瑄</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/pxchen110'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#大致的切版規劃">大致的切版規劃:</a></li>
+    <li><a href="#headernav-section">Header+nav section</a></li>
+    <li><a href="#body-section">body section</a></li>
+    <li><a href="#footer-section">footer section</a></li>
+    <li><a href="#qrcode-banner">qrcode banner</a></li>
+    <li><a href="#成果展示">成果展示</a></li>
+    <li><a href="#檢討回顧">檢討回顧</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/html-css%E6%88%90%E6%9E%9C%E5%B1%952%E4%BB%BF%E5%AF%AB%E6%8B%BC%E5%A4%9A%E5%A4%9A%E7%B6%B2%E7%AB%99/">
+                
+                    <img src="/post/html-css-practice2/20240211_img0.png" loading="lazy" alt="Featured image of post HTML&#43;CSS成果展(2)：仿寫拼多多網站" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/front-end/" >
+                Front-End
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/html-css%E6%88%90%E6%9E%9C%E5%B1%952%E4%BB%BF%E5%AF%AB%E6%8B%BC%E5%A4%9A%E5%A4%9A%E7%B6%B2%E7%AB%99/">HTML&#43;CSS成果展(2)：仿寫拼多多網站</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Feb 11, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>參考資料來源：udemy 課程</p>
+<p>從上次練習從零創造網頁佈局後，發現自己的技巧和美感都有待進步，決定跟著udemy課程的實作項目:搭建拼多多網站首頁，來學習真實網站有哪些常用的佈局和技巧。</p>
+<!-- more -->
+<p>學習流程：將影片要仿寫的部份截圖-&gt;自己寫看看-&gt;觀看課程影片比對老師和我的作法差異-&gt;改善程式-&gt;完成！</p>
+<!-- toc -->
+<h2 id="大致的切版規劃">大致的切版規劃:
+</h2><p><img src="/post/html-css-practice2/20240211_img1.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>切版成三區塊，以及一個固定於網頁左下方的qrcode，在html會分成四個<code>&lt;div&gt;&lt;/div&gt;</code>撰寫</p>
+<ul>
+<li>header+nav(嚴格來說只有navigation bar)</li>
+<li>body(以相同模板套用內容並垂直排列)</li>
+<li>footer(下方聯絡資訊等樣式)</li>
+<li>qrcode banner</li>
+</ul>
+<h2 id="headernav-section">Header+nav section
+</h2><p>切版設計:
+<img src="/post/html-css-practice2/20240211_img2.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>html元素:</p>
+<ul>
+<li>圖片和nav文字都是 <code>&lt;a&gt;&lt;/a&gt;</code> 元素</li>
+</ul>
+<p>css樣式重點:</p>
+<ul>
+<li>網頁滑動仍固定於上方:</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    position: fixed; /*固定在最上面*/
+</span></span><span class="line"><span class="cl">    top: 0; /*定位*/
+</span></span><span class="line"><span class="cl">    left: 0; /*定位*/
+</span></span><span class="line"><span class="cl">    z-index: 999; /*滑動時不會被上來的div蓋住*/
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>nav的div以flex呈現水平排列，以border作為間隔，並清除尾端div的border</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    display: flex; /*將div以flex規劃排列方式，呈現清單*/
+</span></span><span class="line"><span class="cl">    flex-direction: row; 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>nav 下面的小div以border作為間隔</li>
+<li>在倒數個div加上class name(.g-header-list-re)，練習以<code>+</code>方式清除最後一個div元素的border</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    border-right: 1px solid gray; 
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    .g-header-list-re + div  { /*清除最後一個元素的border*/
+</span></span><span class="line"><span class="cl">    border-right: none;  
+</span></span><span class="line"><span class="cl">    }
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="body-section">body section
+</h2><p>切版設計:
+<img src="/post/html-css-practice2/20240211_img3.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>html元素:</p>
+<ul>
+<li>由於區塊模板相似，做好一個候可以重複套用添加內容</li>
+<li>一個區塊以div包覆，下面分三個小div操作</li>
+<li>最上div面用 <code>&lt;p&gt;&lt;/p&gt;</code> 和 <code>&lt;a&gt;&lt;/a&gt;</code> 放置文字與連結點選</li>
+<li>中間div放大圖片</li>
+<li>下方div包含三個小div，放置圖片，文字等商品資訊</li>
+</ul>
+<p>css樣式重點:</p>
+<ul>
+<li>body整體以header做父元素定位，並做水平置中</li>
+<li>body寬度以view point為單位設定，使其可依照視窗縮放比例</li>
+<li>區塊模板以flex呈垂直排列</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    position: absolute; 
+</span></span><span class="line"><span class="cl">    top: 40%;
+</span></span><span class="line"><span class="cl">    left: 50%; /*搭配margin-left: -(width/2)做水平置中*/
+</span></span><span class="line"><span class="cl">    overflow: hidden;
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    display: flex;
+</span></span><span class="line"><span class="cl">    flex-direction: column;
+</span></span><span class="line"><span class="cl">    gap: 50px;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    margin-left: -40vw; /*寬度的一半做水平置中*/
+</span></span><span class="line"><span class="cl">    width: 80vw;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>區塊模版最上方的<code>&lt;p&gt;</code>和<code>&lt;a&gt;</code> 分別以 <code>float: left; float: right;</code> 浮動</li>
+<li>區塊模板下方再套用flex呈水平排列</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    display: flex;
+</span></span><span class="line"><span class="cl">    flex-direction: row;
+</span></span><span class="line"><span class="cl">    gap: 10px;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="footer-section">footer section
+</h2><p>切版設計:
+<img src="/post/html-css-practice2/20240211_img4.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>html元素:</p>
+<ul>
+<li>上方div內有兩個小div，分別放置qrcode跟聯絡資訊</li>
+<li>下方div跟header的nav清單相似，但以list寫法呈現</li>
+</ul>
+<p>css樣式重點:</p>
+<ul>
+<li>footer整體以body做父元素定位</li>
+<li>使用預先知道得body total height作為top距離，讓footer銜接在body下方</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    position:absolute;
+</span></span><span class="line"><span class="cl">    top: 3000px; /*不太好得做法，以body為父元素，body height為top距離*/
+</span></span><span class="line"><span class="cl">    padding-top: 60px;
+</span></span><span class="line"><span class="cl">    width:100vw; /*可依視窗大小縮放的寬度單位*/
+</span></span><span class="line"><span class="cl">    height:300px;
+</span></span><span class="line"><span class="cl">    background-color: lightgray;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>上方div內的兩個小div以<code>float:left;</code>做浮動
+<ul>
+<li>左側div以flex讓內部三個div呈水平排列，同時設定跟右側div相同的高度</li>
+<li>右側div主要調整的是p元素的間隔，高寬，以及與左側div的距離，並以border做區隔</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    /*左側div css*/
+</span></span><span class="line"><span class="cl">    display: flex; /*flex方式排列qrcodes*/
+</span></span><span class="line"><span class="cl">    flex-direction: row;
+</span></span><span class="line"><span class="cl">    gap: 10px; 
+</span></span><span class="line"><span class="cl">    height: 240px; /*讓img+text總高和右側聯絡資訊一樣*/
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    /*右側div css*/
+</span></span><span class="line"><span class="cl">    text-align: left;
+</span></span><span class="line"><span class="cl">    border-left: 1px solid black;
+</span></span><span class="line"><span class="cl">    margin-left: 15px;
+</span></span><span class="line"><span class="cl">    margin-bottom: 20px;
+</span></span><span class="line"><span class="cl">    padding-left: 45px;
+</span></span><span class="line"><span class="cl">    line-height: 30px;
+</span></span><span class="line"><span class="cl">    font-size: 20px;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>下方div(.g-footer-list)的list以更改<code>display:inline-block;</code>的方式呈水平排列，並保留設定元素寬度的能力</li>
+<li>練習以last-child或first-child方式移除頭尾元素的border</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    .g-footer-list ul li { /*以inline-block displayed list製作清單*/
+</span></span><span class="line"><span class="cl">    display: inline-block; /*可設長寬的元素*/
+</span></span><span class="line"><span class="cl">    border-left: 1px solid black;
+</span></span><span class="line"><span class="cl">    margin: 0 auto; /*給予寬度的情況下，margin auto可置中*/
+</span></span><span class="line"><span class="cl">    width: 100px;
+</span></span><span class="line"><span class="cl">    }
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    .g-footer-list li:first-child { /*remove border for the first element in the list*/
+</span></span><span class="line"><span class="cl">    border: none;
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="qrcode-banner">qrcode banner
+</h2><p>html元素:</p>
+<ul>
+<li>div包含img和兩個小div</li>
+</ul>
+<p>css樣式設計:</p>
+<ul>
+<li>整體定位，以網頁為父元素，固定浮動於左下方</li>
+<li>設定z-index浮動在body和footer上方</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    position: fixed; /*固定浮動在網頁左下方*/
+</span></span><span class="line"><span class="cl">    bottom: 50px;
+</span></span><span class="line"><span class="cl">    left: 100px;
+</span></span><span class="line"><span class="cl">    z-index: 998; /*不被body蓋住*/
+</span></span><span class="line"><span class="cl">    padding: 10px 30px;
+</span></span><span class="line"><span class="cl">    border: 1px solid gray;
+</span></span><span class="line"><span class="cl">    background-color: white;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>先設定圖片寬度，配合left和margin-left讓圖片水平置中於div內</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">img {
+</span></span><span class="line"><span class="cl">    position: relative;
+</span></span><span class="line"><span class="cl">    left: 50%;
+</span></span><span class="line"><span class="cl">    margin-left: -75px; 
+</span></span><span class="line"><span class="cl">    width: 150px;
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="成果展示">成果展示
+</h2><p><img src="/post/html-css-practice2/20240211_img0.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p><a class="link" href="https://github.com/pxchen110/html_case/tree/main/true_web_practice1"  target="_blank" rel="noopener"
+    >Github 原始碼 </a></p>
+<p>一併附上拚<a class="link" href="https://m.pinduoduo.com/"  target="_blank" rel="noopener"
+    >多多網站連結</a></p>
+<h2 id="檢討回顧">檢討回顧
+</h2><p>以上就是我得第一版網站仿寫，過程歷經許多trial and error，像是沒規劃好區塊，等寫到60%時又重新修改架構，打掉重練的狀況；也蠻常遇到加了css樣式但卻出不來的困惑。最後列出幾點我在udemy上學到的技巧，以及這一版仿寫有待改進的部分:</p>
+<ul>
+<li>navigation bar 應該也改成list製作會比較簡單，開太多div來包感覺沒意義</li>
+<li>footer出現在尾端的定位方式非robust，和body依賴性太高，萬一body新增內容豈不是要調整top數值?</li>
+<li>佔滿視窗大小並依比例調整，改用<strong>100%<strong>會比</strong>100vw</strong>好，原因可以參考<a class="link" href="https://ithelp.ithome.com.tw/articles/10251849"  target="_blank" rel="noopener"
+    >此網站的解釋</a></li>
+<li>透過將<code>float: left;`` float: right;</code> 設成一個class name，當有元素需要就加上這個class是有效率的方法</li>
+<li>同理可以新增清除浮動的class，有需要就加上</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"> .clearfix::after { /*清除浮動
+</span></span><span class="line"><span class="cl">    content: &#34;&#34;;
+</span></span><span class="line"><span class="cl">    display: block;
+</span></span><span class="line"><span class="cl">    clear: both;
+</span></span><span class="line"><span class="cl">} 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>一開始就設定所有的a元素都移除下底線，或所有list都移除符號</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/html/">HTML</a>
+        
+            <a href="/tags/css/">CSS</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/html-css%E6%88%90%E6%9E%9C%E5%B1%951%E5%8F%AF%E6%84%9B%E8%B2%93%E5%92%AA%E7%B6%B2%E7%AB%99/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/html-css-practice1/20240208_img2.png" loading="lazy" data-key="" data-hash="/post/html-css-practice1/20240208_img2.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">HTML&#43;CSS成果展(1)：可愛貓咪網站</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "pxchen110-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 pxchen
+
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

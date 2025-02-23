@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Background photo by Brett Jordan on Unsplash\n在信箱收件夾，不乏看到許多自動寄出的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信\nPart1: SMTP協定介紹 通訊協定，是協助資訊在不同軟硬體之間傳輸的方式，例如使用相同IP的兩台電腦，可以突破主機限制互相通訊。網際網路中，常用的通訊協定包含TCP/IP, HTTPS(TLS/SSL加密)，以及本文要使用的SMTP協定。 SMTP全名為簡易郵件傳輸通訊協定 (Simple Mail Transfer Protocol)，是透過網路在電腦與伺服器之間接收與傳送電子郵件的通訊方式。只要知道服務廠商的smtp, port, 並提供一個寄件帳號，就可以自動\\廣發信件給多名收件人。\n常見的廠商與smtp伺服器：\ngmail: smtp.gmail.com outlook: smtp-mail.outlook.com 常見的連接埠比較(內容節錄自cloudflare網站) :\n連接埠 25 最常用於 SMTP 伺服器之間的連線。如今，用於終端使用者網路的防火牆通常會封鎖該連接埠，因為垃圾郵件發送者嘗試濫用它來傳送大量垃圾郵件。\n連接埠 465 曾經專供具有安全通訊端層 (SSL) 加密的 SMTP 使用。但是 SSL 已被 Transport Layer Security (TLS) 取代，因此現代電子郵件系統不再使用該連接埠。它只存在於舊版（過時的）系統中。\n連接埠 587 現在是電子郵件提交的預設連接埠。透過此連接埠進行的 SMTP 通訊使用 TLS 加密。\nPart2: 撰寫python程式 python 提供 smtplib 模組來協助 smtp 封裝信息並傳輸給目標端。由於\n">
+<title>Python系列： smtplib 模組實現自動寄信</title>
+
+<link rel='canonical' href='https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97-smtplib-%E6%A8%A1%E7%B5%84%E5%AF%A6%E7%8F%BE%E8%87%AA%E5%8B%95%E5%AF%84%E4%BF%A1/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Python系列： smtplib 模組實現自動寄信">
+<meta property='og:description' content="Background photo by Brett Jordan on Unsplash\n在信箱收件夾，不乏看到許多自動寄出的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信\nPart1: SMTP協定介紹 通訊協定，是協助資訊在不同軟硬體之間傳輸的方式，例如使用相同IP的兩台電腦，可以突破主機限制互相通訊。網際網路中，常用的通訊協定包含TCP/IP, HTTPS(TLS/SSL加密)，以及本文要使用的SMTP協定。 SMTP全名為簡易郵件傳輸通訊協定 (Simple Mail Transfer Protocol)，是透過網路在電腦與伺服器之間接收與傳送電子郵件的通訊方式。只要知道服務廠商的smtp, port, 並提供一個寄件帳號，就可以自動\\廣發信件給多名收件人。\n常見的廠商與smtp伺服器：\ngmail: smtp.gmail.com outlook: smtp-mail.outlook.com 常見的連接埠比較(內容節錄自cloudflare網站) :\n連接埠 25 最常用於 SMTP 伺服器之間的連線。如今，用於終端使用者網路的防火牆通常會封鎖該連接埠，因為垃圾郵件發送者嘗試濫用它來傳送大量垃圾郵件。\n連接埠 465 曾經專供具有安全通訊端層 (SSL) 加密的 SMTP 使用。但是 SSL 已被 Transport Layer Security (TLS) 取代，因此現代電子郵件系統不再使用該連接埠。它只存在於舊版（過時的）系統中。\n連接埠 587 現在是電子郵件提交的預設連接埠。透過此連接埠進行的 SMTP 通訊使用 TLS 加密。\nPart2: 撰寫python程式 python 提供 smtplib 模組來協助 smtp 封裝信息並傳輸給目標端。由於\n">
+<meta property='og:url' content='https://pxchen110.github.io/p/python%E7%B3%BB%E5%88%97-smtplib-%E6%A8%A1%E7%B5%84%E5%AF%A6%E7%8F%BE%E8%87%AA%E5%8B%95%E5%AF%84%E4%BF%A1/'>
+<meta property='og:site_name' content='Xuan&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2024-02-15T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-02-15T00:00:00&#43;00:00'/><meta property='og:image' content='https://pxchen110.github.io/post/python-smtplib/20240215_img1.jpg' />
+<meta name="twitter:title" content="Python系列： smtplib 模組實現自動寄信">
+<meta name="twitter:description" content="Background photo by Brett Jordan on Unsplash\n在信箱收件夾，不乏看到許多自動寄出的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信\nPart1: SMTP協定介紹 通訊協定，是協助資訊在不同軟硬體之間傳輸的方式，例如使用相同IP的兩台電腦，可以突破主機限制互相通訊。網際網路中，常用的通訊協定包含TCP/IP, HTTPS(TLS/SSL加密)，以及本文要使用的SMTP協定。 SMTP全名為簡易郵件傳輸通訊協定 (Simple Mail Transfer Protocol)，是透過網路在電腦與伺服器之間接收與傳送電子郵件的通訊方式。只要知道服務廠商的smtp, port, 並提供一個寄件帳號，就可以自動\\廣發信件給多名收件人。\n常見的廠商與smtp伺服器：\ngmail: smtp.gmail.com outlook: smtp-mail.outlook.com 常見的連接埠比較(內容節錄自cloudflare網站) :\n連接埠 25 最常用於 SMTP 伺服器之間的連線。如今，用於終端使用者網路的防火牆通常會封鎖該連接埠，因為垃圾郵件發送者嘗試濫用它來傳送大量垃圾郵件。\n連接埠 465 曾經專供具有安全通訊端層 (SSL) 加密的 SMTP 使用。但是 SSL 已被 Transport Layer Security (TLS) 取代，因此現代電子郵件系統不再使用該連接埠。它只存在於舊版（過時的）系統中。\n連接埠 587 現在是電子郵件提交的預設連接埠。透過此連接埠進行的 SMTP 通訊使用 TLS 加密。\nPart2: 撰寫python程式 python 提供 smtplib 模組來協助 smtp 封裝信息並傳輸給目標端。由於\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://pxchen110.github.io/post/python-smtplib/20240215_img1.jpg' />
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/profile_hu_d0d4f9ff9a7faeba.jpg" width="300"
+                            height="299" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Xuan&#39;s Blog</a></h1>
+            <h2 class="site-description">長大以後就是小瑄</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/pxchen110'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#part1-smtp協定介紹">Part1: SMTP協定介紹</a></li>
+    <li><a href="#part2-撰寫python程式">Part2: 撰寫python程式</a>
+      <ol>
+        <li><a href="#step0-引入套件和開啟google-mail-權限">step0: 引入套件和開啟google mail 權限</a></li>
+        <li><a href="#step1-設定帳戶資訊">step1: 設定帳戶資訊</a></li>
+        <li><a href="#step2-撰寫郵件內容與寄件人">step2: 撰寫郵件內容與寄件人</a></li>
+        <li><a href="#step3-以擴充電子郵件標準來組合-email-結構">step3: 以擴充電子郵件標準來組合 email 結構</a></li>
+        <li><a href="#step4-設定smtp伺服器並寄信">step4: 設定smtp伺服器並寄信</a></li>
+      </ol>
+    </li>
+    <li><a href="#part3-完整script--成果展示">Part3: 完整script &amp; 成果展示</a></li>
+    <li><a href="#參考資料">參考資料</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/python%E7%B3%BB%E5%88%97-smtplib-%E6%A8%A1%E7%B5%84%E5%AF%A6%E7%8F%BE%E8%87%AA%E5%8B%95%E5%AF%84%E4%BF%A1/">
+                
+                    <img src="/post/python-smtplib/20240215_img1.jpg" loading="lazy" alt="Featured image of post Python系列： smtplib 模組實現自動寄信" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/python/" >
+                Python
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/python%E7%B3%BB%E5%88%97-smtplib-%E6%A8%A1%E7%B5%84%E5%AF%A6%E7%8F%BE%E8%87%AA%E5%8B%95%E5%AF%84%E4%BF%A1/">Python系列： smtplib 模組實現自動寄信</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Feb 15, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>Background photo by <a class="link" href="https://unsplash.com/@brett_jordan"  target="_blank" rel="noopener"
+    >Brett Jordan</a> on <a class="link" href="https://unsplash.com/"  target="_blank" rel="noopener"
+    >Unsplash</a></p>
+<p>在信箱收件夾，不乏看到許多<strong>自動寄出</strong>的信件，像是來自 slurm job 通知分析狀態的信，以及訂閱內容的自動通知等。自動寄信不僅節省人力操作，也可廣發信件增加傳播效率。今天就要介紹如何用python實現自動寄信</p>
+<!-- more -->
+<!-- toc -->
+<h2 id="part1-smtp協定介紹">Part1: SMTP協定介紹
+</h2><p>通訊協定，是協助資訊在不同軟硬體之間傳輸的方式，例如使用相同IP的兩台電腦，可以突破主機限制互相通訊。網際網路中，常用的通訊協定包含TCP/IP, HTTPS(TLS/SSL加密)，以及本文要使用的SMTP協定。
+SMTP全名為簡易郵件傳輸通訊協定 (Simple Mail Transfer Protocol)，是透過網路在電腦與伺服器之間<strong>接收與傳送電子郵件</strong>的通訊方式。只要知道服務廠商的smtp, port, 並提供一個寄件帳號，就可以自動\廣發信件給多名收件人。</p>
+<p>常見的廠商與smtp伺服器：</p>
+<ul>
+<li>gmail:  <code>smtp.gmail.com</code></li>
+<li>outlook: <code>smtp-mail.outlook.com</code></li>
+</ul>
+<p>常見的連接埠比較(內容節錄自<a class="link" href="https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/"  target="_blank" rel="noopener"
+    >cloudflare網站</a>) :</p>
+<blockquote>
+<p>連接埠 25 最常用於 SMTP 伺服器之間的連線。如今，用於終端使用者網路的防火牆通常會封鎖該連接埠，因為垃圾郵件發送者嘗試濫用它來傳送大量垃圾郵件。</p>
+<p>連接埠 465 曾經專供具有安全通訊端層 (SSL) 加密的 SMTP 使用。但是 SSL 已被 Transport Layer Security (TLS) 取代，因此現代電子郵件系統不再使用該連接埠。它只存在於舊版（過時的）系統中。</p>
+<p>連接埠 587 現在是電子郵件提交的預設連接埠。透過此連接埠進行的 SMTP 通訊使用 TLS 加密。</p></blockquote>
+<h2 id="part2-撰寫python程式">Part2: 撰寫python程式
+</h2><p>python 提供 smtplib 模組來協助 smtp 封裝信息並傳輸給目標端。由於</p>
+<h3 id="step0-引入套件和開啟google-mail-權限">step0: 引入套件和開啟google mail 權限
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">import smtplib
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>除了基本模組，常搭配擴充電子郵件標準套件，來處理內文部分</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">from email.mime.multipart import MIMEMultipart #email內容載體
+</span></span><span class="line"><span class="cl">from email.mime.text import MIMEText           #製作郵件內文
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>若要在gmail使用smtplib，需要到 <a class="link" href="https://myaccount.google.com/security"  target="_blank" rel="noopener"
+    >google 帳戶的安全性頁面</a> 完成帳戶密碼設定(下圖紅框標示處)</p>
+<p><img src="/post/python-smtplib/20240215_img2.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h3 id="step1-設定帳戶資訊">step1: 設定帳戶資訊
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">MAIL_USER = &#34;from_who_user_@gmail...&#34;  #寄件者email帳號
+</span></span><span class="line"><span class="cl">MAIL_PASSWD = &#34;......&#34;                 #寄件者email密碼
+</span></span><span class="line"><span class="cl">FROM_ADDRESS = MAIL_USER               #和寄件者相同
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 郵件平台的主機 port (這裡使用 gmail smtp 伺服器)
+</span></span><span class="line"><span class="cl">MAIL_SMTP = &#34;smtp.gmail.com&#34;
+</span></span><span class="line"><span class="cl">MAIL_PORT = 587                        #安全加密port &#34;587&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="step2-撰寫郵件內容與寄件人">step2: 撰寫郵件內容與寄件人
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">to_address = &#34;to_who_@gmail...&#34;        #收件者email帳號
+</span></span><span class="line"><span class="cl">body_content = &#34;&#34;                      #輸入郵件內文
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="step3-以擴充電子郵件標準來組合-email-結構">step3: 以擴充電子郵件標準來組合 email 結構
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">mail = MIMEMultipart()
+</span></span><span class="line"><span class="cl">mail[&#39;From&#39;] = FROM_ADDRESS            #寄件者
+</span></span><span class="line"><span class="cl">mail[&#39;Subject&#39;] = &#34;the subject&#34;        #主旨
+</span></span><span class="line"><span class="cl">mail[&#39;To&#39;] = to_address                #收件者
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mail.attach(MIMEText(body_content))    #以attach方式貼上內文
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="step4-設定smtp伺服器並寄信">step4: 設定smtp伺服器並寄信
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">smtpserver = smtplib.SMTP(MAIL_SMTP, MAIL_PORT)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 發出「Hello」訊息，以在用戶端和伺服器之間建立SMTP連線
+</span></span><span class="line"><span class="cl">smtpserver.ehlo()   
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># TLS加密：延伸保護 SMTP 階段作業
+</span></span><span class="line"><span class="cl">smtpserver.starttls() 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 登入寄件人郵件系統
+</span></span><span class="line"><span class="cl">smtpserver.login(MAIL_USER. MAIL_PASSWD) 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 將step3產生的信件內容轉成string並寫入
+</span></span><span class="line"><span class="cl">smtpserver.sendmail(FROM_ADDRESS, to_address, mail.as_string()) 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 結束系統連線
+</span></span><span class="line"><span class="cl">server.quit() 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="part3-完整script--成果展示">Part3: 完整script &amp; 成果展示
+</h2><p>附上完整的 python script
+<strong>注意: 由於使用個人主機測試，才敢將信箱帳密直接輸入在command line、由 sys 存取，若在公用主機請注意資安考量。</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">#!/usr/bin/env python3
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">import os
+</span></span><span class="line"><span class="cl">import sys
+</span></span><span class="line"><span class="cl">import smtplib
+</span></span><span class="line"><span class="cl">from email.mime.multipart import MIMEMultipart
+</span></span><span class="line"><span class="cl">from email.mime.text import MIMEText
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mail_user = sys.argv[1]
+</span></span><span class="line"><span class="cl">mail_passwd = sys.argv[2]
+</span></span><span class="line"><span class="cl">from_address = mail_user
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mail_smtp = &#34;smtp.gmail.com&#34;
+</span></span><span class="line"><span class="cl">mail_port = 587
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">to_address = sys.argv[3]
+</span></span><span class="line"><span class="cl">body_content = &#34;&#34;&#34;
+</span></span><span class="line"><span class="cl">    This is the auto-send email test 
+</span></span><span class="line"><span class="cl">&#34;&#34;&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mail = MIMEMultipart()
+</span></span><span class="line"><span class="cl">mail[&#39;From&#39;] = mail_user
+</span></span><span class="line"><span class="cl">mail[&#39;To&#39;] = to_address
+</span></span><span class="line"><span class="cl">mail[&#39;Subject&#39;] = &#34;Test for smtp email-sender&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mail.attach(MIMEText(body_content))
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">server = smtplib.SMTP(mail_smtp, mail_port)
+</span></span><span class="line"><span class="cl">server.ehlo()
+</span></span><span class="line"><span class="cl">server.starttls()
+</span></span><span class="line"><span class="cl">server.login(mail_user, mail_passwd)
+</span></span><span class="line"><span class="cl">server.sendmail(mail_user, to_address, mail.as_string())
+</span></span><span class="line"><span class="cl">server.quit()
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>到收件者的信箱查看，成功收到如下圖的信件</p>
+<p><img src="/post/python-smtplib/20240215_img3.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h2 id="參考資料">參考資料
+</h2><p><a class="link" href="https://aws.amazon.com/tw/what-is/smtp/"  target="_blank" rel="noopener"
+    >https://aws.amazon.com/tw/what-is/smtp/</a>
+<a class="link" href="https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/"  target="_blank" rel="noopener"
+    >https://www.cloudflare.com/zh-tw/learning/email-security/what-is-smtp/</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97subprocess%E6%A8%A1%E7%B5%84%E7%AE%A1%E7%90%86%E5%AD%90%E9%80%B2%E7%A8%8B/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-subprocess/20240222_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-subprocess/20240222_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列：subprocess模組管理子進程</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/python%E7%B3%BB%E5%88%97-%E4%B8%89%E7%A8%AE%E5%BC%95%E5%85%A5%E5%A4%96%E9%83%A8%E5%8F%83%E6%95%B8%E7%9A%84%E6%96%B9%E6%B3%95/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/post/python-argument-input/20240221_img1.jpg" loading="lazy" data-key="" data-hash="/post/python-argument-input/20240221_img1.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python系列： 三種引入外部參數的方法</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "pxchen110-blog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 pxchen
+
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
